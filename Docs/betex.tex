@@ -1,0 +1,49 @@
+\documentclass[a4paper,12pt]{article}
+%Compile with TEX->PDF
+\usepackage[pdftex]{color}
+\newcommand{\betex}{\textcolor{blue}{$\beta$}\textcolor{red}{$\epsilon$}$\tau\epsilon\chi$\hspace{1mm}}
+\newcommand{\beos}{\textcolor{blue}{B}\textcolor{red}{e}OS}
+\usepackage[pdftex]{graphicx}
+\DeclareGraphicsExtensions{.png}
+
+\title{\includegraphics[width=124bp,height=50bp]{betex_logo}\\User Manual}
+\author{Brent Miszalski\\misza@ihug.com.au\\http://misza.beosjournal.org}
+
+\begin{document}
+
+\maketitle
+\abstract{The \beos\hspace{1mm}has been severely lacking a professional latex editor, let alone \TeX/\LaTeX\hspace{1mm}itself. I present a complete solution for the creation and compilation of latex documents for the \beos.
+The \betex application is the hub of the solution, utilising tetex, ghostscript and latex2html.}
+\section{Introduction}
+\betex is the premier \TeX/\LaTeX\hspace{1mm}editor for the \beos. With it you can create, compile and preview your latex documents all from within the one, user-friendly interface.
+
+\betex is freeware and the source `may' be released at a later date, at the moment it's not fit for release.
+ 
+\section{Usage}
+The following entails some information on \betex basics.
+\subsection{Opening Files}
+Currently \betex only supports opening files of the ``text/x-tex'' filetype with .tex extension. This means that if you want to open text files with \betex you must first change their mimetype by selecting the files, pressing opt-alt-f to bring up the filetype dialog and changing the filetype. I have chosen this way because \betex is not a text file editor just as much as SoundPlay isn't.
+
+You can open files in many different ways in \betex. The simplest is to choose open from the file menu of click on the folder icon in the main toolbar. To open multiple files stored in a folder (or even in multiple sub-folders, it's recursive), you can either drop the parent folder onto \betex (when running onto the GUI \textbf{OR} onto the \betex icon whilst holding shift) \textbf{OR} choose ``Open Folder\ldots'' from the file menu and select the folder, then ``Open''.
+
+Another way to ``open'' files is using \betex's template support. In the same folder as the \betex application is a ``Templates'' folder where you can store latex documents to be used as templates. To open one select ``Open Template'' from the file menu. This will open a \emph{new} document with the contents of the template. To do any serious work on the new document you will need to save it to your own location (templates are read-only).
+
+Anytime a latex document is opened in \betex it is added to the recent documents list, appended to the ``Open'' menu item in the file menu. You can configure some of the properties of the recent documents list in Preferences $\to$ General.
+
+\betex is, naturally, the default ``handler'' of latex documents and thus any documents you open in the tracker will launch \betex. If \betex is already open and in another workspace, it is possible for \betex to become the active window when a document is opened, see Preferences $\to$ General.
+\subsection{Saving Files}
+Saving files in \betex is straight forward, however there are a few things that need to be mentioned. To be able to compile or preview documents they need to be saved to a location. While working on documents, altered status is indicated by a blue italicised filename in the \betex document list.
+
+\section{How You CAN Help}
+If you have any suggestions for \betex please let me know!
+If you like \betex please consider making a donation (see About box).
+
+\section{Acknowledgements}
+Thanks to:
+\begin{itemize}
+\item{YNOP for SplitPane}
+\item{Michael Pfeiffer}
+\item{Eli Dayan}
+\end{itemize}
+
+\end{document}
