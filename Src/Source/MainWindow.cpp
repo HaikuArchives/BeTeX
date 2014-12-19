@@ -790,19 +790,13 @@ void MainWindow::MessageReceived(BMessage* message)
 					dimChooser->Activate(true);
 					break;
 				}
-				BPoint p;
-				uint32 buttons;
-				LastMouseMovedView()->GetMouse(&p, &buttons);
-				ConvertToScreen(&p);
-				p.x-=30;
-				p.y-=30;
+
 				float w=150,h=115;
-				dimChooser = new DimensionWindow(BRect(p.x,p.y,p.x+w,p.y+h),
+				dimChooser = new DimensionWindow(BRect(0,0,w,h),
 						new BMessenger(this), "10", "10",
 						MenuConstants::K_MENU_INSERT_ARRAY_WITHDIM);
 				dimChooser->Show();
-		
-		
+				dimChooser->CenterOnScreen();
 		}
 		break;
 		case K_MENU_INSERT_ARRAY_WITHDIM:
@@ -840,19 +834,12 @@ void MainWindow::MessageReceived(BMessage* message)
 					dimChooser->Activate(true);
 					break;
 				}
-				BPoint p;
-				uint32 buttons;
-				LastMouseMovedView()->GetMouse(&p, &buttons);
-				ConvertToScreen(&p);
-				p.x-=30;
-				p.y-=30;
 				float w=150,h=115;
-				dimChooser = new DimensionWindow(BRect(p.x,p.y,p.x+w,p.y+h),
+				dimChooser = new DimensionWindow(BRect(0,0,w,h),
 						new BMessenger(this),"10","10",
 						MenuConstants::K_MENU_INSERT_MATRIX_WITHDIM);
 				dimChooser->Show();
-		
-		
+				dimChooser->CenterOnScreen();
 		}
 		break;
 		case K_MENU_INSERT_MATRIX_WITHDIM:
@@ -890,19 +877,13 @@ void MainWindow::MessageReceived(BMessage* message)
 					dimChooser->Activate(true);
 					break;
 				}
-				BPoint p;
-				uint32 buttons;
-				LastMouseMovedView()->GetMouse(&p, &buttons);
-				ConvertToScreen(&p);
-				p.x-=30;
-				p.y-=30;
+
 				float w=150,h=115;
-				dimChooser = new DimensionWindow(BRect(p.x,p.y,p.x+w,p.y+h),
+				dimChooser = new DimensionWindow(BRect(0,0,w,h),
 						new BMessenger(this),"10","10",
 						MenuConstants::K_MENU_INSERT_TABULAR_WITHDIM);
 				dimChooser->Show();
-		
-		
+				dimChooser->CenterOnScreen();
 		}
 		break;
 		case K_MENU_INSERT_TABULAR_WITHDIM:
@@ -1034,14 +1015,9 @@ void MainWindow::MessageReceived(BMessage* message)
 					rgbTxtChooser->Activate(true);
 					break;
 				}
-				BPoint p;
-				uint32 buttons;
-				LastMouseMovedView()->GetMouse(&p, &buttons);
-				ConvertToScreen(&p);
-				p.x-=30;
-				p.y-=30;
+
 				float w=350,h=115;
-				rgbTxtChooser = new ColourWindow(BRect(p.x,p.y,p.x+w,p.y+h),
+				rgbTxtChooser = new ColourWindow(BRect(0,0,w,h),
 						new BMessenger(this),prefs->RGBText_color);
 				rgbTxtChooser->Show();
 			}
@@ -1504,15 +1480,10 @@ void MainWindow::MessageReceived(BMessage* message)
 				break;
 			}
 
-			BPoint p;
-			uint32 buttons;
-			LastMouseMovedView()->GetMouse(&p,&buttons);
-			ConvertToScreen(&p);
-			p.x-=30;
-			p.y-=30;
 			float w=600,h=400;
-			prefsPanel = new PrefsWindow(BRect(p.x,p.y,p.x+w,p.y+h),new BMessenger(this));
+			prefsPanel = new PrefsWindow(BRect(0,0,w,h),new BMessenger(this));
 			prefsPanel->Show();
+			prefsPanel->CenterOnScreen();
 		}
 		break;
 		case K_MENU_EDIT_SEARCH:
@@ -1523,15 +1494,10 @@ void MainWindow::MessageReceived(BMessage* message)
 				break;
 			}
 
-			BPoint p;
-			uint32 buttons;
-			LastMouseMovedView()->GetMouse(&p,&buttons);
-			ConvertToScreen(&p);
-			p.x-=30;
-			p.y-=30;
 			float w=380,h=235;
-			searchPanel = new SearchWindow(BRect(p.x,p.y,p.x+w,p.y+h),new BMessenger(this));
+			searchPanel = new SearchWindow(BRect(0,0,w,h),new BMessenger(this));
 			searchPanel->Show();		
+			searchPanel->CenterOnScreen();
 		}
 		break;
 		case AboutMessages::K_ABOUT_WINDOW_LAUNCH:
@@ -1541,14 +1507,9 @@ void MainWindow::MessageReceived(BMessage* message)
 				aboutPanel->Activate(true);
 				break;
 			}
-			BPoint p;
-			uint32 buttons;
-			LastMouseMovedView()->GetMouse(&p,&buttons);
-			ConvertToScreen(&p);
-			p.x-=15;
-			p.y-=15;
-			aboutPanel = new AboutWindow(BRect(p.x,p.y,p.x+400,p.y+300),new BMessenger(this));
+			aboutPanel = new AboutWindow(BRect(0,0,400,300),new BMessenger(this));
 			aboutPanel->Show();
+			aboutPanel->CenterOnScreen();
 		}
 		break;
 		case K_GTL_WINDOW_GO:
