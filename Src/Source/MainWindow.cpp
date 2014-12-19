@@ -801,8 +801,8 @@ void MainWindow::MessageReceived(BMessage* message)
 		break;
 		case K_MENU_INSERT_ARRAY_WITHDIM:
 		{
-			int32 rows = 10;
-			int32 cols = 10;
+			int32 rows = atoi(message->GetString(K_ROWS, "10"));
+			int32 cols = atoi(message->GetString(K_COLS, "10"));
 
 				BString insert="\\begin{array}{";
 				int i;
@@ -844,8 +844,8 @@ void MainWindow::MessageReceived(BMessage* message)
 		break;
 		case K_MENU_INSERT_MATRIX_WITHDIM:
 		{
-			int32 rows = 10;
-			int32 cols = 10;
+			int32 rows = atoi(message->GetString(K_ROWS, "10"));
+			int32 cols = atoi(message->GetString(K_COLS, "10"));
 
 				BString insert="\\left(\n\\begin{array}{";
 				int i;
@@ -888,8 +888,8 @@ void MainWindow::MessageReceived(BMessage* message)
 		break;
 		case K_MENU_INSERT_TABULAR_WITHDIM:
 		{
-			int32 rows = 10;
-			int32 cols = 10;
+			int32 rows = atoi(message->GetString(K_ROWS, "10"));
+			int32 cols = atoi(message->GetString(K_COLS, "10"));
 
 				BString insert="\\begin{tabular}{|";
 				int i;
