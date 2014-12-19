@@ -10,9 +10,11 @@
 #include <be/interface/ScrollView.h>
 #include <be/storage/Path.h>
 #include <be/storage/FilePanel.h>
+#include <be/storage/NodeMonitor.h>
 #include <be/support/String.h>
 #include <vector>
 
+#include "iconheaders/ConverterIcons.h"
 #include "BubbleHelper.h"
 #include "SplitPane.h"
 #include "TexView.h"
@@ -195,10 +197,10 @@ class MainWindow : public BWindow
 
 			
 			
-		MainTBar* mtbar;			
 		StatusBar* m_statusBar;
 		BMessage* printer_settings;		
-			
+
+		Prefs* prefs;
 };
 #endif
 

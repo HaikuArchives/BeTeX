@@ -116,6 +116,11 @@ BView* ProjectItem::ChildView()
 	return m_childView;
 }
 
+BTextView* ProjectItem::TextView()
+{
+	return (BTextView*)m_childView;
+}
+
 void ProjectItem::SetSaveNeeded(bool needsSave)
 {
 	m_needToSave = needsSave;
@@ -134,4 +139,24 @@ void ProjectItem::SetHomely(bool hasHome)
 bool ProjectItem::IsHomely()
 {
 	return m_hasHome;
+}
+
+void ProjectItem::SetLabel(BString str)
+{
+	m_label = str;
+}
+
+BString ProjectItem::Label()
+{
+	return m_label;
+}
+
+void ProjectItem::SetRef(entry_ref* ref)
+{
+	m_ref = *ref;
+}
+
+entry_ref ProjectItem::GetRef() const
+{
+	return m_ref;
 }

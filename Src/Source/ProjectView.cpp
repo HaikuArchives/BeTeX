@@ -21,6 +21,10 @@ ProjectView::ProjectView(BRect frame, BScrollView *dView)
 {			
 }
 
+ProjectView::~ProjectView()
+{
+}
+
 void ProjectView::SelectionChanged()
 {
 	if(m_lastSelectedIndex >= 0)

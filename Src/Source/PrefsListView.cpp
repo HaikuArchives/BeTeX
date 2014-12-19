@@ -18,6 +18,10 @@ PrefsListView::PrefsListView(BRect frame, BView* parent)
 {
 }
 
+PrefsListView::~PrefsListView()
+{
+}
+
 void PrefsListView::SelectionChanged()
 {
 	

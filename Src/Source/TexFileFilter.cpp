@@ -18,7 +18,7 @@ TexFileFilter::TexFileFilter()
 	
 }
 
-bool TexFileFilter::Filter(const entry_ref* ref, BNode* node, struct stat* st, const char* filetype)
+bool TexFileFilter::Filter(const entry_ref* ref, BNode* node, struct stat_beos* st, const char* filetype)
 {
 	bool isOk = false;
 	char type[256];
