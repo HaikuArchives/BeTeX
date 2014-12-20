@@ -16,6 +16,8 @@ StatusBar::StatusBar(BRect frame)
 				m_statusText("")			
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_NO_VERTICAL));
+	SetExplicitSize(BSize(Bounds().Width(), Bounds().Height()));
 }
 
 StatusBar::~StatusBar()

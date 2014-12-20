@@ -92,8 +92,11 @@ void SplitPane::Draw(BRect f){
       SetHighColor(255,255,255);
       FillRect(BRect(pos+1,Bounds().top+pad+1,pos+2,Bounds().bottom-pad-1)); // 255
    
-      //SetHighColor(216,216,216);
-      SetHighColor(Parent()->ViewColor());
+	  if(Parent())
+		  SetHighColor(Parent()->ViewColor());
+	  else
+		  SetHighColor(216,216,216);
+
       FillRect(BRect(pos+2,Bounds().top+pad+1,pos+thickness-2,Bounds().bottom-pad-1));// 216
    
       SetHighColor(145,145,145);

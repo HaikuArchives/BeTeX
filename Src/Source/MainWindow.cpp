@@ -7,9 +7,11 @@
 #include <be/app/Roster.h>
 #include <be/app/Clipboard.h>
 #include <be/interface/Alert.h>
+#include <be/interface/Alignment.h>
 #include <be/interface/Menu.h>
 #include <be/interface/ScrollBar.h>
 #include <be/interface/PrintJob.h>
+#include <be/interface/LayoutBuilder.h>
 #include <be/storage/Entry.h>
 #include <be/storage/File.h>
 #include <be/storage/Node.h>
@@ -44,13 +46,11 @@ MainWindow::MainWindow(BRect frame)
 {
 	BView *backgroundView = new BView(Bounds(),"parent",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
 	backgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(backgroundView);
 
 	prefs = new Prefs();
 
 	//Setup our MenuBar
 	BMenuBar* menubar = new BMenuBar(frame,"menu_bar");
-	backgroundView->AddChild(menubar);
 	CreateMenuBar(menubar);
 	
 	float statusBarHeight = 14.0f;	
@@ -62,7 +62,6 @@ MainWindow::MainWindow(BRect frame)
 	float menuBarHeight = (menubar->Bounds()).Height();
 	BRect toolBarFrame(0.0f, menuBarHeight + 1.0f, frame.Width(), menuBarHeight + 37.0f);
 	m_toolBar = new MainTBar(toolBarFrame, helper);
-	backgroundView->AddChild(m_toolBar);
 		
 	TLIST_VIEW_WIDTH = 178;
 	BRect Trect(0.0f, 0.0f, frame.Width(), frame.Height() - statusBarHeight);
@@ -90,7 +89,6 @@ MainWindow::MainWindow(BRect frame)
 	m_horizontalSplit->SetAlignment(B_VERTICAL);
 	m_horizontalSplit->SetEditable(false);	
 	m_horizontalSplit->SetBarPosition(TLIST_VIEW_WIDTH);	
-	backgroundView->AddChild(m_horizontalSplit);
 		
 	//if(prefs->splitmsg == NULL && prefs->split_leftmsg == NULL)
 	//{
@@ -100,8 +98,6 @@ MainWindow::MainWindow(BRect frame)
 	
 	BRect statusBarFrame(0.0f, frame.bottom - statusBarHeight, frame.Width(), frame.bottom);
 	m_statusBar = new StatusBar(statusBarFrame);
-	backgroundView->AddChild(m_statusBar);	
-	m_statusBar->SetText("BeTeX");
 	
 	untitled_no = 1;
 	const int UPDATE_TIME = 600000000/2;	// 10/2=5 minutes
@@ -145,6 +141,17 @@ MainWindow::MainWindow(BRect frame)
 	insertfilePanel->SetTarget(this);	
 		
 	ResetPermissions();
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_NO_VERTICAL))
+		.Add(menubar)
+		.Add(m_toolBar)
+		.Add(m_horizontalSplit)
+		.Add(m_statusBar);
+
+	BSize size = GetLayout()->PreferredSize();
+	ResizeTo(size.Width(), size.Height());
+
+	m_statusBar->SetText("BeTeX");
 }
 
 MainWindow::~MainWindow()

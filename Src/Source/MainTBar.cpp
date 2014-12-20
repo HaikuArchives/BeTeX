@@ -154,8 +154,9 @@ MainTBar::MainTBar(BRect r,BubbleHelper* h) : BView(r,"maintbar",B_FOLLOW_NONE,B
 			AddChild(TBPrevHTML = new TButton(tiler,new BMessage(K_CMD_LAUNCH_HTMLVIEWER),PrevHTMLBitmap));
 			helper->SetHelp(TBPrevHTML,"View HTML Document");
 			tiler.OffsetBy(offset,0);
-		
-	
+
+	SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_NO_VERTICAL));
+	SetExplicitMaxSize(BSize(32 * (CountChildren() + 1), 33));
 }
 void MainTBar::Draw(BRect r)
 {
