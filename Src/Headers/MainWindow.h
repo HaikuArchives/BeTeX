@@ -27,6 +27,7 @@
 #include "ProjectItem.h"
 #include "StatusBar.h"
 #include "TexBar.h"
+#include "MainTBar.h"
 
 class MainWindow : public BWindow
 {
@@ -195,8 +196,7 @@ class MainWindow : public BWindow
 			*/
 		TexView* tv;
 
-			
-			
+		MainTBar* m_toolBar;
 		StatusBar* m_statusBar;
 		BMessage* printer_settings;		
 

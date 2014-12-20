@@ -61,7 +61,8 @@ SRCS = Src/Source/AboutWindow.cpp \
 	   Src/Source/MainWindow.cpp \
 	   Src/Source/ProjectView.cpp \
 	   Src/Source/TexFileFilter.cpp \
-	   Src/Source/ToolbarSupport.cpp
+	   Src/Source/ToolbarSupport.cpp \
+	   Src/Source/MainTBar.cpp
 
 #	Specify the resource definition files to use. Full or relative paths can be
 #	used.

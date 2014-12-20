@@ -30,6 +30,7 @@
 #include "Preferences.h"
 #include "MessageFields.h"
 #include "ConverterIcons.h"
+#include "MainTBar.h"
 
 using namespace MenuConstants;
 using namespace PrefsConstants;
@@ -60,6 +61,8 @@ MainWindow::MainWindow(BRect frame)
 	//Create Toolbar
 	float menuBarHeight = (menubar->Bounds()).Height();
 	BRect toolBarFrame(0.0f, menuBarHeight + 1.0f, frame.Width(), menuBarHeight + 37.0f);
+	m_toolBar = new MainTBar(toolBarFrame, helper);
+	backgroundView->AddChild(m_toolBar);
 		
 	TLIST_VIEW_WIDTH = 178;
 	BRect Trect(0.0f, 0.0f, frame.Width(), frame.Height() - statusBarHeight);
@@ -471,6 +474,22 @@ void MainWindow::ResetPermissions()
 		fpdf->SetEnabled(false);
 		fhtml->SetEnabled(false);
 		
+		m_toolBar->TBSave->SetEnabled(false);
+		m_toolBar->TBPrint->SetEnabled(false);
+		m_toolBar->TBViewLog->SetEnabled(false);
+		m_toolBar->TBTexDvi->SetEnabled(false);
+		m_toolBar->TBDviPdf->SetEnabled(false);
+		m_toolBar->TBDviPs->SetEnabled(false);
+		m_toolBar->TBPsPdf->SetEnabled(false);
+		m_toolBar->TBTexDvi->SetEnabled(false);
+		m_toolBar->TBTexPdf->SetEnabled(false);
+		m_toolBar->TBTexHtml->SetEnabled(false);
+		m_toolBar->TBOpenTracker->SetEnabled(false);
+		m_toolBar->TBOpenTerminal->SetEnabled(false);
+		m_toolBar->TBPrevPDF->SetEnabled(false);
+		m_toolBar->TBPrevPS->SetEnabled(false);
+		m_toolBar->TBPrevHTML->SetEnabled(false);
+
 		finsertfile->SetEnabled(false);
 		fdate->SetEnabled(false);
 		farray->SetEnabled(false);
@@ -567,6 +586,26 @@ void MainWindow::ResetPermissions()
 			DoesHtmlExist = html_entry.Exists();
 			DoesLogExist = log_entry.Exists();
 		}
+		//Main Toolbar Buttons
+
+		m_toolBar->TBPrint->SetEnabled(IsNonZeroText);
+		m_toolBar->TBSave->SetEnabled(IsSaveNeeded);
+	
+		m_toolBar->TBViewLog->SetEnabled(DoesLogExist);
+		m_toolBar->TBTexDvi->SetEnabled(DoesTexExist);
+		m_toolBar->TBDviPdf->SetEnabled(DoesDviExist);
+		m_toolBar->TBDviPs->SetEnabled(DoesDviExist);
+		m_toolBar->TBPsPdf->SetEnabled(DoesPsExist);
+		m_toolBar->TBTexDvi->SetEnabled(DoesTexExist);
+		m_toolBar->TBTexPdf->SetEnabled(DoesTexExist);
+		m_toolBar->TBTexHtml->SetEnabled(DoesTexExist);
+		
+		m_toolBar->TBOpenTracker->SetEnabled(DoesTexExist);
+		m_toolBar->TBOpenTerminal->SetEnabled(DoesTexExist);
+		m_toolBar->TBPrevPDF->SetEnabled(DoesPdfExist);
+		m_toolBar->TBPrevPS->SetEnabled(DoesPsExist);
+		m_toolBar->TBPrevHTML->SetEnabled(DoesHtmlExist);
+
 
 		//Menu Items
 		fprint->SetEnabled(IsNonZeroText);
