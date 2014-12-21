@@ -167,7 +167,7 @@ void PrefsWindow::MessageReceived(BMessage* message)
 				//find out which view value has to be updated
 				BView *changedView = m_parent->FindView(prefsID.String());
 				prefsLock.Lock();
-				const char *name;
+				char *name;
 				uint32 type;
 				int32 count;
 				for (int32 i = 0; preferences.GetInfo(B_ANY_TYPE, i, &name, &type, &count) == B_OK; i++)
@@ -321,7 +321,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	//tex to dvi
 	BRect bitmapFrame(0.0f, 0.0f, 31.0f, 31.0f);	
 	BBitmap	*texDviBitmap = new BBitmap(bitmapFrame, B_CMAP8);
-	texDviBitmap->SetBits(TexToDVI, 3072, 0, B_CMAP8);
+	texDviBitmap->SetBits(IconTexToDVI, 3072, 0, B_CMAP8);
 	commandBox->AddChild(new BitmapView(bitRect, texDviBitmap));
 	
 	BTextControl *texDviCtrl = new BTextControl(bitctrlRect, K_LATEX_CMD, NULL, "", GetPrefsMessage(K_LATEX_CMD));
@@ -331,7 +331,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	//dvi to pdf
 	bitRect.OffsetBy(0.0f, bitoffset);	
 	BBitmap* dviPdfBitmap = new BBitmap(bitmapFrame, B_CMAP8);
-	dviPdfBitmap->SetBits(DVIToPDF, 3072, 0, B_CMAP8);		
+	dviPdfBitmap->SetBits(IconDVIToPDF, 3072, 0, B_CMAP8);
 	commandBox->AddChild(new BitmapView(bitRect, dviPdfBitmap));
 	
 	BTextControl *dviPdfCtrl = new BTextControl(bitctrlRect, K_DVIPDF_CMD, NULL, "",  GetPrefsMessage(K_DVIPDF_CMD));
@@ -341,7 +341,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	//dvi to ps
 	bitRect.OffsetBy(0.0f, bitoffset);	
 	BBitmap* dviPsBitmap = new BBitmap(bitmapFrame, B_CMAP8);
-	dviPsBitmap->SetBits(DVIToPS, 3072, 0, B_CMAP8);		
+	dviPsBitmap->SetBits(IconDVIToPS, 3072, 0, B_CMAP8);
 	commandBox->AddChild(new BitmapView(bitRect, dviPsBitmap));
 	
 	BTextControl *dviPsCtrl = new BTextControl(bitctrlRect, K_DVIPS_CMD, NULL, "",  GetPrefsMessage(K_DVIPS_CMD));
@@ -351,7 +351,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	//ps to pdf
 	bitRect.OffsetBy(0.0f, bitoffset);	
 	BBitmap* psPdfBitmap = new BBitmap(bitmapFrame, B_CMAP8);
-	psPdfBitmap->SetBits(PSToPDF, 3072, 0, B_CMAP8);		
+	psPdfBitmap->SetBits(IconPSToPDF, 3072, 0, B_CMAP8);
 	commandBox->AddChild(new BitmapView(bitRect, psPdfBitmap));
 	
 	BTextControl *psPdfCtrl = new BTextControl(bitctrlRect, K_PS2PDF_CMD, NULL, "",  GetPrefsMessage(K_PS2PDF_CMD));
@@ -361,7 +361,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	//tex to pdf
 	bitRect.OffsetBy(0.0f, bitoffset);			
 	BBitmap* texPdfBitmap = new BBitmap(bitmapFrame, B_CMAP8);
-	texPdfBitmap->SetBits(TexToPDF,3072,0,B_CMAP8);
+	texPdfBitmap->SetBits(IconTexToPDF,3072,0,B_CMAP8);
 	commandBox->AddChild(new BitmapView(bitRect, texPdfBitmap));
 	
 	BTextControl *texPdfCtrl = new BTextControl(bitctrlRect, K_PDFLATEX_CMD, NULL, "",  GetPrefsMessage(K_PDFLATEX_CMD));
@@ -371,7 +371,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	//tex to html
 	bitRect.OffsetBy(0.0f, bitoffset);	
 	BBitmap* texHtmlBitmap = new BBitmap(bitmapFrame, B_CMAP8);
-	texHtmlBitmap->SetBits(TexToHTML, 3072, 0, B_CMAP8);		
+	texHtmlBitmap->SetBits(IconTexToHTML, 3072, 0, B_CMAP8);
 	commandBox->AddChild(new BitmapView(bitRect, texHtmlBitmap));
 	
 	BTextControl *texHtmlCtrl = new BTextControl(bitctrlRect, K_LATEX2HTML_CMD, NULL, "",  GetPrefsMessage(K_LATEX2HTML_CMD));
@@ -381,7 +381,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	//ps
 	bitRect.OffsetBy(0.0f, bitoffset);	
 	BBitmap* postScriptBitmap = new BBitmap(bitmapFrame, B_CMAP8);
-	postScriptBitmap->SetBits(PrevPS, 3072, 0, B_CMAP8);
+	postScriptBitmap->SetBits(IconPrevPS, 3072, 0, B_CMAP8);
 	commandBox->AddChild(new BitmapView(secCol, postScriptBitmap));
 	
 	BTextControl *postScriptCtrl = new BTextControl(secColCtrl, K_POSTSCRIPT_CMD, NULL, "", GetPrefsMessage(K_POSTSCRIPT_CMD));

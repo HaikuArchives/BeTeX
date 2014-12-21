@@ -35,12 +35,15 @@ class Prefs
 		rgb_color comment_color;		//blue
 		rgb_color punc_symbol_color; 	//purple
 		rgb_color html_color;			//sea green
+		rgb_color RGBText_color;
 		
 		//Fonts
 		//Have BSlider for live update in size
 		int32 FontSize;					//12
 		//Font Type is Fixed
-		
+
+		BString NumRecentDocs;
+
 		//Boolean Values
 		bool AutoIndent;				//true
 		bool IsSyntax;		//true
@@ -81,6 +84,7 @@ class Prefs
 		bool IsIntlAbsent;
 		bool IsTypeFaceAbsent;
 		bool IsFunctionAbsent;	
+		bool IsRecentDocsPathShown;
 };
 #endif //_PREFS_H_
 

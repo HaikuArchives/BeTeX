@@ -18,7 +18,7 @@ class TexFileFilter : public BRefFilter
 {
 	public:
 		TexFileFilter();
-		virtual bool				Filter(const entry_ref* ref, BNode* node, struct stat* st, const char* filetype);
+		virtual bool				Filter(const entry_ref* ref, BNode* node, struct stat_beos* st, const char* filetype);
 };
 
 #endif 

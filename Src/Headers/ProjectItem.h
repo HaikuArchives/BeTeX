@@ -25,6 +25,7 @@ class ProjectItem : public BListItem
 		void				ShowTextView();
 		void				HideTextView();
 		BView*				ChildView();
+		BTextView*			TextView();
 		
 		void				SetLabel(BString label);
 		BString				Label();
@@ -33,15 +34,18 @@ class ProjectItem : public BListItem
 		bool				IsSaveNeeded();
 		void				SetHomely(bool hasHome);
 		bool				IsHomely();
-		
+
+		void				SetRef(entry_ref* ref);
+		entry_ref			GetRef() const;
+
 	private:
 		SplitPane			*m_splitPane;
 		BView				*m_childView;
 
 		BString				m_label;
 		bool				m_needToSave,
-							m_hasHome
-							;
+							m_hasHome;
+		entry_ref			m_ref;
 };
 #endif
 
