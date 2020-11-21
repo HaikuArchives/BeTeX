@@ -13,7 +13,7 @@
 #include <vector>
 #include "TButton.h"
 //#include "TexBarItem.h"
-#include "constants.h"
+#include "Constants.h"
 #include "Preferences.h"
 #include "BubbleHelper.h"
 //#include "CharRenderer.h"
@@ -38,23 +38,43 @@ struct sextet
 #include "International.h"
 #include "TButton.h"
 #include "BubbleHelper.h"
+#include "MessageFields.h"
 
 class TexBar : public BView
 {
 	public:
-		TexBar(BRect r,BubbleHelper* h,Prefs* pr);
+		TexBar(BRect r,BubbleHelper* h);
 		//virtual void Draw(BRect r);
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage* msg);
 		void ScrollBy(float h,float v);
 		virtual void ScrollTo(BPoint where);
 		void AdjustScrollBar();
-		void RefreshColours();
+		void RefreshColors();
 		virtual void FrameResized(float w, float h);
 		virtual void MouseMoved(BPoint point,uint32 transit,const BMessage* msg);
 		void Tile(BView* v,bool IsOnlyResizing);
-	
+
+		HeaderItem* GetGreekHeader();
+
+		HeaderItem* GetBigHeader();
+
+		HeaderItem* GetBinaryHeader();
+
+		HeaderItem* GetMiscHeader();
+
+		HeaderItem* GetBinRelHeader();
+
+		HeaderItem* GetMMAHeader();
+
+		HeaderItem* GetIntlHeader();
+
+		HeaderItem* GetTypeFaceHeader();
+
+		HeaderItem* GetFunctionHeader();
+
 	private:
+		void UpdateHeaders();
 		Prefs* prefs;
 		BubbleHelper* helper;
 		/*TexBarItem* Greek;
@@ -62,15 +82,15 @@ class TexBar : public BView
 		TexBarItem* BinaryOp;
 		TexBarItem* MiscSym;
 		*/
-		
+
 		TButton* temp_button;
-		
+
 		HeaderItem* GreekHeader;
 		bool IsGreekHidden;
-		
+
 		HeaderItem* BigHeader;
 		bool IsBigHidden;
-	
+
 		HeaderItem* BinaryHeader;
 		bool IsBinaryHidden;
 
@@ -79,19 +99,19 @@ class TexBar : public BView
 
 		HeaderItem* BinRelHeader;
 		bool IsBinRelHidden;
-		
+
 		HeaderItem* MMAHeader;
 		bool IsMMAHidden;
-		
+
 		HeaderItem* IntlHeader;
 		bool IsIntlHidden;
-		
+
 		HeaderItem* TypeFaceHeader;
 		bool IsTypeFaceHidden;
-		
+
 		HeaderItem* FunctionHeader;
 		bool IsFunctionHidden;
-		
+
 		//if these are  true, we don't even create their header objects
 		bool IsGreekAbsent;
 		bool IsBigAbsent;
@@ -102,7 +122,7 @@ class TexBar : public BView
 		bool IsIntlAbsent;
 		bool IsTypeFaceAbsent;
 		bool IsFunctionAbsent;
-		
+
 		//BubbleHelper* helper;
 		vector<BBitmap*> greekbitvec;
 		vector<BBitmap*> bigbitvec;
@@ -113,7 +133,7 @@ class TexBar : public BView
 		vector<BBitmap*> intlbitvec;
 		bool IsResizing;
 		float TotalHeight;
-		
+
 };
 
 #endif

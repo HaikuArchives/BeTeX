@@ -37,8 +37,8 @@ struct helppair
     char    *text;
 };
 
-BubbleHelper::BubbleHelper(rgb_color colour)
-				:	m_bubbleColour(colour),
+BubbleHelper::BubbleHelper(rgb_color color)
+				:	m_bubbleColor(color),
 					m_helplist(new BList(30))
 {
 	m_helperthread = spawn_thread(_helper,"helper",B_NORMAL_PRIORITY,this);
@@ -157,8 +157,7 @@ void BubbleHelper::Helper()
     m_textview->MakeSelectable(false);
     m_textview->SetWordWrap(false);
     //m_textview->SetLowColor(240,240,100);
-    m_textview->SetViewColor(m_bubbleColour);
-    //cout << "test" << endl;
+    m_textview->SetViewColor(m_bubbleColor);
     m_textview->SetHighColor(0,0,0);
     m_textwin->AddChild(m_textview);
     m_textwin->Run();
@@ -245,7 +244,7 @@ void BubbleHelper::HideBubble()
 
 void BubbleHelper::ShowBubble(BPoint dest)
 {
-    m_textview->SetViewColor(m_bubbleColour);
+    m_textview->SetViewColor(m_bubbleColor);
     m_textwin->MoveTo(dest);
     m_textwin->SetWorkspaces(B_CURRENT_WORKSPACE);
     if(m_textwin->IsHidden())
@@ -317,4 +316,9 @@ void BubbleHelper::DisplayHelp(char *text, BPoint where)
 void BubbleHelper::EnableHelp(bool enable)
 {
     m_enabled = enable;
+}
+
+
+void BubbleHelper::SetColor(rgb_color color) {
+	m_bubbleColor = color;
 }

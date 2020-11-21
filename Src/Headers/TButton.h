@@ -15,7 +15,7 @@
 class TButton : public BControl
 {
 	public:
-		TButton(BRect frame,BMessage* msg,BBitmap* Icon);
+		TButton(const char* name, BRect frame,BMessage* msg,BBitmap* Icon);
 		TButton(BRect frame,BMessage* msg,vector<BBitmap*> Icons,vector<BPoint> Origins);
 		TButton(BRect frame,BMessage* msg,vector<BBitmap*> Icons,vector<BPoint> Origins,vector<float> Scales);
 		TButton(BRect frame,BMessage* msg,const char* text,BFont font);

@@ -27,7 +27,11 @@
 *   Setup the main view. Add in all the niffty components
 *   we have made and get things rolling
 *******************************************************/
-SplitPane::SplitPane(BRect frame, BView *one, BView *two,uint32 Mode):BView(frame, "", Mode,B_WILL_DRAW|B_FRAME_EVENTS){
+SplitPane::SplitPane(BRect frame,const char *name, BView *one, BView *two,
+		uint32 Mode)
+	:
+	BView(frame, name, Mode,B_WILL_DRAW|B_FRAME_EVENTS) 
+{
    SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));  // This is default get from parent if exist
    //SetViewColor(B_TRANSPARENT_32_BIT); // go tran so we have control over drawing
    BRect b;

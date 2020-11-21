@@ -11,8 +11,10 @@
 #include <be/interface/CheckBox.h>
 #include <be/interface/StringView.h>
 #include <be/interface/Slider.h>
-#include "ColourButton.h"
+
+#include "ColorButton.h"
 #include "PrefsListView.h"
+#include "Prefs.h"
 
 class BitmapView : public BView
 {
@@ -29,25 +31,27 @@ class BitmapView : public BView
 class PrefsWindow : public BWindow
 {
 	public:
-		PrefsWindow(BRect frame, BMessenger *messenger);
+		PrefsWindow(BRect frame, BMessenger *messenger, BView *texBar);
 		virtual				~PrefsWindow();
 		
 		virtual void		MessageReceived(BMessage* msg);
-		void				Quit();
+		virtual void				Quit();
 		
 	private:	
 		BView				*constructGeneralBox(BRect frame);
 		BView				*constructCommandBox(BRect frame);
-		BView				*constructColourBox(BRect frame);
+		BView				*constructColorBox(BRect frame);
 		BView				*constructToolbarBox(BRect frame);
 		void				ResetToDefaults(uint32 resetFlag);
 		BMessage*			GetPrefsMessage(BString prefsID);
 		
 	private:
-		BMessenger			*m_msgr;		
+		BMessage			initialPreferences;
+		BMessenger			*m_msgr;
+		BView				*m_texBar;
 		BView				*m_parent;						
 		
-		bool				m_colourPrefsChanged,
+		bool				m_colorPrefsChanged,
 							m_fontSizeChanged,
 							m_toolbarChanged
 							;

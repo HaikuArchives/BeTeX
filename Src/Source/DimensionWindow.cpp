@@ -12,7 +12,7 @@
 #include <be/interface/Button.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "constants.h"
+#include "Constants.h"
 #include "MessageFields.h"
 
 DimensionWindow::DimensionWindow(BRect frame, BMessenger* messenger, BString standardWidth, BString standardHeight, uint32 return_msg) 

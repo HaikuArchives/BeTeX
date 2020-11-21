@@ -30,11 +30,12 @@
 class BubbleHelper
 {
 	public:
-		BubbleHelper(rgb_color colour);
+		BubbleHelper(rgb_color color);
 		virtual				~BubbleHelper();
 
 		void				SetHelp(BView *view, const char *text);
 		void				EnableHelp(bool enable = true);
+		void				SetColor(rgb_color color);
 
 	private:
 		void				DisplayHelp(char *text, BPoint where);
@@ -47,7 +48,7 @@ class BubbleHelper
 		void				ShowBubble(BPoint dest);
 
 	private:
-		rgb_color			m_bubbleColour;	
+		rgb_color			m_bubbleColor;
 		thread_id			m_helperthread;
 		BList				*m_helplist;
 		BWindow				*m_textwin;

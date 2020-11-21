@@ -11,7 +11,7 @@
 #include <be/app/Roster.h>
 #include <be/support/String.h>
 #include "BeTeXLogoSmall.h"
-#include "constants.h"
+#include "Constants.h"
 
 AboutView::AboutView(BRect frame) 
 			:	BView(frame,"about",B_FOLLOW_ALL_SIDES,B_WILL_DRAW)
@@ -186,20 +186,20 @@ void AboutWindow::MessageReceived(BMessage* msg)
 			else
 			{
 				if(m_bottom.blue == 0)
-				{	
+				{
 					m_bottom.blue++;
 					m_bottom.red--;
 					m_bup = true;
 				}
 				else
-				{	
+				{
 					m_bottom.blue--;
 					m_bottom.red++;
 				}
 			}
-			
-			m_gradient->SetTopColour(m_top);
-			m_gradient->SetBottomColour(m_bottom);			
+
+			m_gradient->SetTopColor(m_top);
+			m_gradient->SetBottomColor(m_bottom);
 		}
 		break;
 		case AboutMessages::K_ABOUT_WINDOW_QUIT:

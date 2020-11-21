@@ -63,7 +63,7 @@ namespace GreekSymbolConstants
 			;
 };
 
-namespace ColourConstants
+namespace ColorConstants
 {
 	const rgb_color	
 			K_BLACK =						{0,0,0,255},
@@ -77,7 +77,7 @@ namespace ColourConstants
 			K_NAVY_BLUE = 					{50,0,150,255},
 			K_ORANGE = 						{255,174,0,255},
 			K_BUBBLE_DEFAULT = 				{255,255,200,255},
-			/*BeOS Colours*/
+			/*BeOS Colors*/
 			K_BE_BLUE_BACKGROUND =			{51,102,152,255},
 			K_BE_BLUE_STATUS_BAR =			{51,152,255,255},
 			K_BE_BLUE_FOCUS =				{0,0,229,255},
@@ -88,7 +88,7 @@ namespace ColourConstants
 			K_YELLOW_2 =					{255,255,0,255},
 			K_GREEN_2  =					{0,255,0,255},
 			K_BLUE_2   =					{0,0,255,255},			
-			/*Custom Colours*/			
+			/*Custom Colors*/			
 			//Spectrum
 			K_SPECTRUM_RED    =				{235,0,0,255},
 			K_SPECTRUM_ORANGE =				{235,122,0,255},
@@ -103,8 +103,8 @@ namespace ColourConstants
 			K_COPPER =						{213,100,0,255},
 			K_ORICHALCHUM =					{255,174,0},
 			
-			//UI colour constants			
-			K_UNSAVED_TEXT_COLOUR =			{0,0,255}
+			//UI color constants			
+			K_UNSAVED_TEXT_COLOR =			{0,0,255}
 			;
 };
 
@@ -162,7 +162,7 @@ namespace MenuConstants
 			K_MENU_INSERT_TABULAR =			'mitr',
 			K_MENU_INSERT_TABULAR_WITHDIM =	'trwd',
 			K_MENU_INSERT_EQUATION =		'mien', 
-			K_MENU_INSERT_COLOURED_TEXT =	'mict',
+			K_MENU_INSERT_COLORED_TEXT =	'mict',
 			K_MENU_INSERT_ITEMIZE =			'miit',
 			K_MENU_INSERT_DESCRIPTION =		'midn',
 			K_MENU_INSERT_ENUMERATE =		'miee',
@@ -222,13 +222,13 @@ namespace SearchWindowConstants
 			;
 };
 
-namespace ColourPrefsConstants
+namespace ColorPrefsConstants
 {
 	const uint32 
-			K_COLOUR_WINDOW_QUIT =					'clrq',
-			K_COLOUR_PREFS_UPDATE =					'cput',
-			K_COLOUR_PREFS_OK =						'cpok',
-			K_COLOUR_PREFS_CANCEL =					'cpcl'
+			K_COLOR_WINDOW_QUIT =					'clrq',
+			K_COLOR_PREFS_UPDATE =					'cput',
+			K_COLOR_PREFS_OK =						'cpok',
+			K_COLOR_PREFS_CANCEL =					'cpcl'
 			;
 };
 
@@ -236,18 +236,17 @@ namespace PrefsConstants
 {
 	const uint32 
 			K_PREFS_UPDATE =						'PVud',
-			K_LOAD_PREFERENCES =					'PVlp',
 			K_PREFS_VIEW_OK =						'pvok',
 			K_PREFS_VIEW_CANCEL =					'pvcl',
-			K_PREFS_VIEW_RESET_COLOUR_DEFAULTS =	'pcrd',
+			K_PREFS_VIEW_RESET_COLOR_DEFAULTS = 	'pcrd',
 			K_PREFS_VIEW_RESET_COMMAND_DEFAULTS =	'pcmd',
 			K_PREFS_VIEW_RESET_TOOLBAR_DEFAULTS =	'pvrt',			
 			K_PREFS_VIEW_RESET_GENERAL_DEFAULTS =	'pcgd',
-			K_PREFS_WINDOW_QUIT =					'pfwq'
+			K_PREFS_WINDOW_QUIT =				'pfwq'
 			;
 			
 	const uint32
-			K_RESET_COLOUR_PREFS =					1,
+			K_RESET_TEXVIEW_PREFS =					1,
 			K_RESET_COMMAND_PREFS =					2, 
 			K_RESET_TOOLBAR_PREFS =					4,
 			K_RESET_GENERAL_PREFS =					8

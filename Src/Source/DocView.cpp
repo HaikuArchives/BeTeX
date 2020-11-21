@@ -10,6 +10,10 @@
 
 #include "BeTeXLogo.h"
 
+/*
+Default display : BeTeX logo 
+*/
+
 DocView::DocView(BRect frame) 
 			:	BView(frame, "DocView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 {

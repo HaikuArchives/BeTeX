@@ -4,8 +4,8 @@
  * All rights reserved.											 *
  * Distributed under the terms of the MIT License.               *
  *****************************************************************/
-#ifndef COLOUR_WINDOW_H
-#define COLOUR_WINDOW_H
+#ifndef COLOR_WINDOW_H
+#define COLOR_WINDOW_H
 
 #include <be/app/Messenger.h>
 #include <be/app/Message.h>
@@ -16,25 +16,25 @@
 #include <be/interface/Button.h>
 #include <be/interface/ColorControl.h>
 #include <TypeConstants.h>
-#include "ColourView.h"
+#include "ColorView.h"
 
-class FastColour : public BColorControl
+class FastColor : public BColorControl
 {
 	public:
-		FastColour(ColourView *theWell, BPoint leftTop, color_control_layout matrix, float cellSide, const char* name, BMessage* message = NULL, bool bufferedDrawing = false);
+		FastColor(ColorView *theWell, BPoint leftTop, color_control_layout matrix, float cellSide, const char* name, BMessage* message = NULL, bool bufferedDrawing = false);
 		
 		void				SetValue(int32 v);
-		void				SetValue(rgb_color colour);
+		void				SetValue(rgb_color color);
 	
 	private:
-	 	ColourView			*well;
+	 	ColorView			*well;
 };
 
-class ColourWindow : public BWindow
+class ColorWindow : public BWindow
 {
 	public:
-		ColourWindow(BRect frame, BMessenger* messenger, rgb_color colour);
-		virtual				~ColourWindow();
+		ColorWindow(BRect frame, BMessenger* messenger, rgb_color color);
+		virtual				~ColorWindow();
 		
 		virtual void		MessageReceived(BMessage *message);
 		void				Quit();
@@ -46,8 +46,8 @@ class ColourWindow : public BWindow
 							*m_cancelButton;	
 							
 		BView				*m_parent;
-		FastColour			*m_ctrlBox;
-		ColourView			*m_colourView;
+		FastColor			*m_ctrlBox;
+		ColorView			*m_colorView;
 };
 
 #endif

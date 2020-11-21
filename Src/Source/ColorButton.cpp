@@ -4,19 +4,19 @@
  * All rights reserved.											 *
  * Distributed under the terms of the MIT License.               *
  *****************************************************************/
-#ifndef COLOUR_BUTTON_H
-#include "ColourButton.h"
+#ifndef COLOR_BUTTON_H
+#include "ColorButton.h"
 #endif 
 
 #include <be/app/Application.h>
 #include <Screen.h>
 #include <iostream>
-#include "constants.h"
+#include "Constants.h"
 
-ColourButton::ColourButton(BRect frame, BMessage *message, rgb_color colour, BString label) 
-				:	BControl(frame, "colourbutton", NULL, message, B_FOLLOW_NONE, B_WILL_DRAW),
-					m_colourWindow(NULL),
-					m_colour(colour),
+ColorButton::ColorButton(BRect frame, BString name, BMessage *message, rgb_color color, BString label) 
+				:	BControl(frame, name, NULL, message, B_FOLLOW_NONE, B_WILL_DRAW),
+					m_colorWindow(NULL),
+					m_color(color),
 					m_label(label),
 					m_isDown(false),
 					m_isOver(false),
@@ -30,22 +30,22 @@ ColourButton::ColourButton(BRect frame, BMessage *message, rgb_color colour, BSt
 	m_bitmap->Unlock();	
 }
 
-ColourButton::~ColourButton()
+ColorButton::~ColorButton()
 {
 }
 
-void ColourButton::AttachedToWindow()
+void ColorButton::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
 	SetTarget(Parent());
 }
 
-void ColourButton::Draw(BRect updateRect)
+void ColorButton::Draw(BRect updateRect)
 {
 	Render();
 }
 
-void ColourButton::Render()
+void ColorButton::Render()
 {
 	m_bitmap->Lock();
 
@@ -55,35 +55,35 @@ void ColourButton::Render()
 	m_bitmapView->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	m_bitmapView->FillRect(r);
 	r = BRect(0,0,14,14);
-	m_bitmapView->SetHighColor(m_colour);
+	m_bitmapView->SetHighColor(m_color);
 	m_bitmapView->FillRect(r);
 	
 	if(m_isDown)
-		m_bitmapView->SetHighColor(tint_color(m_colour,B_DARKEN_2_TINT));
+		m_bitmapView->SetHighColor(tint_color(m_color,B_DARKEN_2_TINT));
 	else
-		m_bitmapView->SetHighColor(tint_color(m_colour,B_LIGHTEN_2_TINT));
+		m_bitmapView->SetHighColor(tint_color(m_color,B_LIGHTEN_2_TINT));
 	
 	m_bitmapView->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom));
 	m_bitmapView->StrokeLine(BPoint(r.left,r.top),BPoint(r.right,r.top));
 	
 	if(m_isDown)
-		m_bitmapView->SetHighColor(tint_color(m_colour,B_DARKEN_1_TINT));
+		m_bitmapView->SetHighColor(tint_color(m_color,B_DARKEN_1_TINT));
 	else
-		m_bitmapView->SetHighColor(tint_color(m_colour,B_LIGHTEN_1_TINT));
+		m_bitmapView->SetHighColor(tint_color(m_color,B_LIGHTEN_1_TINT));
 
 
 	if(m_isDown)
-		m_bitmapView->SetHighColor(tint_color(m_colour,B_LIGHTEN_2_TINT));
+		m_bitmapView->SetHighColor(tint_color(m_color,B_LIGHTEN_2_TINT));
 	else
-		m_bitmapView->SetHighColor(tint_color(m_colour,B_DARKEN_2_TINT));
+		m_bitmapView->SetHighColor(tint_color(m_color,B_DARKEN_2_TINT));
 
 	m_bitmapView->StrokeLine(BPoint(r.left,r.bottom),BPoint(r.right,r.bottom));
 	m_bitmapView->StrokeLine(BPoint(r.right,r.top),BPoint(r.right,r.bottom));
 	
 	if(m_isDown)
-		m_bitmapView->SetHighColor(tint_color(m_colour,B_LIGHTEN_1_TINT));
+		m_bitmapView->SetHighColor(tint_color(m_color,B_LIGHTEN_1_TINT));
 	else
-		m_bitmapView->SetHighColor(tint_color(m_colour,B_DARKEN_1_TINT));
+		m_bitmapView->SetHighColor(tint_color(m_color,B_DARKEN_1_TINT));
 	
 	BPoint point(r.RightBottom());
 	
@@ -103,7 +103,7 @@ void ColourButton::Render()
 	m_bitmap->Unlock();
 }
 
-void ColourButton::MouseDown(BPoint point)
+void ColorButton::MouseDown(BPoint point)
 {
 	uint32 button;
 	GetMouse(&point, &button);
@@ -116,7 +116,7 @@ void ColourButton::MouseDown(BPoint point)
 	}
 }
 
-void ColourButton::MouseUp(BPoint point)
+void ColorButton::MouseUp(BPoint point)
 {	
 	m_isDown = false;
 	Render();
@@ -128,7 +128,7 @@ void ColourButton::MouseUp(BPoint point)
 	}
 }
 
-void ColourButton::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
+void ColorButton::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
 	uint32 button;
 	GetMouse(&point, &button);
@@ -158,7 +158,7 @@ void ColourButton::MouseMoved(BPoint point, uint32 transit, const BMessage* mess
 	Parent()->MouseMoved(point, transit, message);
 }
 
-void ColourButton::MessageReceived(BMessage* message)
+void ColorButton::MessageReceived(BMessage* message)
 {
 	if(message->WasDropped())
 	{
@@ -167,7 +167,7 @@ void ColourButton::MessageReceived(BMessage* message)
 		// if there is RGB color
 		if( (message->FindData("RGBColor", B_RGB_COLOR_TYPE, (const void **)&rgb, &size) == B_OK))
 		{
-			m_colour = *rgb;
+			m_color = *rgb;
 			Render();
 			BControl::Invoke();
 		}
@@ -175,19 +175,19 @@ void ColourButton::MessageReceived(BMessage* message)
 		
 	switch(message->what)
 	{
-		case ColourPrefsConstants::K_COLOUR_WINDOW_QUIT:
+		case ColorPrefsConstants::K_COLOR_WINDOW_QUIT:
 		{
-			m_colourWindow = NULL;//mmm?
+			m_colorWindow = NULL;//mmm?
 		}
 		break;
-		case ColourPrefsConstants::K_COLOUR_PREFS_UPDATE:
+		case ColorPrefsConstants::K_COLOR_PREFS_UPDATE:
 		{
 			rgb_color*	rgb;
 			ssize_t		size;
 			// if there is RGB color
 			if( (message->FindData("color", B_RGB_COLOR_TYPE, (const void **)&rgb, &size) == B_OK))
 			{
-				m_colour = *rgb;
+				m_color = *rgb;
 				Render();
 				BControl::Invoke();
 			}		
@@ -199,12 +199,12 @@ void ColourButton::MessageReceived(BMessage* message)
 	}
 }
 
-status_t ColourButton::Invoke(BMessage* message = NULL)
+status_t ColorButton::Invoke(BMessage* message = NULL)
 {	
 	//start up chooser window
-	if(m_colourWindow != NULL)
+	if(m_colorWindow != NULL)
 	{
-		m_colourWindow->Activate(true);
+		m_colorWindow->Activate(true);
 		return B_OK;
 	}
 
@@ -218,20 +218,20 @@ status_t ColourButton::Invoke(BMessage* message = NULL)
 	float width = 350.0f,
 		  height = 115.0f;	
 
-	BRect colourWindowFrame(point.x, point.y, point.x + width, point.y + height);	
-	m_colourWindow = new ColourWindow(colourWindowFrame, new BMessenger(this), m_colour);
-	m_colourWindow->Show();
+	BRect colorWindowFrame(point.x, point.y, point.x + width, point.y + height);	
+	m_colorWindow = new ColorWindow(colorWindowFrame, new BMessenger(this), m_color);
+	m_colorWindow->Show();
 	
 	return B_OK;
 }
 
-void ColourButton::SetValue(rgb_color colour)
+void ColorButton::SetValue(rgb_color color)
 {	
-	m_colour = colour;
+	m_color = color;
 	Render();	
 }
 
-rgb_color ColourButton::Value()
+rgb_color ColorButton::Value()
 {
-	return m_colour;
+	return m_color;
 }

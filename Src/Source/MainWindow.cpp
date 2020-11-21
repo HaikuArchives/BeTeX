@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include "constants.h"
+#include "Constants.h"
 #include "Toolbar.h"
 #include "ToolbarButton.h"
 #include "TexFileFilter.h"
@@ -36,73 +36,75 @@
 
 using namespace MenuConstants;
 using namespace PrefsConstants;
-using namespace ColourPrefsConstants;
+using namespace ColorPrefsConstants;
 using namespace SearchWindowConstants;
 using namespace InterfaceConstants;
 using namespace ToolbarConstants;
+using namespace AboutMessages;
 
 MainWindow::MainWindow(BRect frame) 
 				:	BWindow(frame, "BeTeX", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
-	BView *backgroundView = new BView(Bounds(),"parent",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
-	backgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	prefs = new Prefs();
-
 	//Setup our MenuBar
 	BMenuBar* menubar = new BMenuBar(frame,"menu_bar");
+ 
 	CreateMenuBar(menubar);
-	
-	float statusBarHeight = 14.0f;	
+
+	float statusBarHeight = 14.0f;
 	//Create bubblehelper
-	rgb_color bubbleColour;
-	helper = new BubbleHelper(bubbleColour);
-	
+	helper = new BubbleHelper(preferences->bubble_color);
+
 	//Create Toolbar
 	float menuBarHeight = (menubar->Bounds()).Height();
+
+
+
 	BRect toolBarFrame(0.0f, menuBarHeight + 1.0f, frame.Width(), menuBarHeight + 37.0f);
 	m_toolBar = new MainTBar(toolBarFrame, helper);
-		
+
 	TLIST_VIEW_WIDTH = 178;
 	BRect Trect(0.0f, 0.0f, frame.Width(), frame.Height() - statusBarHeight);
+
 	BRect Textrect = Trect;
 	Textrect.InsetBy(10,10);
 
-	m_texToolBar = new TexBar(BRect(0,(frame.Height()/2)-99, TLIST_VIEW_WIDTH, frame.Height()- statusBarHeight), helper, prefs);
-	BScrollView* toolbarScroll = new BScrollView("tbscroller",m_texToolBar,B_FOLLOW_LEFT | B_FOLLOW_TOP,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
-	
+	m_texToolBar = new TexBar(BRect(0,(frame.Height()/2)-99, TLIST_VIEW_WIDTH, frame.Height()- statusBarHeight), helper);
+	BScrollView* toolbarScroll = new BScrollView("tbscroller",m_texToolBar,B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
+
 	DocView* docView = new DocView(Trect);
-	docScroll = new BScrollView("docScroll",docView,B_FOLLOW_LEFT | B_FOLLOW_TOP,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
-	
+	docScroll = new BScrollView("docScroll",docView,B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
+
 	m_projectView = new ProjectView(BRect(0,0,TLIST_VIEW_WIDTH,frame.Height()/2-100),docScroll);
-	BScrollView* projectScroll = new BScrollView("ScrollView",m_projectView,B_FOLLOW_LEFT | B_FOLLOW_TOP,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
-	
-	m_verticalSplit = new SplitPane(BRect(0,frame.top,TLIST_VIEW_WIDTH,frame.Height()), projectScroll, toolbarScroll, B_FOLLOW_ALL_SIDES);	//frame = r, maybe should be bounds?
+	BScrollView* projectScroll = new BScrollView("ScrollView",m_projectView,B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
+
+	m_verticalSplit = new SplitPane(BRect(0,frame.top,TLIST_VIEW_WIDTH,frame.Height()), "vertical", projectScroll, toolbarScroll, B_FOLLOW_ALL_SIDES);
+
 	m_verticalSplit->SetAlignment(B_HORIZONTAL);
 	m_verticalSplit->SetEditable(false);
 	LEFT_BAR_V_POS = frame.Height()/4;
-	m_verticalSplit->SetBarPosition(LEFT_BAR_V_POS);		
-	
-	m_horizontalSplit = new SplitPane(frame, m_verticalSplit, docScroll,B_FOLLOW_ALL_SIDES);	
+	m_verticalSplit->SetBarPosition(LEFT_BAR_V_POS);
+
+	m_horizontalSplit = new SplitPane(frame, "horizontal", m_verticalSplit, docScroll,B_FOLLOW_ALL_SIDES);
 	m_projectView->SetSplitPane(m_horizontalSplit);
 
 	m_horizontalSplit->SetAlignment(B_VERTICAL);
-	m_horizontalSplit->SetEditable(false);	
-	m_horizontalSplit->SetBarPosition(TLIST_VIEW_WIDTH);	
-		
-	//if(prefs->splitmsg == NULL && prefs->split_leftmsg == NULL)
-	//{
-	//	prefs->splitmsg = m_horizontalSplit->GetState();
-	//	prefs->split_leftmsg = m_verticalSplit->GetState();
-	//}
-	
+	m_horizontalSplit->SetEditable(false);
+	m_horizontalSplit->SetBarPosition(TLIST_VIEW_WIDTH);
+
+	if(preferences->splitmsg == NULL && preferences->split_leftmsg == NULL)
+	{
+		preferences->splitmsg = m_horizontalSplit->GetState();
+		preferences->split_leftmsg = m_verticalSplit->GetState();
+	}
+
+
 	BRect statusBarFrame(0.0f, frame.bottom - statusBarHeight, frame.Width(), frame.bottom);
 	m_statusBar = new StatusBar(statusBarFrame);
-	
+
 	untitled_no = 1;
-	const int UPDATE_TIME = 600000000/2;	// 10/2=5 minutes
+	//const int UPDATE_TIME = 600000000/2;	// 10/2=5 minutes
 	printer_settings = NULL;
-	
+
 	entry_ref betex_ref;
 	TemplateDir = "";
 	if(be_roster->FindApp(APP_SIG,&betex_ref) == B_OK)
@@ -114,40 +116,42 @@ MainWindow::MainWindow(BRect frame)
 			TemplateDir << betex_path.Path();
 			TemplateDir += "/Templates";
 		}
-	}	
-		
+	}
+
 	searchPanel = NULL;//new SearchWindow(BRect(100,100,250,250),this);
+	//gtlPanel = NULL;
 	aboutPanel = NULL;
 	prefsPanel = NULL;
 	rgbTxtChooser = NULL;
 	dimChooser = NULL;
 	RemoveAfterSave = false;
-	
+
 	BMessage recentrefs;
 	be_roster->GetRecentDocuments(&recentrefs,20,TEX_FILETYPE,APP_SIG);
-	
+
 	//Setup SaveFilePanel
 	savePanel = new BFilePanel(B_SAVE_PANEL, NULL, NULL, B_FILE_NODE, false, NULL, new TexFileFilter()); 
 	savePanel->SetTarget(this);
-	
+
 	//Setup OpenFilePanel
 	openPanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_FILE_NODE, true, NULL, new TexFileFilter());
 	openPanel->SetTarget(this);
-	
+
 	openfolderPanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_DIRECTORY_NODE, true);
 	openfolderPanel->SetTarget(this);
-	
+
 	insertfilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_FILE_NODE, false, new BMessage(MenuConstants::K_MENU_INSERT_FILE_RECEIVED), new TexFileFilter());
-	insertfilePanel->SetTarget(this);	
-		
+	insertfilePanel->SetTarget(this);
+
 	ResetPermissions();
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_NO_VERTICAL))
-		.Add(menubar)
+ 		.Add(menubar)
 		.Add(m_toolBar)
 		.Add(m_horizontalSplit)
-		.Add(m_statusBar);
-
+		.Add(m_statusBar)
+		.End()
+		;
 	BSize size = GetLayout()->PreferredSize();
 	ResizeTo(size.Width(), size.Height());
 
@@ -157,9 +161,9 @@ MainWindow::MainWindow(BRect frame)
 MainWindow::~MainWindow()
 {
 	prefsLock.Lock();
-	preferences.AddRect(K_MAIN_WINDOW_RECT, Frame());
-	preferences.AddMessage(K_SPLIT_MSG ,m_horizontalSplit->GetState());
-	preferences.AddMessage(K_SPLIT_LEFT_MSG, m_verticalSplit->GetState());
+	preferences->main_window_rect = Frame();
+	preferences->splitmsg = m_horizontalSplit->GetState();
+	preferences->split_leftmsg = m_verticalSplit->GetState();
 	prefsLock.Unlock();
 	//clean up bubblehelper
 	if(helper != NULL)
@@ -170,29 +174,29 @@ void MainWindow::CreateMenuBar(BMenuBar *menuBar)
 {
 	BMenu* fileMenu = new BMenu("File");
 	menuBar->AddItem(fileMenu);
-	
-	fileMenu->AddItem(fnew = new BMenuItem("New", new BMessage(MenuConstants::K_MENU_FILE_NEW),'N'));	
+
+	fileMenu->AddItem(fnew = new BMenuItem("New", new BMessage(MenuConstants::K_MENU_FILE_NEW),'N'));
 	fileMenu->AddItem(fopen = new BMenuItem(opensubmenu = new BMenu("Open" B_UTF8_ELLIPSIS),new BMessage(MenuConstants::K_MENU_FILE_OPEN)));
 	fopen->SetShortcut('O',0);
-		
+
 	fileMenu->AddItem(fopentemplate = new BMenuItem(fopentemplatesubmenu = new BMenu("Open Template" B_UTF8_ELLIPSIS), NULL));
-	fileMenu->AddItem(fopenfolder = new BMenuItem("Open Folder" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_OPEN_FOLDER)));	
+	fileMenu->AddItem(fopenfolder = new BMenuItem("Open Folder" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_OPEN_FOLDER)));
 	fileMenu->AddItem(fclose = new BMenuItem("Close", new BMessage(MenuConstants::K_MENU_FILE_CLOSE),'W'));
 	fileMenu->AddItem(fsave = new BMenuItem("Save", new BMessage(MenuConstants::K_MENU_FILE_SAVE),'S'));
-	fileMenu->AddItem(fsaveas = new BMenuItem("Save As" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_SAVEAS)));	
+	fileMenu->AddItem(fsaveas = new BMenuItem("Save As" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_SAVEAS)));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(fpgsetup = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_PAGE_SETUP)));
-	fileMenu->AddItem(fprint = new BMenuItem("Print" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_PRINT),'P'));	
-	fileMenu->AddSeparatorItem();	
+	fileMenu->AddItem(fprint = new BMenuItem("Print" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_PRINT),'P'));
+	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(fprefs = new BMenuItem("Preferences" B_UTF8_ELLIPSIS,new BMessage(MenuConstants::K_MENU_FILE_PREFS)));
 	fprefs->SetShortcut('P',B_SHIFT_KEY);
 	fileMenu->AddItem(freset_layout = new BMenuItem("Reset Layout", new BMessage(MenuConstants::K_MENU_FORMAT_RESET_LAYOUT)));
 	fileMenu->AddItem(fabout = new BMenuItem("About BeTeX" B_UTF8_ELLIPSIS,new BMessage(MenuConstants::K_MENU_FILE_ABOUT)));
 	fileMenu->AddItem(fquit = new BMenuItem("Quit",new BMessage(MenuConstants::K_MENU_FILE_QUIT),'Q'));
-	
+
 	BMenu* editMenu = new BMenu("Edit");
 	menuBar->AddItem(editMenu);
-	
+
 	editMenu->AddItem(fundo = new BMenuItem("Undo", new BMessage(B_UNDO),'Z'));
 	editMenu->AddSeparatorItem();
 	editMenu->AddItem(fcut = new BMenuItem("Cut", new BMessage(B_CUT),'X'));
@@ -203,19 +207,19 @@ void MainWindow::CreateMenuBar(BMenuBar *menuBar)
 	editMenu->AddSeparatorItem();
 	editMenu->AddItem(fsearchreplace = new BMenuItem("Find" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_EDIT_SEARCH),'F'));
 	editMenu->AddItem(fgotoline = new BMenuItem("Go To Line" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_EDIT_GOTOLINE),'G'));
-	
+
 	BMenu* formatMenu = new BMenu("Format");
 	menuBar->AddItem(formatMenu);
 	formatMenu->AddItem(fbold = new BMenuItem("Bold", new BMessage(MenuConstants::K_MENU_FORMAT_BOLD),'B'));
 	formatMenu->AddItem(femph = new BMenuItem("Emphasized", new BMessage(MenuConstants::K_MENU_FORMAT_EMPH),'E'));
-	formatMenu->AddItem(fital = new BMenuItem("Italic", new BMessage(MenuConstants::K_MENU_FORMAT_ITAL),'I'));	
+	formatMenu->AddItem(fital = new BMenuItem("Italic", new BMessage(MenuConstants::K_MENU_FORMAT_ITAL),'I'));
 	formatMenu->AddSeparatorItem();
 	formatMenu->AddItem(fshiftleft = new BMenuItem("Shift Left", new BMessage(MenuConstants::K_MENU_FORMAT_SHIFT_LEFT),'['));
 	formatMenu->AddItem(fshiftright = new BMenuItem("Shift Right", new BMessage(MenuConstants::K_MENU_FORMAT_SHIFT_RIGHT),']'));
-	formatMenu->AddSeparatorItem();	
+	formatMenu->AddSeparatorItem();
 	formatMenu->AddItem(fcomment = new BMenuItem("Comment Selection", new BMessage(MenuConstants::K_MENU_FORMAT_COMMENTLINE)));
 	formatMenu->AddItem(funcomment = new BMenuItem("UnComment Selection", new BMessage(MenuConstants::K_MENU_FORMAT_UNCOMMENTLINE)));
-		
+
 	BMenu* insertMenu = new BMenu("Insert");
 	menuBar->AddItem(insertMenu);
 	insertMenu->AddItem(finsertfile = new BMenuItem("File" B_UTF8_ELLIPSIS,new BMessage(MenuConstants::K_MENU_INSERT_FILE)));
@@ -224,14 +228,14 @@ void MainWindow::CreateMenuBar(BMenuBar *menuBar)
 	insertMenu->AddItem(fmatrix = new BMenuItem("Matrix",new BMessage(MenuConstants::K_MENU_INSERT_MATRIX)));
 	insertMenu->AddItem(ftabular = new BMenuItem("Tabular",new BMessage(MenuConstants::K_MENU_INSERT_TABULAR)));
 	insertMenu->AddItem(fequation = new BMenuItem("Equation",new BMessage(MenuConstants::K_MENU_INSERT_EQUATION)));   
-	insertMenu->AddItem(frgbcolor = new BMenuItem("Coloured Text",new BMessage(MenuConstants::K_MENU_INSERT_COLOURED_TEXT)));
-	
+	insertMenu->AddItem(frgbcolor = new BMenuItem("Colored Text",new BMessage(MenuConstants::K_MENU_INSERT_COLORED_TEXT)));
+
 	insertMenu->AddItem(flists = new BMenuItem(flistsubmenu = new BMenu("Lists"),NULL));
 	flistsubmenu->AddItem(fitemize = new BMenuItem("Itemize",new BMessage(MenuConstants::K_MENU_INSERT_ITEMIZE)));
 	flistsubmenu->AddItem(fdescription = new BMenuItem("Description",new BMessage(MenuConstants::K_MENU_INSERT_DESCRIPTION)));
 	flistsubmenu->AddItem(fenumerate = new BMenuItem("Enumerate",new BMessage(MenuConstants::K_MENU_INSERT_ENUMERATE)));
-	
-	insertMenu->AddItem(fenvironments = new BMenuItem(fenvironmentssubmenu = new BMenu("Environments"),NULL));	
+
+	insertMenu->AddItem(fenvironments = new BMenuItem(fenvironmentssubmenu = new BMenu("Environments"),NULL));
 	fenvironmentssubmenu->AddItem(ffigure = new BMenuItem("Figure",new BMessage(MenuConstants::K_MENU_INSERT_FIGURE)));
 	fenvironmentssubmenu->AddItem(ftable = new BMenuItem("Table",new BMessage(MenuConstants::K_MENU_INSERT_TABLE)));
 	fenvironmentssubmenu->AddSeparatorItem();
@@ -244,7 +248,7 @@ void MainWindow::CreateMenuBar(BMenuBar *menuBar)
 	fenvironmentssubmenu->AddSeparatorItem();
 	fenvironmentssubmenu->AddItem(fverbatim = new BMenuItem("Verbatim",new BMessage(MenuConstants::K_MENU_INSERT_VERBATIM)));
 	fenvironmentssubmenu->AddItem(fquote = new BMenuItem("Quote",new BMessage(MenuConstants::K_MENU_INSERT_QUOTE)));
-		
+
 	BMenu *compileMenu = new BMenu("Compile");
 	menuBar->AddItem(compileMenu);
 	compileMenu->AddItem(ftexdvi = new BMenuItem("tex->dvi", new BMessage(ToolbarConstants::K_CMD_COMPILE_TEXDVI),'1'));
@@ -263,7 +267,6 @@ void MainWindow::CreateMenuBar(BMenuBar *menuBar)
 
 void MainWindow::InsertText(const char* text)
 {
-	//TListItem* it = CurrentTListItem;
 	TexView* tv = CurrentTexView();
 	if(tv != NULL)
 	{
@@ -282,7 +285,7 @@ void MainWindow::InsertText(const char* text)
 				cmd.CopyInto(leftstr,0,lbrk+1);
 				BString rightstr;
 				cmd.CopyInto(rightstr,rbrk,cmd.Length()-rbrk);
-				
+
 				tv->Insert(start,leftstr.String(),leftstr.Length(),NULL);
 				tv->Insert(finish+leftstr.Length(),rightstr.String(),rightstr.Length(),NULL);
 				tv->Select(finish+rightstr.Length()+leftstr.Length(),finish+rightstr.Length()+leftstr.Length());
@@ -303,7 +306,7 @@ void MainWindow::InsertText(const char* text)
 				tv->Select(start+cmd.Length(),start+cmd.Length());
 		}
 		tv->ScrollToSelection();
-	}		
+	}
 }
 
 void MainWindow::UpdateStatusBar()
@@ -311,35 +314,34 @@ void MainWindow::UpdateStatusBar()
 	int current = m_projectView->CurrentSelection();
 	if(m_projectView->CountItems() == 0 || current < 0)
 			m_statusBar->SetText("BeTeX");
-	
+
 	else
 	{
-		
+
 		if(current >= 0)
 		{
 			TexView* tv = CurrentTexView();
 			ProjectItem* item = CurrentTListItem();
-			
+
 			if(tv == NULL || item == NULL)
 				return;
-			
+
 			BString displayme;
 
 			int32 offset,finish;
 			tv->GetSelection(&offset,&finish);
-			
+
 			vector<int> sols;
 			vector<int> eols;
 			tv->FillSolEol(sols,eols,0,tv->TextLength()-1);
-			//cout << sols.size() << " " << eols.size() << endl;
 			int line=sols.size();
 			for(int i=sols.size()-1;i>=0;i--)
 			{
 				if(offset >= sols[i])// && offset <= eols[i])
-				{	
+				{
 					line = i;
 					break;
-				}	
+				}
 			}
 			if(line < 0)
 				displayme << item->Label();//was FName()
@@ -350,10 +352,15 @@ void MainWindow::UpdateStatusBar()
 				position++;
 				//last lines don't display........ :P
 				displayme << item->Label() << " [" << (int)line << "," << (int) position << "]";
-			}				
+			}
 			m_statusBar->SetText(displayme.String());
 		}
 	}
+}
+
+ProjectView* MainWindow::GetProjectView()
+{
+	return m_projectView;
 }
 
 TexView* MainWindow::CurrentTexView()
@@ -364,7 +371,7 @@ TexView* MainWindow::CurrentTexView()
 		TexView* tv;
 		ProjectItem* item;
 		item = (ProjectItem*)m_projectView->ItemAt(current);
-		tv = (TexView*)item->ChildView();
+		tv = (TexView*)(item->ChildView());
 		return tv;
 	}
 	return NULL;
@@ -396,40 +403,39 @@ void MainWindow::Execute(char* script, const char* cmd)
 		{
 			BPath parent;
 			path.GetParent(&parent);
-			
+
 			BString initial;
 			initial << "#!/bin/sh\n" << "cd \"" << parent.Path() << "\"\n";
-			BString sourceme;
-			sourceme << "source ~/.profile\n";
 			BString command;
 			command << cmd << "\n";
 			BString fname;
 			fname << path.Leaf();
 			fname.Replace(".tex","",1);
 			command.ReplaceAll("$",fname.String());
-			
+
 			BString echostr;
 			echostr << "echo \"\\$ " << command.String() << "\"";
 			echostr.ReplaceAll("\n","");
 			echostr << "\n";
-			
+
 			BString end;
 			end << "echo \"(Press Enter To Continue)\"\nread\nexit 0\n";
-			
+
 			BFile file(script,B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-			
+
 			if(file.InitCheck() == B_OK)
 			{
 				file.Write(initial.String(),initial.Length());
-				file.Write(sourceme.String(),sourceme.Length()); 
 				file.Write(echostr.String(),echostr.Length()); 
 				file.Write(command.String(),command.Length());
 				file.Write(end.String(),end.Length());
+				file.SetPermissions(X_OK);
 				file.Unset();
 				char *args[] = {script, NULL};
-				be_roster->Launch("application/x-vnd.Be-SHEL",1,args);
-				
-			}	
+				//TODO : for BeOS R5, the signature is x-vnd.Be-SHEL, how to deal both Haiku and BeOS ?
+				be_roster->Launch("application/x-vnd.Haiku-Terminal",1,args);
+
+			}
 		}
 	}
 	ResetPermissions();
@@ -452,15 +458,15 @@ void MainWindow::ResetPermissions()
 		//edit items
 		fundo->SetEnabled(false);
 		//fredo->SetEnabled(false);
-		
+
 		fbold->SetEnabled(false);
 		femph->SetEnabled(false);
 		fital->SetEnabled(false);
 		fshiftleft->SetEnabled(false);
 		fshiftright->SetEnabled(false);
-		
-		
-		
+
+
+
 		fcut->SetEnabled(false);
 		fcopy->SetEnabled(false);
 		fpaste->SetEnabled(false);
@@ -469,20 +475,21 @@ void MainWindow::ResetPermissions()
 		fgotoline->SetEnabled(false);
 		fcomment->SetEnabled(false);
 		funcomment->SetEnabled(false);
-		
+
 		ftexdvi->SetEnabled(false);
 		fdvipdf->SetEnabled(false);
 		fdvips->SetEnabled(false);
 		fpspdf->SetEnabled(false);
 		ftexpdf->SetEnabled(false);
 		ftexhtml->SetEnabled(false);
-		
+
 		fpostscript->SetEnabled(false);
 		fpdf->SetEnabled(false);
 		fhtml->SetEnabled(false);
-		
+
 		m_toolBar->TBSave->SetEnabled(false);
 		m_toolBar->TBPrint->SetEnabled(false);
+		//m_toolBar->TBDelTmp->SetEnabled(false);
 		m_toolBar->TBViewLog->SetEnabled(false);
 		m_toolBar->TBTexDvi->SetEnabled(false);
 		m_toolBar->TBDviPdf->SetEnabled(false);
@@ -496,6 +503,8 @@ void MainWindow::ResetPermissions()
 		m_toolBar->TBPrevPDF->SetEnabled(false);
 		m_toolBar->TBPrevPS->SetEnabled(false);
 		m_toolBar->TBPrevHTML->SetEnabled(false);
+		//m_toolBar->TBDelTmp->SetAuxIcon(true);
+
 
 		finsertfile->SetEnabled(false);
 		fdate->SetEnabled(false);
@@ -530,33 +539,33 @@ void MainWindow::ResetPermissions()
 	}
 	else
 	{
-	
+
 		bool DoesPdfExist = false;
 		bool DoesPsExist = false;
 		bool DoesDviExist = false;
 		bool DoesHtmlExist = false;
 		bool DoesLogExist = false;
 		bool DoesTexExist = li->IsHomely();
-		
+
 		bool IsSomeTextPasteable = false;
-		
+
 		bool IsSaveNeeded = li->IsSaveNeeded() || !DoesTexExist;
-		
+
 		bool IsNonZeroText = tv->TextLength() > 0;
 		int32 start,finish;
 		tv->GetSelection(&start,&finish);
 		bool IsSomeTextSelected = (start != finish);
-		
+
 		BPath parent;
-		entry_ref ref = li->GetRef();
+		entry_ref ref  = li->GetRef();
 		TexPath.SetTo(&ref);
 		if(TexPath.InitCheck() == B_OK)
 		{
 			basename = "";
 			basename << TexPath.Leaf();
 			basename.Replace(".tex","",1);
-	
-			
+
+
 			TexPath.GetParent(&parent);
 			parent_dir = parent;
 		}
@@ -568,25 +577,25 @@ void MainWindow::ResetPermissions()
 			BString ps_path;
 			BString html_path;
 			BString log_path;
-			
+
 			pdf_path << TexPath.Path();
 			pdf_path.Replace(".tex",".pdf",1);
-			
+
 			log_path << TexPath.Path();
 			log_path.Replace(".tex",".log",1);
-			
+
 			ps_path << TexPath.Path();
 			ps_path.Replace(".tex",".ps",1);
 			dvi_path << TexPath.Path();
 			dvi_path.Replace(".tex",".dvi",1);
 			html_path << parent_dir.Path() << "/" << basename.String() << "/" << basename.String() << ".html";
-				
+
 			BEntry log_entry(log_path.String());
 			BEntry pdf_entry(pdf_path.String());
 			BEntry ps_entry(ps_path.String());
 			BEntry dvi_entry(dvi_path.String());
 			BEntry html_entry(html_path.String());
-			
+
 			DoesPdfExist = pdf_entry.Exists();
 			DoesPsExist = ps_entry.Exists();
 			DoesDviExist = dvi_entry.Exists();
@@ -597,7 +606,7 @@ void MainWindow::ResetPermissions()
 
 		m_toolBar->TBPrint->SetEnabled(IsNonZeroText);
 		m_toolBar->TBSave->SetEnabled(IsSaveNeeded);
-	
+
 		m_toolBar->TBViewLog->SetEnabled(DoesLogExist);
 		m_toolBar->TBTexDvi->SetEnabled(DoesTexExist);
 		m_toolBar->TBDviPdf->SetEnabled(DoesDviExist);
@@ -606,20 +615,19 @@ void MainWindow::ResetPermissions()
 		m_toolBar->TBTexDvi->SetEnabled(DoesTexExist);
 		m_toolBar->TBTexPdf->SetEnabled(DoesTexExist);
 		m_toolBar->TBTexHtml->SetEnabled(DoesTexExist);
-		
+
 		m_toolBar->TBOpenTracker->SetEnabled(DoesTexExist);
 		m_toolBar->TBOpenTerminal->SetEnabled(DoesTexExist);
 		m_toolBar->TBPrevPDF->SetEnabled(DoesPdfExist);
 		m_toolBar->TBPrevPS->SetEnabled(DoesPsExist);
 		m_toolBar->TBPrevHTML->SetEnabled(DoesHtmlExist);
 
-
 		//Menu Items
 		fprint->SetEnabled(IsNonZeroText);
 		fpgsetup->SetEnabled(IsNonZeroText);
 		fsave->SetEnabled(IsSaveNeeded);
 		fsaveas->SetEnabled(true);//IsSaveNeeded);
-		
+
 		fclose->SetEnabled(true);
 		fbold->SetEnabled(true);
 		femph->SetEnabled(true);
@@ -654,47 +662,45 @@ void MainWindow::ResetPermissions()
 		fshiftleft->SetEnabled(true);//IsSomeTextSelected);
 		fshiftright->SetEnabled(true);//IsSomeTextSelected);
 
-	
+
 		fselall->SetEnabled(!IsSomeTextSelected);
 		fcomment->SetEnabled(IsSomeTextSelected);
 		funcomment->SetEnabled(IsSomeTextSelected);
-		
+
 		fsearchreplace->SetEnabled(true);
 		fgotoline->SetEnabled(true);
-	
-		const char* cliptext;
-		int32 length;
+
 		BMessage* clip = NULL;
-		
-		
+
+
 		//should do some watching.....
 		if(be_clipboard->Lock())
 		{
-			
+
 			IsSomeTextPasteable = ((clip = be_clipboard->Data()));//if((clip = be_clip
 			be_clipboard->Unlock();
 		}
-		
+
 		fpaste->SetEnabled(IsSomeTextPasteable);
-		
+
 		ftexdvi->SetEnabled(DoesTexExist);
 		fdvipdf->SetEnabled(DoesDviExist);
 		fdvips->SetEnabled(DoesDviExist);
 		fpspdf->SetEnabled(DoesPsExist);
 		ftexpdf->SetEnabled(DoesTexExist);
 		ftexhtml->SetEnabled(DoesTexExist);
-	
+
 		fpostscript->SetEnabled(DoesPsExist);
 		fpdf->SetEnabled(DoesPdfExist);
 		fhtml->SetEnabled(DoesHtmlExist);
-			
-	
+
+
 		//Setup some node monitoring......
 		if(TexPath.InitCheck() == B_OK && DoesTexExist)
 		{
-		
+
 			bool IsAlreadyWatched=false;
-			for(int i=0;i<watchedPaths.size();i++)
+			for(uint i=0;i<watchedPaths.size();i++)
 			{
 				if(parent == watchedPaths[i])
 				{
@@ -702,24 +708,24 @@ void MainWindow::ResetPermissions()
 					break;
 				}
 			}
-			
-			
+
+
 			if(!IsAlreadyWatched)
 			{
-				
-				
+
+
 				watchedPaths.push_back(parent);
-				
+
 				node_ref nref;
 				BEntry parent_entry(parent.Path());
 				if(parent_entry.InitCheck() == B_OK)
 				{
 					parent_entry.GetNodeRef(&nref);
 					BMessenger msgr(this);
-					
+
 					if(watch_node(&nref,B_WATCH_DIRECTORY,msgr) != B_OK)
 						cout << "err watching: " << parent.Path() << endl;
-					
+
 				}
 					node_ref nref_latex2htmlfolder;
 					BString latex2html_dir;
@@ -732,10 +738,10 @@ void MainWindow::ResetPermissions()
 						if(watch_node(&nref_latex2htmlfolder,B_WATCH_DIRECTORY,msgr) != B_OK)
 						cout << "err watching latex2html folder" << endl;
 						//&& watch_node(&nref_latex2htmlfolder,B_WATCH_DIRECTORY,msgr) == B_OK)
-					}				
+					}
 			}
 		}
-		
+
 	}
 }
 
@@ -755,9 +761,9 @@ void MainWindow::SetShortcuts()
 
 //replace by multiple handlers!!!
 void MainWindow::MessageReceived(BMessage* message)
-{	
+{
 	switch(message->what)
-	{	
+	{
 		case K_MENU_FORMAT_RESET_LAYOUT:
 		{
 			m_verticalSplit->SetAlignment(B_HORIZONTAL);
@@ -766,8 +772,8 @@ void MainWindow::MessageReceived(BMessage* message)
 			m_horizontalSplit->SetAlignment(B_VERTICAL);
 			m_horizontalSplit->SetEditable(false);
 			m_horizontalSplit->SetBarPosition(TLIST_VIEW_WIDTH);
-			//prefs->splitmsg = SP->GetState();
-			//prefs->split_leftmsg = LEFT->GetState();
+			preferences->splitmsg = m_horizontalSplit->GetState();
+			preferences->split_leftmsg = m_verticalSplit->GetState();
 		}
 		break;
 		case K_MENU_INSERT_DATE:
@@ -778,7 +784,7 @@ void MainWindow::MessageReceived(BMessage* message)
 				//Avert your eyes! This isn't nice code :-)
 				int MAX_BUF=100;
 				BString cmd="";
-				cmd << "date ";
+				cmd << "date " << preferences->dateFlags.String();
 				FILE* ptr = popen(cmd.String(),"r");
 				char buf[MAX_BUF+1];
 				int size;
@@ -819,26 +825,32 @@ void MainWindow::MessageReceived(BMessage* message)
 						}
 					}
 				}
-			}							
+			}
 		}
 		break;
 		case K_MENU_INSERT_FILE:
 		{
 			insertfilePanel->Show();
-		
+
 		}
 		break;
 		case K_MENU_INSERT_ARRAY:
 		{
-				//launch colour chooser window
+				//launch color chooser window
 				if(dimChooser != NULL)
 				{
 					dimChooser->Activate(true);
 					break;
 				}
 
+				BPoint p;
+				uint32 buttons;
+				ChildAt(0)->GetMouse(&p,&buttons);
+				ChildAt(0)->ConvertToScreen(&p);
+				p.x-=30;
+				p.y-=30;
 				float w=150,h=115;
-				dimChooser = new DimensionWindow(BRect(0,0,w,h),
+				dimChooser = new DimensionWindow(BRect(p.x,p.y,p.x+w,p.y+h),
 						new BMessenger(this), "10", "10",
 						MenuConstants::K_MENU_INSERT_ARRAY_WITHDIM);
 				dimChooser->Show();
@@ -868,20 +880,26 @@ void MainWindow::MessageReceived(BMessage* message)
 							insert << "* \\\\\n";
 					}
 				}
-				insert << "\\end{array}\n";	
+				insert << "\\end{array}\n";
 				InsertText(insert.String());
 		}
-		break;	
+		break;
 		case K_MENU_INSERT_MATRIX:
 		{
-				//launch colour chooser window
+				//launch color chooser window
 				if(dimChooser != NULL)
 				{
 					dimChooser->Activate(true);
 					break;
 				}
+				BPoint p;
+				uint32 buttons;
+				ChildAt(0)->GetMouse(&p,&buttons);
+				ChildAt(0)->ConvertToScreen(&p);
+				p.x-=30;
+				p.y-=30;
 				float w=150,h=115;
-				dimChooser = new DimensionWindow(BRect(0,0,w,h),
+				dimChooser = new DimensionWindow(BRect(p.x,p.y,p.x+w,p.y+h),
 						new BMessenger(this),"10","10",
 						MenuConstants::K_MENU_INSERT_MATRIX_WITHDIM);
 				dimChooser->Show();
@@ -911,23 +929,30 @@ void MainWindow::MessageReceived(BMessage* message)
 							insert << "* \\\\\n";
 					}
 				}
-				insert << "\\end{array}\n\\right)\n";	
+				insert << "\\end{array}\n\\right)\n";
 				InsertText(insert.String());
 		}
 		break;
 		case K_MENU_INSERT_TABULAR:
 		{
-				//launch colour chooser window
+				//launch color chooser window
 				if(dimChooser != NULL)
 				{
 					dimChooser->Activate(true);
 					break;
 				}
 
+				BPoint p;
+				uint32 buttons;
+				ChildAt(0)->GetMouse(&p,&buttons);
+				ChildAt(0)->ConvertToScreen(&p);
+				p.x-=30;
+				p.y-=30;
 				float w=150,h=115;
-				dimChooser = new DimensionWindow(BRect(0,0,w,h),
+				dimChooser = new DimensionWindow(BRect(p.x,p.y,p.x+w,p.y+h),
 						new BMessenger(this),"10","10",
 						MenuConstants::K_MENU_INSERT_TABULAR_WITHDIM);
+
 				dimChooser->Show();
 				dimChooser->CenterOnScreen();
 		}
@@ -957,14 +982,14 @@ void MainWindow::MessageReceived(BMessage* message)
 							insert << "* \\\\\n";
 					}
 				}
-				insert << "\\hline\n\\end{tabular}\n";	
+				insert << "\\hline\n\\end{tabular}\n";
 				InsertText(insert.String());
 		}
 		break;
 		case K_DIM_WINDOW_QUIT:
 		{
 			dimChooser = NULL;
-		
+
 		}
 		break;
 		case K_MENU_INSERT_EQNARRAY:
@@ -996,25 +1021,25 @@ void MainWindow::MessageReceived(BMessage* message)
 		case K_MENU_INSERT_FIGURE:
 		{
 			InsertText("\\begin{figure}\n\t\\includegraphics[*]{*}\n\t\\caption{*}\n\t\\label{*}\n\\end{figure}\n");
-		
+
 		}
-		break;		
+		break;
 		case K_MENU_INSERT_CENTER:
 		{
 			InsertText("\\begin{center}\n\n\\end{center}\n");
-		
+
 		}
 		break;
 		case K_MENU_INSERT_FLUSHLEFT:
 		{
 			InsertText("\\begin{flushleft}\n\n\\end{flushleft}\n");
-		
+
 		}
 		break;
 		case K_MENU_INSERT_FLUSHRIGHT:
 		{
 			InsertText("\\begin{flushright}\n\n\\end{flushright}\n");
-		
+
 		}
 		break;
 		case K_MENU_INSERT_ITEMIZE:
@@ -1023,7 +1048,7 @@ void MainWindow::MessageReceived(BMessage* message)
 			//  \item *
 			//  \item *
 			//\end{itemize}
-						
+
 			InsertText("\\begin{itemize}\n\t\\item *\n\t\\item *\n\\end{itemize}\n");
 		}
 		break;
@@ -1033,7 +1058,7 @@ void MainWindow::MessageReceived(BMessage* message)
 			    \item[*] *
 			    \item[*] *
 			\end{description}
-			*/			
+			*/
 			InsertText("\\begin{description}\n\t\\item[*] *\n\t\\item[*] *\n\\end{description}\n");
 		}
 		break;
@@ -1051,43 +1076,35 @@ void MainWindow::MessageReceived(BMessage* message)
 			InsertText("\\begin{equation}\\label{*}\n\t*\n\\end{equation}\n");
 		}
 		break;
-		case K_MENU_INSERT_COLOURED_TEXT:
+		case K_MENU_INSERT_COLORED_TEXT:
 		{
 			if(CurrentTListItem() != NULL)
 			{
-				//launch colour chooser window
+				//launch color chooser window
 				if(rgbTxtChooser != NULL)
 				{
 					rgbTxtChooser->Activate(true);
 					break;
 				}
 
+				BPoint p;
+				uint32 buttons;
+				ChildAt(0)->GetMouse(&p,&buttons);
+				ChildAt(0)->ConvertToScreen(&p);
+				p.x-=30;
+				p.y-=30;
 				float w=350,h=115;
-				rgbTxtChooser = new ColourWindow(BRect(0,0,w,h),
-						new BMessenger(this),prefs->RGBText_color);
+				rgbTxtChooser = new ColorWindow(BRect(p.x,p.y,p.x+w,p.y+h),
+						new BMessenger(this),preferences->RGBText_color);
+
 				rgbTxtChooser->Show();
 			}
 		}
 		break;
-		case K_COLOUR_PREFS_UPDATE:
+		case K_COLOR_WINDOW_QUIT:
 		{
-			rgb_color*	Rgb;
-			ssize_t		Size;
-			rgb_color color;
-			// if there is RGB color
-			if((message->FindData("color", B_RGB_COLOR_TYPE, (const void **)&Rgb, &Size) == B_OK))
-			{
-				prefs->RGBText_color = *Rgb;
-				BString text;
-				text << "\\textcolor[rgb]{" << (int)prefs->RGBText_color.red << "," << (int)prefs->RGBText_color.green << "," << (int)prefs->RGBText_color.blue << "}{}"; 
-				InsertText(text.String());
-			}
-		}
-		break;
-		case K_COLOUR_WINDOW_QUIT:
-		{
-			rgbTxtChooser = NULL;	
-		
+			rgbTxtChooser = NULL;
+
 		}
 		break;
 		case K_MENU_FORMAT_SHIFT_RIGHT:
@@ -1096,9 +1113,9 @@ void MainWindow::MessageReceived(BMessage* message)
 			if(tv != NULL)
 			{
 				tv->ShiftRight();
-				
+
 			}
-		
+
 		}
 		break;
 		case K_MENU_FORMAT_SHIFT_LEFT:
@@ -1107,9 +1124,9 @@ void MainWindow::MessageReceived(BMessage* message)
 			if(tv != NULL)
 			{
 				tv->ShiftLeft();
-				
+
 			}
-		
+
 		}
 		break;
 		case B_NODE_MONITOR:
@@ -1131,7 +1148,7 @@ void MainWindow::MessageReceived(BMessage* message)
 		{
 			InsertText("\\textit{}");
 		}
-		break;		
+		break;
 		case K_CMD_DELETE_TEMP_FILES:
 		{
 			ProjectItem* item = CurrentTListItem();
@@ -1159,8 +1176,8 @@ void MainWindow::MessageReceived(BMessage* message)
 					}
 				}
 			}
-			
-		
+
+
 		}
 		break;
 		case K_CMD_VIEW_LOG_FILE:
@@ -1175,18 +1192,18 @@ void MainWindow::MessageReceived(BMessage* message)
 					BString logpath;
 					logpath << path.Path();
 					logpath.Replace(".tex",".log",1);
-					
+
 					char* arg = (char*)logpath.String();
 					be_roster->Launch("application/x-vnd.Be-STEE",1,&arg);
 				}
 			}
-		
+
 		}
 		break;
 		case K_UPDATE_CLIPBOARD_MENU_STATUS:
 		{
 			ResetPermissions();
-		
+
 		}
 		break;
 		case K_MENU_FILE_PAGE_SETUP:
@@ -1227,14 +1244,14 @@ void MainWindow::MessageReceived(BMessage* message)
 							break;
 					}*/
 					int offset=0;
-					for(int i=0;i<sols.size();i++)
-					{	
+					for(uint i=0;i<sols.size();i++)
+					{
 						tv->Insert(sols[i]+offset,"%",1);
 						offset++;	//we have to do this because with each insert the sols[i] offset is invalid (a shift occurs)
 					}
 				}
 			}
-		
+
 		}
 		break;
 		case K_MENU_FORMAT_UNCOMMENTLINE:
@@ -1251,7 +1268,7 @@ void MainWindow::MessageReceived(BMessage* message)
 					tv->FillSolEol(sols,eols,start,finish);
 					//int32 startline=-1;
 					//int32 endline=-1;
-					
+
 					/*for(int i=0;i<sols.size();i++)
 					{
 						if(start >= sols[i] && start <= eols[i])
@@ -1266,7 +1283,7 @@ void MainWindow::MessageReceived(BMessage* message)
 					BFont font(be_fixed_font);
 					font.SetSize(12);
 					int offset=0;
-					for(int i=0;i<sols.size();i++)
+					for(uint i=0;i<sols.size();i++)
 					{
 						const char* text = tv->Text();
 						if(text[sols[i]-offset] == '%')	//we don't want to delete a non-comment
@@ -1275,13 +1292,13 @@ void MainWindow::MessageReceived(BMessage* message)
 							offset++;//we have to do this because with each delete the sols[i] offset is invalid (a shift occurs)
 						}
 					}
-					
-						
+
+
 				}
 			}
-		
+
 		}
-		break;		
+		break;
 		case K_FILE_CONTENTS_CHANGED:
 		{
 			ProjectItem* item = CurrentTListItem();
@@ -1290,19 +1307,18 @@ void MainWindow::MessageReceived(BMessage* message)
 				if(!item->IsSaveNeeded())
 				{
 					item->SetSaveNeeded(true);
-					//m_projectView->InvalidateItem(m_projectView->CurrentSelection());
+					//TODO ?m_projectView->InvalidateItem(m_projectView->CurrentSelection());
 				}
 			}
-		
+
 		}
 		break;
 		case K_SEARCH_WINDOW_FIND:
 		{
 			const char* ftext;
 			int32	err;// = B_ERROR; 
-			int32	endpoint;
 			int32	length;
-			
+
 			if(message->FindString("ftext",&ftext) == B_OK)
 			{
 
@@ -1315,33 +1331,33 @@ void MainWindow::MessageReceived(BMessage* message)
 					TexView* tv = CurrentTexView();
 					if(tv != NULL)
 					{
-						
+
 						BString findme;
 						findme << ftext;
 						length = findme.Length();
-					
+
 						if(length <= 0)
 							return;
-						
+
 						BString text(tv->Text());
-						
+
 						int32 start,finish;
 						tv->GetSelection(&start,&finish);
-									
-						if(prefs->IsSearchBackwards)
+
+						//if(preferences->IsSearchBackwards)
 						{
-							if(prefs->IsCaseSensitive)
+							//if(preferences->IsCaseSensitive)
 							{
 								err = text.FindLast(findme,start);
 							}
-							else
+							/*else
 							{
 								err = text.IFindLast(findme,start);
-							}
+							}*/
 						}
-						else
+						/*else
 						{
-							if(prefs->IsCaseSensitive)
+							//if(preferences->IsCaseSensitive)
 							{
 								err = text.FindFirst(findme,finish);
 							}
@@ -1349,24 +1365,24 @@ void MainWindow::MessageReceived(BMessage* message)
 							{
 								err = text.IFindFirst(findme,finish);
 							}
-						}
-						
-						if(err < 0 && prefs->IsWrapAround)
+						}*/
+
+						if(err < 0 /*&& preferences->IsWrapAround*/)
 						{
-							if(prefs->IsSearchBackwards)
+							//if(preferences->IsSearchBackwards)
 							{
-								if(prefs->IsCaseSensitive)
+								//if(preferences->IsCaseSensitive)
 								{
 									err = text.FindLast(findme,text.Length());
 								}
-								else
+								/*else
 								{
 									err = text.IFindLast(findme,text.Length());
-								}
+								}*/
 							}
-							else
+							/*else
 							{
-								if(prefs->IsCaseSensitive)
+								if(preferences->IsCaseSensitive)
 								{
 									err = text.FindFirst(findme,0);
 								}
@@ -1374,7 +1390,7 @@ void MainWindow::MessageReceived(BMessage* message)
 								{
 									err = text.IFindFirst(findme,0);
 								}
-							}
+							}*/
 						}
 						if (err >= 0) 
 						{
@@ -1382,7 +1398,7 @@ void MainWindow::MessageReceived(BMessage* message)
 							tv->Select(err, finish);
 							tv->ScrollToSelection();
 							Activate(true);
-						}					
+						}
 					}//end if(tv != NULL)
 			}
 		}
@@ -1392,9 +1408,9 @@ void MainWindow::MessageReceived(BMessage* message)
 		{
 			const char* ftext;
 			const char* rtext;
-			bool all;	
+			bool all;
 			if(message->FindString("ftext",&ftext) == B_OK
-			&& message->FindString("rtext",&rtext) == B_OK			
+			&& message->FindString("rtext",&rtext) == B_OK
 			&& message->FindBool("all",&all)==B_OK)
 			{
 				TexView* tv = CurrentTexView();
@@ -1402,13 +1418,13 @@ void MainWindow::MessageReceived(BMessage* message)
 				{
 					BString findme;
 					findme << ftext;
-					
+
 					BString replacewith;
 					replacewith << rtext;
-					
+
 					BString text(tv->Text());
-					
-					
+
+
 					int32 start,finish;
 					int32 offset;
 					if(all)
@@ -1419,7 +1435,7 @@ void MainWindow::MessageReceived(BMessage* message)
 					//if(replacewith.Length() > 0)
 					//while((offset = text.FindFirst(findme.String(),start)) >= 0)
 					//{
-					//{	
+					//{
 					if(!all)
 					{
 						offset = text.FindFirst(findme,start);
@@ -1431,7 +1447,7 @@ void MainWindow::MessageReceived(BMessage* message)
 					}
 					else
 					{
-						if(prefs->IsAllDocs)
+						if(preferences->IsAllDocs)
 						{
 							TexView* tv;
 							ProjectItem* item;
@@ -1439,31 +1455,31 @@ void MainWindow::MessageReceived(BMessage* message)
 							for(int i=0;i<m_projectView->CountItems();i++)
 							{
 								item = (ProjectItem*)m_projectView->ItemAt(i);
-								tv = (TexView*)item->TextView();
+								tv = (TexView*)item->ChildView();
 								if(item != NULL && tv != NULL)
 								{
 									text = tv->Text();
-									if(prefs->IsCaseSensitive)
+									// if(preferences->IsCaseSensitive)
 									{
 										text.ReplaceAll(findme.String(),replacewith.String());
 									}
-									else
+									/*else
 									{
 										text.IReplaceAll(findme.String(),replacewith.String());
-									}
-									
+									}*/
+
 									if(text.Compare(tv->Text()) == 0)
 										return;	//the same after replace all
-									
+
 									tv->SetText(text.String(),text.Length());
-									
+
 									/*if(text.Length() < start)
 										start = text.Length();
 									if(text.Length() < finish)
 										finish = text.Length();
 									*/
 									//if(i == m_projectView->CountItems()-1)
-									//{	
+									//{
 										//tv->Select(start,finish);
 										//tv->ScrollToSelection();
 										Activate(true);
@@ -1474,8 +1490,8 @@ void MainWindow::MessageReceived(BMessage* message)
 						}
 						else
 						{
-							
-							if(prefs->IsCaseSensitive)
+
+							if(preferences->IsCaseSensitive)
 							{
 								text.ReplaceAll(findme.String(),replacewith.String());
 							}
@@ -1483,24 +1499,24 @@ void MainWindow::MessageReceived(BMessage* message)
 							{
 								text.IReplaceAll(findme.String(),replacewith.String());
 							}
-							
+
 							if(text.Compare(tv->Text()) == 0)
 								return;	//the same after replace all
-							
+
 							tv->SetText(text.String(),text.Length());
-							
+
 							if(text.Length() < start)
 								start = text.Length();
 							if(text.Length() < finish)
 								finish = text.Length();
-								
+
 							tv->Select(start,finish);
 							tv->ScrollToSelection();
 							Activate(true);
-						
-					
-						}						
-					
+
+
+						}
+
 					}
 				}
 			}
@@ -1511,13 +1527,15 @@ void MainWindow::MessageReceived(BMessage* message)
 			searchPanel = NULL;
 		}
 		break;
-		case AboutMessages::K_ABOUT_WINDOW_QUIT:
+		case K_GTL_WINDOW_QUIT:
+			gtlPanel = NULL;
+		break;
+		case K_ABOUT_WINDOW_QUIT:
 			aboutPanel = NULL;
-		break;		
+		break;
 		case K_PREFS_WINDOW_QUIT:
 			prefsPanel = NULL;
 		break;
-		
 		case K_MENU_FILE_PREFS:
 		{
 			if(prefsPanel != NULL)
@@ -1526,10 +1544,18 @@ void MainWindow::MessageReceived(BMessage* message)
 				break;
 			}
 
+			BPoint p;
+			uint32 buttons;
+			ChildAt(0)->GetMouse(&p,&buttons);
+			ChildAt(0)->ConvertToScreen(&p);
+			p.x-=30;
+			p.y-=30;
 			float w=600,h=400;
-			prefsPanel = new PrefsWindow(BRect(0,0,w,h),new BMessenger(this));
-			prefsPanel->Show();
-			prefsPanel->CenterOnScreen();
+			prefsPanel = new PrefsWindow(BRect(p.x, p.y, p.x+w, p.y+h),new BMessenger(this), m_texToolBar);
+
+			prefsPanel->StartWatching(this, PrefsConstants::K_PREFS_UPDATE);
+
+ 			prefsPanel->Show();
 		}
 		break;
 		case K_MENU_EDIT_SEARCH:
@@ -1540,10 +1566,34 @@ void MainWindow::MessageReceived(BMessage* message)
 				break;
 			}
 
+			BPoint p;
+			uint32 buttons;
+			ChildAt(0)->GetMouse(&p,&buttons);
+			ChildAt(0)->ConvertToScreen(&p);
+			p.x-=30;
+			p.y-=30;
 			float w=380,h=235;
-			searchPanel = new SearchWindow(BRect(0,0,w,h),new BMessenger(this));
-			searchPanel->Show();		
+			searchPanel = new SearchWindow(BRect(p.x,p.y,p.x+w,p.y+h),new BMessenger(this));
+
+			searchPanel->Show();
 			searchPanel->CenterOnScreen();
+		}
+		break;
+		case K_MENU_EDIT_GOTOLINE:
+		{
+			if(gtlPanel != NULL)
+			{
+				gtlPanel->Activate(true);
+				break;
+			}
+			BPoint p;
+			uint32 buttons;
+			ChildAt(0)->GetMouse(&p,&buttons);
+			ChildAt(0)->ConvertToScreen(&p);
+			p.x-=15;
+			p.y-=15;
+			gtlPanel = new GoToLineWindow(BRect(p.x,p.y,p.x+102,p.y+40),new BMessenger(this));
+			gtlPanel->Show();
 		}
 		break;
 		case AboutMessages::K_ABOUT_WINDOW_LAUNCH:
@@ -1553,7 +1603,14 @@ void MainWindow::MessageReceived(BMessage* message)
 				aboutPanel->Activate(true);
 				break;
 			}
-			aboutPanel = new AboutWindow(BRect(0,0,400,300),new BMessenger(this));
+
+			BPoint p;
+			uint32 buttons;
+			ChildAt(0)->GetMouse(&p,&buttons);
+			ChildAt(0)->ConvertToScreen(&p);
+			p.x-=15;
+			p.y-=15;
+			aboutPanel = new AboutWindow(BRect(p.x,p.y,p.x+400,p.y+300),new BMessenger(this));
 			aboutPanel->Show();
 			aboutPanel->CenterOnScreen();
 		}
@@ -1571,9 +1628,9 @@ void MainWindow::MessageReceived(BMessage* message)
 					UpdateStatusBar();
 				}
 			}
-		
+
 		}
-		break;		
+		break;
 		case K_UPDATE_STATUSBAR:
 		{
 			ResetPermissions();
@@ -1610,7 +1667,7 @@ void MainWindow::MessageReceived(BMessage* message)
 				}
 			}
 		}
-		break;				
+		break;
 		case K_CMD_LAUNCH_TRACKER:
 		{
 			ProjectItem* item = CurrentTListItem();
@@ -1625,15 +1682,15 @@ void MainWindow::MessageReceived(BMessage* message)
 					char* arg = (char*)parent.Path();
 					be_roster->Launch("application/x-vnd.Be-TRAK",1,&arg);
 				}
-			}		
+			}
 		}
 		break;
-		
+
 		case K_CMD_LAUNCH_DVIVIEWER:
 		break;
 		case K_CMD_LAUNCH_PSVIEWER:
 		{
-			Execute("/tmp/psview.sh",prefs->postscript_cmd.String());	
+			Execute("/tmp/psview.sh",preferences->postscript_cmd.String());
 		}
 		break;
 		case K_CMD_LAUNCH_HTMLVIEWER:
@@ -1650,7 +1707,7 @@ void MainWindow::MessageReceived(BMessage* message)
 					path.GetParent(&parent);
 					BString fname(path.Leaf());
 					fname.Replace(".tex","",1);
-					
+
 					BString url;
 					url << parent.Path() << "/" << fname.String() << "/" << fname.String() << ".html";
 					char *args[] = {(char*)url.String(), NULL};
@@ -1674,7 +1731,7 @@ void MainWindow::MessageReceived(BMessage* message)
 					{
 						BPath parent;
 						path.GetParent(&parent);
-						
+
 						BString pdfname(path.Leaf());
 						pdfname.Replace(".tex",".pdf",1);
 						parent.Append(pdfname.String());
@@ -1687,37 +1744,32 @@ void MainWindow::MessageReceived(BMessage* message)
 		break;
 		case K_CMD_COMPILE_TEXDVI:
 		{
-			Execute("/tmp/textodvi.sh",prefs->latex_cmd.String());
-		
+			Execute("/tmp/textodvi.sh",preferences->latex_cmd.String());
 		}
 		break;
 		case K_CMD_COMPILE_DVIPDF:
 		{
-			Execute("/tmp/dvitopdf.sh",prefs->dvipdf_cmd.String());
-		
+			Execute("/tmp/dvitopdf.sh",preferences->dvipdf_cmd.String());
 		}
 		break;
 		case K_CMD_COMPILE_DVIPS:
 		{
-			Execute("/tmp/dvitops.sh",prefs->dvips_cmd.String());
-		
+			Execute("/tmp/dvitops.sh",preferences->dvips_cmd.String());
 		}
 		break;
 		case K_CMD_COMPILE_PSPDF:
 		{
-			Execute("/tmp/pstopdf.sh",prefs->ps2pdf_cmd.String());
-		
+			Execute("/tmp/pstopdf.sh",preferences->ps2pdf_cmd.String());
 		}
 		break;
 		case K_CMD_COMPILE_TEXPDF:
 		{
-			Execute("/tmp/textopdf.sh",prefs->pdflatex_cmd.String());
-		
+			Execute("/tmp/textopdf.sh",preferences->pdflatex_cmd.String());
 		}
 		break;
 		case K_CMD_COMPILE_TEXHTML:
 		{
-			Execute("/tmp/textohtml.sh",prefs->latex2html_cmd.String());	
+			Execute("/tmp/textohtml.sh",preferences->latex2html_cmd.String());
 		}
 		break;
 		case B_SIMPLE_DATA:
@@ -1736,18 +1788,27 @@ void MainWindow::MessageReceived(BMessage* message)
 					BNodeInfo ni(&node);
 					if(ni.InitCheck() == B_OK)
 					{
-						
+
 						char mime[B_MIME_TYPE_LENGTH];
 						if(ni.GetType(mime)==B_OK)
 						{
 							BString str(ref.name);
-							
+
 							if(str.FindFirst(".tex") > 0 && (strcmp(TEX_FILETYPE,mime) == 0 || strcmp("text/plain",mime) == 0))
 							{
-									
-								//m_projectView->AddItem(new ProjectItem(SP,docScroll,&ref,prefs));
-								be_roster->AddToRecentDocuments(&ref,APP_SIG);			
-								m_projectView->Select(m_projectView->CountItems()-1);							
+								BScrollView *docScroll = new BScrollView("docScroll",new TexView(BRect(0,0,0,0),BRect(0,0,0,0)),
+																		 B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
+								ProjectItem *projectItem= new ProjectItem(m_horizontalSplit, str, 
+									docScroll);
+								projectItem->SetRef(&ref);
+								m_projectView->AddItem(projectItem);
+								be_roster->AddToRecentDocuments(&ref,APP_SIG);
+								m_projectView->Select(m_projectView->CountItems()-1);
+
+								TexView* tv = CurrentTexView();
+								if(tv != NULL)
+									tv->LoadFile(&ref);
+								ResetPermissions();
 							}
 						}
 						if(strcmp(mime,"application/x-vnd.Be-directory")==0 ||
@@ -1759,67 +1820,72 @@ void MainWindow::MessageReceived(BMessage* message)
 								if(dir.InitCheck() == B_OK)
 								{
 									while(dir.GetNextRef(&dir_contains_ref) == B_OK)
-									{	
+									{
 										if(process_dir.AddRef("refs",&dir_contains_ref) != B_OK)
 											return;
-										
-									}	
+
+									}
 									PostMessage(&process_dir,this);
 								}
 							}
-						
+
 					}
 				}
 				ref_num++;
-				
+
 			}
 		//	OkToRemoveItem = true;
-			//if(prefs->IsActivationOk && !IsActive())
-			//	Activate();
+			if(preferences->IsActivationOk && !IsActive())
+				Activate();
 		}
 		break;
 		case K_MENU_FILE_OPEN_TEMPLATE:
 		{
 			entry_ref ref;
-			status_t err;
 			if(message->FindRef("refs",&ref) == B_OK)
+			//No need to verify the mime type : it is already verified when the template is added to the menu
 			{
 				BNode node(&ref);
 				if(node.InitCheck()==B_OK)
 				{
-					BNodeInfo ni(&node);
+					/*BNodeInfo ni(&node);
 					if(ni.InitCheck() == B_OK)
 					{
-						
+
 						char mime[B_MIME_TYPE_LENGTH];
 						if(ni.GetType(mime)==B_OK)
 						{
 							BString str(ref.name);
 							if(str.FindFirst(".tex") > 0 && (strcmp(TEX_FILETYPE,mime) == 0 || strcmp("text/plain",mime) == 0))
 							{
-								/*m_projectView->AddItem(new TListItem(SP,docScroll,&ref,prefs));
-								be_roster->AddToRecentDocuments(&ref,"application/x-vnd.misza-BeTeX");			
-								m_projectView->Select(m_projectView->CountItems()-1);		
-								*/
-								//BString fname(ref.name);
-								//m_projectView->AddItem(new ProjectItem(SP,docScroll,&ref,prefs,true));	
+					*/
+								BScrollView *docScroll = new BScrollView(ref.name, new TexView(BRect(0,0,0,0),BRect(0,0,0,0)),
+						 					 B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
+						 		ProjectItem *projectItem = new ProjectItem(m_horizontalSplit, ref.name, docScroll);
+								projectItem->SetRef(&ref);
+								m_projectView->AddItem(projectItem);
+								be_roster->AddToRecentDocuments(&ref,"application/x-vnd.misza-BeTeX");
 								m_projectView->Select(m_projectView->CountItems()-1);
-								/*TexView* tv = CurrentTexView();
+
+								//BString fname(ref.name);
+
+								TexView* tv = CurrentTexView();
 								if(tv != NULL)
-									tv->LoadFile(&ref);*/
-								ResetPermissions();				
+									tv->LoadFile(&ref);
+								ResetPermissions();
+					/*
 							}
 						}
-					}
+					}*/
 				}
 			}
-		
+
 		}
 		break;
 		case B_SAVE_REQUESTED:
 		{
 			 Save(message,m_projectView->CurrentSelection());
-			
+
 			if(RemoveAfterSave)
 			{
 				int32 current = RemoveAfterSaveIndex;
@@ -1832,23 +1898,23 @@ void MainWindow::MessageReceived(BMessage* message)
 				}
 				else
 				{
-					
+
 					if(current - 1 >= 0)
 						m_projectView->Select(current-1);
 					else if(current < items)
 						m_projectView->Select(current);
-				}							
-				
+				}
+
 				UpdateStatusBar();
 				RemoveAfterSave = false;
 			}
-	
+
 		}
 		break;
 		case K_MENU_FILE_NEW:
 		{
 			NewDocument();
-			
+
 		}
 		break;
 		case K_MENU_FILE_OPEN:
@@ -1860,8 +1926,8 @@ void MainWindow::MessageReceived(BMessage* message)
 		case K_MENU_FILE_CLOSE:
 		{
 			Close(m_projectView->CurrentSelection());
-			
-		}	
+
+		}
 		break;
 		case K_MENU_FILE_SAVEAS:
 		{
@@ -1880,7 +1946,7 @@ void MainWindow::MessageReceived(BMessage* message)
 			m_projectView->Prev(1);
 		break;
 		case K_MENU_FILE_QUIT:
-		{			
+		{
 			QuitRequested();
 		}
 		break;
@@ -1898,11 +1964,10 @@ void MainWindow::MessageReceived(BMessage* message)
 				if(item != NULL && tv != NULL)
 				{
 					tv->UpdateColors();
-					tv->SetViewColor(prefs->bg_color);
-					tv->Invalidate();				
+					tv->SetViewColor(preferences->bg_color);
+					tv->Invalidate();
 				}
 			}
-										
 		}
 		break;
 		case K_RESET_ALL_TEX_VIEW_FONTS:
@@ -1915,8 +1980,21 @@ void MainWindow::MessageReceived(BMessage* message)
 				tv = (TexView*)item->ChildView();
 				if(item != NULL && tv != NULL)
 				{
-					tv->UpdateFontSize();				
+					tv->UpdateFontSize();
 				}
+			}
+		}
+		break;
+		case B_OBSERVER_NOTICE_CHANGE:
+		{
+			if (message->GetInt32(B_OBSERVE_ORIGINAL_WHAT,0) == (int32)PrefsConstants::K_PREFS_UPDATE) 
+			{
+					rgb_color bubble_color = preferences->bubble_color;
+					helper->SetColor(bubble_color);
+			}
+			else 
+			{
+				BWindow::MessageReceived(message);
 			}
 		}
 		break;
@@ -1930,8 +2008,10 @@ void MainWindow::NewDocument()
 {
 	BString fname;
 	fname << "Untitled" << untitled_no << ".tex";
+	BScrollView *docScroll = new BScrollView(fname.String(), new TexView(BRect(0,0,0,0),BRect(0,0,0,0)),
+						 					 B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
 	m_projectView->AddItem(new ProjectItem(m_horizontalSplit,fname,
-				new TexView(BRect(0,0,0,0),BRect(0,0,0,0),prefs)));
+				docScroll)); //docScroll.Rect() ?
 	untitled_no++;
 	m_projectView->Select(m_projectView->CountItems()-1);
 	ResetPermissions();
@@ -1939,18 +2019,16 @@ void MainWindow::NewDocument()
 
 void MainWindow::Save(BMessage* msg,int32 index)
 {
-	
+
 			entry_ref ref;
 			const char* fname;
 			BPath path;
 			BEntry entry;
 
-			int current = m_projectView->CurrentSelection();
 			if(index >=0)
 			{
 				ProjectItem* li = (ProjectItem*)m_projectView->ItemAt(index);
-				//if(msg)
-				
+
 				if (msg && (msg->FindRef("directory", &ref)) == B_OK && (msg->FindString("name", &fname)) == B_OK)
 				{
 					if(entry.SetTo(&ref) == B_OK)
@@ -1958,24 +2036,25 @@ void MainWindow::Save(BMessage* msg,int32 index)
 						entry.GetPath(&path);
 						BString name_checker=fname;
 						if(name_checker.FindFirst(".tex") < 0)
-						{	
-							name_checker << ".tex";							
+						{
+							name_checker << ".tex";
 							fname = name_checker.String(); 
 						}
-						
+
 						path.Append(fname);
-						
+
 						BFile file(path.Path(),B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 						if(file.InitCheck() == B_OK)
 						{
-							file.Write(li->TextView()->Text(),li->TextView()->TextLength());
+							file.Write(((BTextView *)li->ChildView())->Text(),
+									   ((BTextView *)li->ChildView())->TextLength());
 							file.Unset();
 							update_mime_info(path.Path(),0,0,0);
-							
+
 							BString title;
 							title << "BeTeX" << " - " << fname;
 							SetTitle(title.String());
-							
+
 							BEntry final_entry(path.Path());
 							entry_ref final_ref;
 							final_entry.GetRef(&final_ref);
@@ -1984,31 +2063,33 @@ void MainWindow::Save(BMessage* msg,int32 index)
 							li->SetHomely(true);
 							li->SetSaveNeeded(false);
 							m_projectView->InvalidateItem(index);
-							
+
 						}
 					}
-				}	
+				}
 				else	//Save to current file
 				{
 					if(li->IsHomely()) //we can save somewhere
-					{	
+					{
 						ref = li->GetRef();
 						BFile file(&ref,B_READ_WRITE | B_ERASE_FILE);
 						if(file.InitCheck() == B_OK)
 						{
-							file.Write(li->TextView()->Text(),li->TextView()->TextLength());
+							file.Write(li->ChildView()->Text(),li->ChildView()->TextLength());
 							li->SetSaveNeeded(false);
 							li->SetHomely(true);
 							m_projectView->InvalidateItem(index);
-							
+
 						}
 					}
+					/*
 					else	//need to choose initial name
 					{
 						 SaveAsPanel(index);
 						 
 					}
-					
+					*/
+
 				}
 			}
 			ResetPermissions();
@@ -2033,8 +2114,8 @@ void MainWindow::Close(int32 current)
 			if(li != NULL && li->IsSaveNeeded())
 			{
 				BString text;
-				//text << "Save changes to \"" << li->FName() << "\"?";
-				
+				text << "Save changes to \"" << li->Label() << "\"?";
+
 				BAlert* alert = new BAlert("savealert",text.String(),"Cancel", "Don't Save","Save",
 				B_WIDTH_AS_USUAL,B_WARNING_ALERT);
 				alert->SetShortcut(0,B_ESCAPE);
@@ -2043,12 +2124,13 @@ void MainWindow::Close(int32 current)
 				{
 					case 0:
 						break;
-					//break;
+
 					case 1:
+					//TODO review block
 					{
-						
+
 						//m_projectView->Invalidate();
-						
+
 						//if(!all)
 						//{
 							m_projectView->RemoveItem(current);
@@ -2060,18 +2142,18 @@ void MainWindow::Close(int32 current)
 							}
 							else
 							{
-								
 								if(current - 1 >= 0)
 									m_projectView->Select(current-1);
 								else if(current < items)
 									m_projectView->Select(current);
-							}							
-							
-							
+							}
+
+
 						//}
 					}break;
 					case 2:
-					{	
+					//TODO review block
+					{
 						 //OkToRemoveItem = false;
 						 RemoveAfterSave = true;
 						 RemoveAfterSaveIndex = current;
@@ -2079,7 +2161,6 @@ void MainWindow::Close(int32 current)
 						 //for(;!OkToRemoveItem;)
 						 //	;
 						// while(savePanel->IsShowing())
-						// 	cout << "crap" << endl;	
 						//m_projectView->Invalidate();
 					}break;
 				}	//end switch
@@ -2087,7 +2168,7 @@ void MainWindow::Close(int32 current)
 				{
 					if(cbfqindex+1 != cbfq.size())
 					{
-						cbfqindex++;			
+						cbfqindex++;
 						Close(cbfq[cbfqindex]);
 					}
 					else
@@ -2102,7 +2183,7 @@ void MainWindow::Close(int32 current)
 		{
 				m_projectView->RemoveItem(current);
 				//m_projectView->Invalidate();
-				
+
 				int items = m_projectView->CountItems();
 				if(items == 0)
 				{
@@ -2111,13 +2192,13 @@ void MainWindow::Close(int32 current)
 				}
 				else
 				{
-					
+
 					if(current - 1 >= 0)
 						m_projectView->Select(current-1);
 					else if(current < items)
 						m_projectView->Select(current);
-				}			
-				
+				}
+
 		}
 		}
 		//end if(current >=0) 
@@ -2137,7 +2218,7 @@ void MainWindow::Print()
 			status_t result = B_OK;
 			TexView* tv = CurrentTexView();
 			ProjectItem* it = CurrentTListItem();
-			
+
 			BRect paper_rect;
 			BRect printable_rect;
 			BRect old_text_rect;
@@ -2146,45 +2227,43 @@ void MainWindow::Print()
 				old_text_rect = tv->TextRect();
 				if(printer_settings == NULL)
 				{
-					//result = PageSetup(it->FName());//job.ConfigPage();
+					result = PageSetup(it->Label());//job.ConfigPage();
 					if(result != B_OK)
 					{
 						return;
 					}
 				}
-				//BPrintJob job(it->FName());
-				BPrintJob job("fixme");
-				
+				BPrintJob job(it->Label());
 					//setup the driver with user settings
 					job.SetSettings(new BMessage(*printer_settings));
-					
+
 					result = job.ConfigJob();
 					if(result != B_OK)
 						return;
-						
-						
+
+
 						//printer_settings = job.Settings();
 						//use new settings for internal use
 						//may have changed
 						paper_rect = job.PaperRect();
 						printable_rect = job.PrintableRect();
-						
+
 						BRect resize_to_me(printable_rect);
 						resize_to_me.top-=20;
 						resize_to_me.right -= 10;
 						tv->SetTextRect(resize_to_me);
-						
+
 						//Time to get num of pages...
 						//pages are zero-based
 						int32 firstPage = job.FirstPage();
 						int32 lastPage = job.LastPage();
-						
+
 						int32 firstLine = 0;
 						int32 lastLine = tv->CountPhysicalLines();
-						
+
 						int32 pagesInDocument = 1;
 						int32 linesInDocument = tv->CountPhysicalLines();
-						
+
 						int32 currentLine = 0;
 						while(currentLine < linesInDocument)
 						{
@@ -2196,7 +2275,7 @@ void MainWindow::Print()
 								if(currentHeight < printable_rect.Height())
 									currentLine++;
 							}
-							
+
 							if(pagesInDocument == lastPage)
 								lastLine = currentLine;
 							if(currentHeight >= printable_rect.Height())
@@ -2206,33 +2285,33 @@ void MainWindow::Print()
 									firstLine = currentLine;
 							}
 						}
-						
+
 						if(lastPage > pagesInDocument - 1)
 						{
 							lastPage = pagesInDocument - 1;
 							lastLine = currentLine - 1;
 						}
-						
-						
-						
-						
+
+
+
+
 						//Verify that the range is correct
 						// 0 ... LONG_MAX -> Print all the document
 						// n ... LONG_MAX -> Print from page n to the end
 						// n ... m -> Print from page n to page m
-						
-						
+
+
 						int32 numPages = lastPage - firstPage + 1;
-						
+
 						//Verify range is correct
 						if(numPages <= 0)
 							return;
-							
+
 						//Now we can print the page
 						job.BeginJob();
-						
+
 						//Print all pages
-						bool can_continue = job.CanContinue();
+						//TODO ? bool can_continue = job.CanContinue();
 
 						int32 printLine = firstLine;
 						while (printLine < lastLine)
@@ -2244,7 +2323,7 @@ void MainWindow::Print()
 								currentHeight += tv->LineHeight(printLine);
 								if (currentHeight < printable_rect.Height()) 
 									printLine++;
-								
+
 							}
 							float top = 0;
 							if (firstLineOnPage != 0)
@@ -2257,10 +2336,10 @@ void MainWindow::Print()
 						}
 						job.CommitJob();
 						tv->SetTextRect(old_text_rect);
-						
-					
-						
-					
+
+
+
+
 				}
 
 }
@@ -2268,14 +2347,14 @@ void MainWindow::Print()
 status_t MainWindow::PageSetup(const char* fname)
 {
 	status_t result = B_OK;
-	
+
 	BPrintJob job(fname);
-	
+
 	if(printer_settings != NULL)
 		job.SetSettings(new BMessage(*printer_settings));
-		
+
 	result = job.ConfigPage();
-	
+
 	if(result == B_NO_ERROR)
 	{
 		delete printer_settings;
@@ -2290,12 +2369,11 @@ void MainWindow::MenusBeginning()
 	{
 		delete opensubmenu->RemoveItem(i);
 	}
-	
+
 	BMessage recentrefs;
-	be_roster->GetRecentDocuments(&recentrefs,atoi(prefs->NumRecentDocs.String()),TEX_FILETYPE,APP_SIG);
-		
+	be_roster->GetRecentDocuments(&recentrefs,atoi(preferences->NumRecentDocs.String()),TEX_FILETYPE,APP_SIG);
+
 	entry_ref ref;
-	status_t err;
 	int32 ref_num;
 	ref_num = 0;
 	while(recentrefs.FindRef("refs", ref_num,&ref) == B_OK)
@@ -2305,18 +2383,20 @@ void MainWindow::MenusBeginning()
 		if(entry.InitCheck() == B_OK && entry.Exists() && openmsg->AddRef("refs",&ref) == B_OK)
 		{
 			BPath temp_path(&ref);
-			const char* label = prefs->IsRecentDocsPathShown ? temp_path.Path() : temp_path.Leaf() ;
-			opensubmenu->AddItem(new BMenuItem(label,openmsg));		
+			Prefs *prefs = preferences;
+			bool isPathShown = preferences->IsRecentDocsPathShown;
+			const char* label  = isPathShown ? temp_path.Path() : temp_path.Leaf() ;
+			opensubmenu->AddItem(new BMenuItem(label,openmsg));
 		}
-		
+
 		ref_num++;
 	}
-	
+
 	for(int j=fopentemplatesubmenu->CountItems()-1;j>=0;j--)
 	{
 		delete fopentemplatesubmenu->RemoveItem(j);
 	}
-	
+
 	if(TemplateDir.Length() > 0)
 	{
 		BEntry entryTemplate(TemplateDir.String());
@@ -2333,10 +2413,10 @@ void MainWindow::MenusBeginning()
 			while(dir.GetNextRef(&ref) == B_OK)
 			{
 				BMessage* openmsg = new BMessage(K_MENU_FILE_OPEN_TEMPLATE);
-				BEntry entry(&ref);
+				BEntry entry(&ref, true);
 				if(entry.InitCheck() == B_OK && entry.Exists() && openmsg->AddRef("refs",&ref) == B_OK)
 				{
-					BNode node(&ref);
+					BNode node(&entry);
 					if(node.InitCheck()==B_OK)
 					{
 						BNodeInfo ni(&node);
@@ -2348,17 +2428,17 @@ void MainWindow::MenusBeginning()
 								BString str(ref.name);
 								if(str.FindFirst(".tex") > 0 && (strcmp(TEX_FILETYPE,mime) == 0 || strcmp("text/plain",mime) == 0))
 								{
-									fopentemplatesubmenu->AddItem(new BMenuItem(ref.name,openmsg));		
+									fopentemplatesubmenu->AddItem(new BMenuItem(ref.name,openmsg));
 								}
 							}
 						}
 					}
 				}
-				
+
 			}
-		
-		
-		}	
+
+
+		}
 	}
 }
 
@@ -2453,13 +2533,13 @@ BView* MainWindow::CreateToolBar(BRect toolBarFrame)
 }
 
 bool MainWindow::PromptToQuit()
-{	
+{
 	for(int32 i = 0; i < m_projectView->CountItems(); i++)
 	{
 		ProjectItem* projectItem = static_cast<ProjectItem*>(m_projectView->ItemAt(i));
 		if(projectItem->IsSaveNeeded())
 			return true;
-	}		
+	}
 	return false;
 }
 
@@ -2468,3 +2548,4 @@ bool MainWindow::QuitRequested()
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return !PromptToQuit();
 }
+
