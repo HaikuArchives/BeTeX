@@ -86,7 +86,7 @@ BeTeX::BeTeX()
 	}
 	//I could also add some attributes to the tex file
 	//such as author, etc.....
-	
+
 	m_mainWindow = new MainWindow(preferences->main_window_rect);
 	m_mainWindow->Show();
 }

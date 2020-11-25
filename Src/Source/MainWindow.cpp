@@ -20,9 +20,8 @@
 #include <be/storage/Mime.h>
 
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
+//#include <stdio.h>
+
 
 #include "Constants.h"
 #include "Toolbar.h"
@@ -83,21 +82,14 @@ MainWindow::MainWindow(BRect frame)
 	m_verticalSplit->SetEditable(false);
 	LEFT_BAR_V_POS = frame.Height()/4;
 	m_verticalSplit->SetBarPosition(LEFT_BAR_V_POS);
-
+	
 	m_horizontalSplit = new SplitPane(frame, "horizontal", m_verticalSplit, docScroll,B_FOLLOW_ALL_SIDES);
 	m_projectView->SetSplitPane(m_horizontalSplit);
 
 	m_horizontalSplit->SetAlignment(B_VERTICAL);
 	m_horizontalSplit->SetEditable(false);
 	m_horizontalSplit->SetBarPosition(TLIST_VIEW_WIDTH);
-
-	if(preferences->splitmsg == NULL && preferences->split_leftmsg == NULL)
-	{
-		preferences->splitmsg = m_horizontalSplit->GetState();
-		preferences->split_leftmsg = m_verticalSplit->GetState();
-	}
-
-
+		
 	BRect statusBarFrame(0.0f, frame.bottom - statusBarHeight, frame.Width(), frame.bottom);
 	m_statusBar = new StatusBar(statusBarFrame);
 
@@ -152,6 +144,25 @@ MainWindow::MainWindow(BRect frame)
 		.Add(m_statusBar)
 		.End()
 		;
+	//Update split panes according to preferences
+	if (preferences->splitmsg != NULL) 
+	{
+		Lock();
+			m_horizontalSplit->SetState(preferences->splitmsg);
+		UnlockLooper();
+	} else {
+		preferences->splitmsg = m_horizontalSplit->GetState();
+	}
+	if (preferences->split_leftmsg != NULL) 
+	{
+		Lock();
+			m_verticalSplit->SetState(preferences->split_leftmsg);
+		Unlock();
+	} else {
+		preferences->split_leftmsg = m_verticalSplit->GetState();
+	}
+	
+	//Resize
 	BSize size = GetLayout()->PreferredSize();
 	ResizeTo(size.Width(), size.Height());
 
@@ -161,9 +172,9 @@ MainWindow::MainWindow(BRect frame)
 MainWindow::~MainWindow()
 {
 	prefsLock.Lock();
-	preferences->main_window_rect = Frame();
-	preferences->splitmsg = m_horizontalSplit->GetState();
-	preferences->split_leftmsg = m_verticalSplit->GetState();
+		preferences->main_window_rect = Frame();
+		preferences->splitmsg = m_horizontalSplit->GetState();
+		preferences->split_leftmsg = m_verticalSplit->GetState();
 	prefsLock.Unlock();
 	//clean up bubblehelper
 	if(helper != NULL)
@@ -390,7 +401,7 @@ ProjectItem* MainWindow::CurrentTListItem()
 }
 
 //rewrite this function completely!
-void MainWindow::Execute(char* script, const char* cmd)
+void MainWindow::Execute(const char* script, const char* cmd)
 {
 	int current = m_projectView->CurrentSelection();
 	if(current >=0)
@@ -431,7 +442,7 @@ void MainWindow::Execute(char* script, const char* cmd)
 				file.Write(end.String(),end.Length());
 				file.SetPermissions(X_OK);
 				file.Unset();
-				char *args[] = {script, NULL};
+				const char *args[] = {script, NULL};
 				//TODO : for BeOS R5, the signature is x-vnd.Be-SHEL, how to deal both Haiku and BeOS ?
 				be_roster->Launch("application/x-vnd.Haiku-Terminal",1,args);
 
@@ -1782,7 +1793,8 @@ void MainWindow::MessageReceived(BMessage* message)
 			ref_num = 0;
 			while((err = message->FindRef("refs", ref_num, &ref)) == B_OK)
 			{
-				BNode node(&ref);
+				BEntry e(&ref,true);
+				BNode node(&e);
 				if(node.InitCheck()==B_OK)
 				{
 					BNodeInfo ni(&node);
@@ -2383,7 +2395,6 @@ void MainWindow::MenusBeginning()
 		if(entry.InitCheck() == B_OK && entry.Exists() && openmsg->AddRef("refs",&ref) == B_OK)
 		{
 			BPath temp_path(&ref);
-			Prefs *prefs = preferences;
 			bool isPathShown = preferences->IsRecentDocsPathShown;
 			const char* label  = isPathShown ? temp_path.Path() : temp_path.Leaf() ;
 			opensubmenu->AddItem(new BMenuItem(label,openmsg));

@@ -53,7 +53,7 @@ class MainWindow : public BWindow
 		ProjectView*		GetProjectView();
 		TexView*			CurrentTexView();
 		ProjectItem*		CurrentTListItem();		
-		void				Execute(char* script, const char* command);
+		void				Execute(const char* script, const char* command);
 		
 		void				SetShortcuts();
 		void				ResetPermissions();

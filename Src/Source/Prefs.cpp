@@ -466,21 +466,8 @@ Prefs::Archive(BMessage * archive, bool deep) const
 
 	archive->AddRect("main_window_rect",main_window_rect);
 
-	//Find MainWindow
-	//TODO Is there a better solution ?
-
-	BWindow *mw;
-	for (int i = 0; i < be_app->CountWindows(); i++)
-	{
-		if (dynamic_cast<MainWindow*>(be_app->WindowAt(i)))
-		{
-			mw = be_app->WindowAt(i);
-			break;
-		}
-	}
-
-	archive->AddMessage("splitmsg",((SplitPane *)mw->FindView("horizontal"))->GetState());// == B_OK &&
-	archive->AddMessage("split_leftmsg",((SplitPane *)mw->FindView("vertical"))->GetState());// == B_OK)
+	archive->AddMessage("splitmsg",splitmsg);// == B_OK &&
+	archive->AddMessage("split_leftmsg",split_leftmsg);// == B_OK)
 
 	return B_OK;
 }
