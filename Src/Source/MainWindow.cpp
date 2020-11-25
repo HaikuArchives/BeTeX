@@ -97,18 +97,10 @@ MainWindow::MainWindow(BRect frame)
 	//const int UPDATE_TIME = 600000000/2;	// 10/2=5 minutes
 	printer_settings = NULL;
 
-	entry_ref betex_ref;
-	TemplateDir = "";
-	if(be_roster->FindApp(APP_SIG,&betex_ref) == B_OK)
-	{
-		BPath betex_path(&betex_ref);
-		if(betex_path.InitCheck() == B_OK)
-		{
-			betex_path.GetParent(&betex_path);
-			TemplateDir << betex_path.Path();
-			TemplateDir += "/Templates";
-		}
-	}
+	BPath templatePath;
+	if (find_directory(B_SYSTEM_DATA_DIRECTORY, &templatePath) == B_OK)
+		templatePath.Append("BeTeX");
+		templatePath.Append("Templates"); 
 
 	searchPanel = NULL;//new SearchWindow(BRect(100,100,250,250),this);
 	//gtlPanel = NULL;
@@ -2348,12 +2340,7 @@ void MainWindow::Print()
 						}
 						job.CommitJob();
 						tv->SetTextRect(old_text_rect);
-
-
-
-
 				}
-
 }
 
 status_t MainWindow::PageSetup(const char* fname)
