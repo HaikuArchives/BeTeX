@@ -99,9 +99,10 @@ MainWindow::MainWindow(BRect frame)
 
 	BPath templatePath;
 	if (find_directory(B_SYSTEM_DATA_DIRECTORY, &templatePath) == B_OK)
-		templatePath.Append("BeTeX");
+	{	templatePath.Append("BeTeX");
 		templatePath.Append("Templates"); 
-
+		TemplateDir = templatePath.Path();
+	}
 	searchPanel = NULL;//new SearchWindow(BRect(100,100,250,250),this);
 	//gtlPanel = NULL;
 	aboutPanel = NULL;
