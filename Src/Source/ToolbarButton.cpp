@@ -1,328 +1,575 @@
-#ifndef MAIN_WINDOW_H
-#include "MainWindow.h"
-#endif
+// =============================================================================
+//
+// libwalter ToolbarButton.cpp
+//
+// Button control for WToolbar
+//
+// Page width 80, tab width 4, encoding UTF-8, line endings LF.
+//
+// Original author:
+//     Gabriele Biffi - http://www.biffuz.it/
+// Contributors:
+//
+// Released under the terms of the MIT license.
+//
+// =============================================================================
 
-#include <be/app/Application.h>
-#include <be/app/MessageRunner.h>
-#include <be/app/Roster.h>
-#include <be/app/Clipboard.h>
-#include <be/interface/Alert.h>
-#include <be/interface/Alignment.h>
-#include <be/interface/Menu.h>
-#include <be/interface/ScrollBar.h>
-#include <be/interface/PrintJob.h>
-#include <be/interface/LayoutBuilder.h>
-#include <be/storage/Entry.h>
-#include <be/storage/File.h>
-#include <be/storage/Node.h>
-#include <be/storage/NodeInfo.h>
-#include <be/storage/Directory.h>
-#include <be/storage/Mime.h>
+/* WToolbarButton is the classic toolbar button. It can have a picture or a
+ * label, or both. Currently it supports only bitmaps; SVG will be added later.
+ * It can have different pictures for different button size (e.g., "large" or
+ * "small") and for different states (enabled, disabled, mouse over, pushed,
+ * etc.). See the ButtonDecorator class for more info.
+ */
 
-#include <unistd.h>
-//#include <stdio.h>
+// Standard C headers
+#include <math.h>
 
+// Haiku headers
+#include <Bitmap.h>
 
-#include "Constants.h"
+// libwalter headers
+#include "BitmapUtils.h"
+#include "ButtonDecorator.h"
 #include "Toolbar.h"
 #include "ToolbarButton.h"
-#include "TexFileFilter.h"
-#include "DocView.h"
-#include "Preferences.h"
-#include "MessageFields.h"
-#include "ConverterIcons.h"
-#include "MainTBar.h"
+#include "ToolbarSupport.h"
 
-using namespace MenuConstants;
-using namespace PrefsConstants;
-using namespace ColorPrefsConstants;
-using namespace SearchWindowConstants;
-using namespace InterfaceConstants;
-using namespace ToolbarConstants;
-using namespace AboutMessages;
+// =============================================================================
+// WToolbarButton
+// =============================================================================
 
-MainWindow::MainWindow(BRect frame) 
-				:	BWindow(frame, "BeTeX", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+// Constructors and destructors
+
+/* Creates a new button. name is the name of the item (will not be visible to
+ * the user), label is the label that is visible to the user if the toolbar is
+ * set to show item labels, picture is the button's picture (currently only
+ * bitmaps are supported), message is the message that is sent to the target
+ * when the button is clicked, switchMode if true will make the button remain
+ * pressed (the state can be checked with Value()). Any of these values can be
+ * NULL, if not required.
+ * The constructor will generate a grayscale version of the supplied picture to
+ * use as a disabled picture. The picture will become property of the button's
+ * decorator; do not delete it.
+ */
+WToolbarButton::WToolbarButton(const char *name, const char *label,
+	BBitmap *picture, BMessage *message, bool switchMode)
+	: WToolbarControl(name, message)
 {
-	//Setup our MenuBar
-	BMenuBar* menubar = new BMenuBar(frame,"menu_bar");
- 
-	CreateMenuBar(menubar);
+	_InitObject();
 
-	float statusBarHeight = 14.0f;
-	//Create bubblehelper
-	helper = new BubbleHelper(preferences->bubble_color);
+	SetLabel(label);
+	SetSwitchMode(switchMode);
 
-	//Create Toolbar
-	float menuBarHeight = (menubar->Bounds()).Height();
-
-
-
-	BRect toolBarFrame(0.0f, menuBarHeight + 1.0f, frame.Width(), menuBarHeight + 37.0f);
-	m_toolBar = new MainTBar(toolBarFrame, helper);
-
-	TLIST_VIEW_WIDTH = 178;
-	BRect Trect(0.0f, 0.0f, frame.Width(), frame.Height() - statusBarHeight);
-
-	BRect Textrect = Trect;
-	Textrect.InsetBy(10,10);
-
-	m_texToolBar = new TexBar(BRect(0,(frame.Height()/2)-99, TLIST_VIEW_WIDTH, frame.Height()- statusBarHeight), helper);
-	BScrollView* toolbarScroll = new BScrollView("tbscroller",m_texToolBar,B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
-
-	DocView* docView = new DocView(Trect);
-	docScroll = new BScrollView("docScroll",docView,B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
-
-	m_projectView = new ProjectView(BRect(0,0,TLIST_VIEW_WIDTH,frame.Height()/2-100),docScroll);
-	BScrollView* projectScroll = new BScrollView("ScrollView",m_projectView,B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS,false,true);
-
-	m_verticalSplit = new SplitPane(BRect(0,frame.top,TLIST_VIEW_WIDTH,frame.Height()), "vertical", projectScroll, toolbarScroll, B_FOLLOW_ALL_SIDES);
-
-	m_verticalSplit->SetAlignment(B_HORIZONTAL);
-	m_verticalSplit->SetEditable(false);
-	LEFT_BAR_V_POS = frame.Height()/4;
-	m_verticalSplit->SetBarPosition(LEFT_BAR_V_POS);
-	
-	m_horizontalSplit = new SplitPane(frame, "horizontal", m_verticalSplit, docScroll,B_FOLLOW_ALL_SIDES);
-	m_projectView->SetSplitPane(m_horizontalSplit);
-
-	m_horizontalSplit->SetAlignment(B_VERTICAL);
-	m_horizontalSplit->SetEditable(false);
-	m_horizontalSplit->SetBarPosition(TLIST_VIEW_WIDTH);
-		
-	BRect statusBarFrame(0.0f, frame.bottom - statusBarHeight, frame.Width(), frame.bottom);
-	m_statusBar = new StatusBar(statusBarFrame);
-
-	untitled_no = 1;
-	//const int UPDATE_TIME = 600000000/2;	// 10/2=5 minutes
-	printer_settings = NULL;
-
-	BPath templatePath;
-	if (find_directory(B_SYSTEM_DATA_DIRECTORY, &templatePath) == B_OK)
-	{	templatePath.Append("BeTeX");
-		templatePath.Append("Templates"); 
-		TemplateDir = templatePath.Path();
+	if (picture != NULL) {
+		BBitmap *bitmaps[8];
+		bitmaps[0] = picture;
+		bitmaps[1] = BitmapUtils::Grayscale(picture);
+		for (int i = 2; i < 8; i++)
+			bitmaps[i] = NULL;
+		fDecorator->SetPicture(bitmaps);
 	}
-	searchPanel = NULL;//new SearchWindow(BRect(100,100,250,250),this);
-	//gtlPanel = NULL;
-	aboutPanel = NULL;
-	prefsPanel = NULL;
-	rgbTxtChooser = NULL;
-	dimChooser = NULL;
-	RemoveAfterSave = false;
-
-	BMessage recentrefs;
-	be_roster->GetRecentDocuments(&recentrefs,20,TEX_FILETYPE,APP_SIG);
-
-	//Setup SaveFilePanel
-	savePanel = new BFilePanel(B_SAVE_PANEL, NULL, NULL, B_FILE_NODE, false, NULL, new TexFileFilter()); 
-	savePanel->SetTarget(this);
-
-	//Setup OpenFilePanel
-	openPanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_FILE_NODE, true, NULL, new TexFileFilter());
-	openPanel->SetTarget(this);
-
-	openfolderPanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_DIRECTORY_NODE, true);
-	openfolderPanel->SetTarget(this);
-
-	insertfilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_FILE_NODE, false, new BMessage(MenuConstants::K_MENU_INSERT_FILE_RECEIVED), new TexFileFilter());
-	insertfilePanel->SetTarget(this);
-
-	ResetPermissions();
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
-		.SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_NO_VERTICAL))
- 		.Add(menubar)
-		.Add(m_toolBar)
-		.Add(m_horizontalSplit)
-		.Add(m_statusBar)
-		.End()
-		;
-	//Update split panes according to preferences
-	if (preferences->splitmsg != NULL) 
-	{
-		Lock();
-			m_horizontalSplit->SetState(preferences->splitmsg);
-		UnlockLooper();
-	} else {
-		preferences->splitmsg = m_horizontalSplit->GetState();
-	}
-	if (preferences->split_leftmsg != NULL) 
-	{
-		Lock();
-			m_verticalSplit->SetState(preferences->split_leftmsg);
-		Unlock();
-	} else {
-		preferences->split_leftmsg = m_verticalSplit->GetState();
-	}
-	
-	//Resize
-	BSize size = GetLayout()->PreferredSize();
-	ResizeTo(size.Width(), size.Height());
-
-	m_statusBar->SetText("BeTeX");
 }
 
-MainWindow::~MainWindow()
+WToolbarButton::WToolbarButton(BMessage *archive)
+	: WToolbarControl(archive)
 {
-	prefsLock.Lock();
-		preferences->main_window_rect = Frame();
-		preferences->splitmsg = m_horizontalSplit->GetState();
-		preferences->split_leftmsg = m_verticalSplit->GetState();
-	prefsLock.Unlock();
-	//clean up bubblehelper
-	if(helper != NULL)
-		delete helper;
-}
+	BMessage decArchive;
+	bool switchMode;
+	int value;
 
-void MainWindow::CreateMenuBar(BMenuBar *menuBar)
-{
-	BMenu* fileMenu = new BMenu("File");
-	menuBar->AddItem(fileMenu);
+	_InitObject();
 
-	fileMenu->AddItem(fnew = new BMenuItem("New", new BMessage(MenuConstants::K_MENU_FILE_NEW),'N'));
-	fileMenu->AddItem(fopen = new BMenuItem(opensubmenu = new BMenu("Open" B_UTF8_ELLIPSIS),new BMessage(MenuConstants::K_MENU_FILE_OPEN)));
-	fopen->SetShortcut('O',0);
-
-	fileMenu->AddItem(fopentemplate = new BMenuItem(fopentemplatesubmenu = new BMenu("Open Template" B_UTF8_ELLIPSIS), NULL));
-	fileMenu->AddItem(fopenfolder = new BMenuItem("Open Folder" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_OPEN_FOLDER)));
-	fileMenu->AddItem(fclose = new BMenuItem("Close", new BMessage(MenuConstants::K_MENU_FILE_CLOSE),'W'));
-	fileMenu->AddItem(fsave = new BMenuItem("Save", new BMessage(MenuConstants::K_MENU_FILE_SAVE),'S'));
-	fileMenu->AddItem(fsaveas = new BMenuItem("Save As" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_SAVEAS)));
-	fileMenu->AddSeparatorItem();
-	fileMenu->AddItem(fpgsetup = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_PAGE_SETUP)));
-	fileMenu->AddItem(fprint = new BMenuItem("Print" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_PRINT),'P'));
-	fileMenu->AddSeparatorItem();
-	fileMenu->AddItem(fprefs = new BMenuItem("Preferences" B_UTF8_ELLIPSIS,new BMessage(MenuConstants::K_MENU_FILE_PREFS)));
-	fprefs->SetShortcut('P',B_SHIFT_KEY);
-	fileMenu->AddItem(freset_layout = new BMenuItem("Reset Layout", new BMessage(MenuConstants::K_MENU_FORMAT_RESET_LAYOUT)));
-	fileMenu->AddItem(fabout = new BMenuItem("About BeTeX" B_UTF8_ELLIPSIS,new BMessage(MenuConstants::K_MENU_FILE_ABOUT)));
-	fileMenu->AddItem(fquit = new BMenuItem("Quit",new BMessage(MenuConstants::K_MENU_FILE_QUIT),'Q'));
-
-	BMenu* editMenu = new BMenu("Edit");
-	menuBar->AddItem(editMenu);
-
-	editMenu->AddItem(fundo = new BMenuItem("Undo", new BMessage(B_UNDO),'Z'));
-	editMenu->AddSeparatorItem();
-	editMenu->AddItem(fcut = new BMenuItem("Cut", new BMessage(B_CUT),'X'));
-	editMenu->AddItem(fcopy = new BMenuItem("Copy", new BMessage(B_COPY),'C'));
-	editMenu->AddItem(fpaste = new BMenuItem("Paste", new BMessage(B_PASTE),'V'));
-	editMenu->AddSeparatorItem();
-	editMenu->AddItem(fselall = new BMenuItem("Select All", new BMessage(B_SELECT_ALL),'A'));
-	editMenu->AddSeparatorItem();
-	editMenu->AddItem(fsearchreplace = new BMenuItem("Find" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_EDIT_SEARCH),'F'));
-	editMenu->AddItem(fgotoline = new BMenuItem("Go To Line" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_EDIT_GOTOLINE),'G'));
-
-	BMenu* formatMenu = new BMenu("Format");
-	menuBar->AddItem(formatMenu);
-	formatMenu->AddItem(fbold = new BMenuItem("Bold", new BMessage(MenuConstants::K_MENU_FORMAT_BOLD),'B'));
-	formatMenu->AddItem(femph = new BMenuItem("Emphasized", new BMessage(MenuConstants::K_MENU_FORMAT_EMPH),'E'));
-	formatMenu->AddItem(fital = new BMenuItem("Italic", new BMessage(MenuConstants::K_MENU_FORMAT_ITAL),'I'));
-	formatMenu->AddSeparatorItem();
-	formatMenu->AddItem(fshiftleft = new BMenuItem("Shift Left", new BMessage(MenuConstants::K_MENU_FORMAT_SHIFT_LEFT),'['));
-	formatMenu->AddItem(fshiftright = new BMenuItem("Shift Right", new BMessage(MenuConstants::K_MENU_FORMAT_SHIFT_RIGHT),']'));
-	formatMenu->AddSeparatorItem();
-	formatMenu->AddItem(fcomment = new BMenuItem("Comment Selection", new BMessage(MenuConstants::K_MENU_FORMAT_COMMENTLINE)));
-	formatMenu->AddItem(funcomment = new BMenuItem("UnComment Selection", new BMessage(MenuConstants::K_MENU_FORMAT_UNCOMMENTLINE)));
-
-	BMenu* insertMenu = new BMenu("Insert");
-	menuBar->AddItem(insertMenu);
-	insertMenu->AddItem(finsertfile = new BMenuItem("File" B_UTF8_ELLIPSIS,new BMessage(MenuConstants::K_MENU_INSERT_FILE)));
-	insertMenu->AddItem(fdate = new BMenuItem("Date",new BMessage(MenuConstants::K_MENU_INSERT_DATE)));
-	insertMenu->AddItem(farray = new BMenuItem("Array",new BMessage(MenuConstants::K_MENU_INSERT_ARRAY)));
-	insertMenu->AddItem(fmatrix = new BMenuItem("Matrix",new BMessage(MenuConstants::K_MENU_INSERT_MATRIX)));
-	insertMenu->AddItem(ftabular = new BMenuItem("Tabular",new BMessage(MenuConstants::K_MENU_INSERT_TABULAR)));
-	insertMenu->AddItem(fequation = new BMenuItem("Equation",new BMessage(MenuConstants::K_MENU_INSERT_EQUATION)));   
-	insertMenu->AddItem(frgbcolor = new BMenuItem("Colored Text",new BMessage(MenuConstants::K_MENU_INSERT_COLORED_TEXT)));
-
-	insertMenu->AddItem(flists = new BMenuItem(flistsubmenu = new BMenu("Lists"),NULL));
-	flistsubmenu->AddItem(fitemize = new BMenuItem("Itemize",new BMessage(MenuConstants::K_MENU_INSERT_ITEMIZE)));
-	flistsubmenu->AddItem(fdescription = new BMenuItem("Description",new BMessage(MenuConstants::K_MENU_INSERT_DESCRIPTION)));
-	flistsubmenu->AddItem(fenumerate = new BMenuItem("Enumerate",new BMessage(MenuConstants::K_MENU_INSERT_ENUMERATE)));
-
-	insertMenu->AddItem(fenvironments = new BMenuItem(fenvironmentssubmenu = new BMenu("Environments"),NULL));
-	fenvironmentssubmenu->AddItem(ffigure = new BMenuItem("Figure",new BMessage(MenuConstants::K_MENU_INSERT_FIGURE)));
-	fenvironmentssubmenu->AddItem(ftable = new BMenuItem("Table",new BMessage(MenuConstants::K_MENU_INSERT_TABLE)));
-	fenvironmentssubmenu->AddSeparatorItem();
-	fenvironmentssubmenu->AddItem(fcenter = new BMenuItem("Center",new BMessage(MenuConstants::K_MENU_INSERT_CENTER)));
-	fenvironmentssubmenu->AddItem(fflushleft = new BMenuItem("FlushLeft",new BMessage(MenuConstants::K_MENU_INSERT_FLUSHLEFT)));
-	fenvironmentssubmenu->AddItem(fflushright = new BMenuItem("FlushRight",new BMessage(MenuConstants::K_MENU_INSERT_FLUSHRIGHT)));
-	fenvironmentssubmenu->AddSeparatorItem();
-	fenvironmentssubmenu->AddItem(feqnarray = new BMenuItem("EqnArray",new BMessage(MenuConstants::K_MENU_INSERT_EQNARRAY)));
-	fenvironmentssubmenu->AddItem(ffeqnarraystar = new BMenuItem("EqnArray*",new BMessage(MenuConstants::K_MENU_INSERT_EQNARRAY_STAR)));
-	fenvironmentssubmenu->AddSeparatorItem();
-	fenvironmentssubmenu->AddItem(fverbatim = new BMenuItem("Verbatim",new BMessage(MenuConstants::K_MENU_INSERT_VERBATIM)));
-	fenvironmentssubmenu->AddItem(fquote = new BMenuItem("Quote",new BMessage(MenuConstants::K_MENU_INSERT_QUOTE)));
-
-	BMenu *compileMenu = new BMenu("Compile");
-	menuBar->AddItem(compileMenu);
-	compileMenu->AddItem(ftexdvi = new BMenuItem("tex->dvi", new BMessage(ToolbarConstants::K_CMD_COMPILE_TEXDVI),'1'));
-	compileMenu->AddItem(fdvipdf = new BMenuItem("dvi->pdf", new BMessage(ToolbarConstants::K_CMD_COMPILE_DVIPDF),'2'));
-	compileMenu->AddItem(fdvips = new BMenuItem("dvi->ps", new BMessage(ToolbarConstants::K_CMD_COMPILE_DVIPS),'3'));
-	compileMenu->AddItem(fpspdf = new BMenuItem("ps->pdf", new BMessage(ToolbarConstants::K_CMD_COMPILE_PSPDF),'4'));
-	compileMenu->AddItem(ftexpdf = new BMenuItem("tex->pdf", new BMessage(ToolbarConstants::K_CMD_COMPILE_TEXPDF),'5'));
-	compileMenu->AddItem(ftexhtml = new BMenuItem("tex->html", new BMessage(ToolbarConstants::K_CMD_COMPILE_TEXHTML),'6'));
-
-	BMenu* previewMenu = new BMenu("Preview");
-	menuBar->AddItem(previewMenu);
-	previewMenu->AddItem(fpostscript = new BMenuItem("Postscript" B_UTF8_ELLIPSIS, new BMessage(ToolbarConstants::K_CMD_LAUNCH_PSVIEWER),'7'));
-	previewMenu->AddItem(fpdf = new BMenuItem("Pdf" B_UTF8_ELLIPSIS, new BMessage(ToolbarConstants::K_CMD_LAUNCH_BE_PDF),'8'));
-	previewMenu->AddItem(fhtml = new BMenuItem("Html" B_UTF8_ELLIPSIS, new BMessage(ToolbarConstants::K_CMD_LAUNCH_HTMLVIEWER),'9'));
-}
-
-void MainWindow::InsertText(const char* text)
-{
-	TexView* tv = CurrentTexView();
-	if(tv != NULL)
-	{
-		BString cmd(text);
-		int lbrk,rbrk;
-		lbrk=cmd.FindLast('{');
-		rbrk=cmd.FindLast('}');
-		bool InsertTextIntoBrk= (lbrk >= 0 && rbrk >= 0 && rbrk-lbrk == 1);
-		int32 start,finish;
-		tv->GetSelection(&start,&finish);
-		if(start != finish)
-		{
-			if(InsertTextIntoBrk)
-			{
-				BString leftstr;
-				cmd.CopyInto(leftstr,0,lbrk+1);
-				BString rightstr;
-				cmd.CopyInto(rightstr,rbrk,cmd.Length()-rbrk);
-
-				tv->Insert(start,leftstr.String(),leftstr.Length(),NULL);
-				tv->Insert(finish+leftstr.Length(),rightstr.String(),rightstr.Length(),NULL);
-				tv->Select(finish+rightstr.Length()+leftstr.Length(),finish+rightstr.Length()+leftstr.Length());
+	if (archive->FindMessage("WToolbarButton::decorator",
+	  &decArchive) == B_OK) {
+		BArchivable *archivable;
+		archivable = ButtonDecorator::Instantiate(&decArchive);
+		if (archivable != NULL) {
+			ButtonDecorator *decorator =
+				static_cast<ButtonDecorator*>(archivable);
+			if (decorator != NULL) {
+				delete fDecorator;
+				fDecorator = decorator;
 			}
 			else
-			{
-				tv->Delete(start,finish);
-				tv->Insert(start,cmd.String(),cmd.Length(),NULL);
-				tv->Select(start+cmd.Length(),start+cmd.Length());
-			}
+				delete archivable;
 		}
-		else
-		{
-			tv->Insert(start,cmd.String(),cmd.Length(),NULL);
-			if(InsertTextIntoBrk)
-				tv->Select(start+cmd.Length()-1,start+cmd.Length()-1);
-			else
-				tv->Select(start+cmd.Length(),start+cmd.Length());
-		}
-		tv->ScrollToSelection();
+	}
+
+	if (archive->FindBool("WToolbarButton::switch_mode", &switchMode) == B_OK)
+		SetSwitchMode(switchMode);
+
+	if (archive->FindInt32("WToolbarButton::value", (int32*)(&value)) == B_OK)
+		SetValue(value);
+}	
+
+WToolbarButton::~WToolbarButton()
+{
+	delete fDecorator;
+}
+
+// Private
+
+void
+WToolbarButton::_InitObject(void)
+{
+	fDecorator = new ButtonDecorator(NULL, NULL, BD_POSITION_ABOVE);
+	fCanvas = NULL;
+	fMouseDown = false;
+	fMouseOver = false;
+	fStyle = W_TOOLBAR_STYLE_FLAT;
+	fSwitchMode = false;
+	fValue = B_CONTROL_OFF;
+}
+
+// Drawing hooks
+
+/* Returns the thickness of the border, in toolbar's units. The default
+ * implementation returns 0 if the toolbar's style is W_TOOLBAR_STYLE_MENU, 2
+ * otherwise. You can overload this if your custom style's border has a differnt
+ * thickness, but currently the returned value will be rounded down.
+ */
+float
+WToolbarButton::BorderThickness(void)
+{
+	return (fStyle == W_TOOLBAR_STYLE_MENU ? 0.0 : 2.0);
+}
+
+/* Returns the size of the button content, including the extra space for the
+ * pushed effect. You can overload this, but currently the returned values will
+ * be rounded down.
+ */
+void
+WToolbarButton::ContentSize(float *width, float *height)
+{
+	float w, h;
+	fDecorator->GetPreferredSize(fCanvas, &w, &h);
+	if (fStyle != W_TOOLBAR_STYLE_MENU) {
+		// One extra pixel for pushed effect
+		w += 1.0;
+		h += 1.0;
+	}
+	if (width != NULL)
+		*width = w;
+	if (height != NULL)
+		*height = h;
+}
+
+/* Draws the background of the button. You can overload this if you want your
+ * buttons to have a custom background.
+ */
+void
+WToolbarButton::DrawBackground(BRect updateRect)
+{
+	// Draw the menu selection background
+	if (Enabled() && Toolbar()->Enabled() && fMouseOver &&
+	 	fStyle == W_TOOLBAR_STYLE_MENU) {
+		fCanvas->SetLowColor(ui_color(B_MENU_SELECTION_BACKGROUND_COLOR));
+		fCanvas->FillRect(Bounds(), B_SOLID_LOW);
+	}
+
+	// Draw the background when value is on
+	if (fStyle != W_TOOLBAR_STYLE_MENU && fValue == B_CONTROL_ON) {
+		fCanvas->SetHighColor(255, 255, 255, 128);
+		fCanvas->SetDrawingMode(B_OP_ALPHA);
+		fCanvas->FillRect(Bounds(), B_SOLID_HIGH);
 	}
 }
 
-void MainWindow::UpdateStatusBar()
+/* Draws the button's border.
+ * If you want to draw a custom border, remember to overload BorderThickness()
+ * as well.
+ */
+void
+WToolbarButton::DrawBorder(BRect updateRect)
 {
-	int current = m_projectView->CurrentSelection();
-	if(m_projectView->CountItems() == 0 || current < 0)
-			m_statusBar->SetText("BeTeX");
+	bool doDraw = false;
+	bool pushed = false;
 
-	else
-	{
+	// Check if the border has to be drawn, and how
 
-		if(current >= 0)
-		{
-			TexView* tv = CurrentTexView();
-			ProjectItem*
+	if (fStyle == W_TOOLBAR_STYLE_FLAT) {
+		// Flat toolbar: draw only if the mouse is over us or value is on
+		if ((fMouseOver && Enabled() && Toolbar()->Enabled()) ||
+		 	fValue == B_CONTROL_ON) {
+			doDraw = true;
+			pushed = (fMouseDown || fValue == B_CONTROL_ON);
+		}
+	} else if (fStyle == W_TOOLBAR_STYLE_MENU) {
+		// Menu: no border needed
+	} else {
+		// 3D or unknown toolbar: draw it
+		doDraw = true;
+		pushed = (fMouseDown || fValue == B_CONTROL_ON);
+	}
+
+	// Draw the border
+
+	if (doDraw)
+		WToolbarSupport::Draw3DBorder(fCanvas, Bounds(), pushed);
+}
+
+/* Draws the button's content at position.
+ * If you want to draw a custom content, remember to overload ContentSize() as
+ * well.
+ */
+void
+WToolbarButton::DrawContent(BPoint position, BRect updateRect)
+{
+	int status = BD_STATUS_NORMAL;
+	float w, h;
+	BRect r;
+
+	// Status
+	if (fMouseDown || fValue == B_CONTROL_ON)
+		status = BD_STATUS_PUSHED;
+	if (fMouseOver)
+		status |= BD_STATUS_OVER;
+	if (!Enabled() || !Toolbar()->Enabled())
+		status |= BD_STATUS_DISABLED;
+
+	// Calculate the contect rectangle
+	fDecorator->GetPreferredSize(fCanvas, &w, &h);
+	r =  BRect(position, BPoint(position.x + w, position.y + h));
+	if (fMouseDown || fValue == B_CONTROL_ON)
+		r.OffsetBy(1.0, 1.0);
+
+	// Draw the content
+	fDecorator->Draw(fCanvas, r, status);
+}
+
+/* Returns the padding of the content (the empty space between the button's
+ * border and the content). You can overload this to give a custom padding, but
+ * currently the value will be rounded down.
+ */
+float
+WToolbarButton::Padding(void)
+{
+	return 2.0;
+}
+
+// BArchivable hooks
+
+/* Archive the button into the given archive. Adds the following fields to the
+ * archive if the respective properties are different from the default:
+ *  WToolbarButton::decorator	message
+ *  WToolbarButton::switch_mode	bool
+ *  WToolbarButton::value		int32
+ * The decorator field is the archive of the decorator. The default decorator
+ * archives all the pictures and the label.
+ */
+status_t
+WToolbarButton::Archive(BMessage *archive, bool deep) const
+{
+	status_t status;
+
+	status = WToolbarControl::Archive(archive, deep);
+
+	if (status == B_OK) {
+		BMessage decorator;
+		status = fDecorator->Archive(&decorator);
+		if (status == B_OK)
+			status = archive->AddMessage("WToolbarButton::decorator",
+				&decorator);
+	}
+
+	if (status == B_OK && fSwitchMode == false)
+		status = archive->AddBool("WToolbarButton::switch_mode", fSwitchMode);
+
+	if (status == B_OK && fValue != B_CONTROL_OFF)
+		status = archive->AddInt32("WToolbarButton::value", (int32)fValue);
+
+	return status;
+}
+
+BArchivable *
+WToolbarButton::Instantiate(BMessage *archive)
+{
+	return (validate_instantiation(archive, "WToolbarButton") ?
+		new WToolbarButton(archive) : NULL);
+}
+
+// WToolbarItem hooks
+
+void
+WToolbarButton::AttachedToToolbar(void)
+{
+	WToolbarItem::AttachedToToolbar();
+	fMouseDown = false;
+	fMouseOver = false;
+}
+
+void
+WToolbarButton::DetachedFromToolbar(void)
+{
+	WToolbarItem::DetachedFromToolbar();
+}
+
+/* Draws the button on the given canvas (the toolbar itself, or an off-screen
+ * buffer).
+ */
+void
+WToolbarButton::Draw(BView *canvas, BRect updateRect)
+{
+	if (Toolbar() == NULL || canvas == NULL)
+		return;
+
+	float w, h, ch, cw, border, padding;
+	BPoint cp;
+
+	// Prepare infos for protected drawing hooks
+	fCanvas = canvas;
+	fStyle = Toolbar()->Style();
+
+	// Border and padding. We do it after setting infos because BorderSize()
+	// and Padding() may need them
+	border = floor(BorderThickness());
+	padding = floor(Padding());
+
+	// Draw the background
+	fCanvas->PushState();
+	DrawBackground(updateRect);
+	fCanvas->PopState();
+
+	// Draw the border
+	fCanvas->PushState();
+	DrawBorder(updateRect);
+	fCanvas->PopState();
+
+	// Calculate position of the content
+	w = Bounds().Width();
+	h = Bounds().Height();
+	ContentSize(&cw, &ch);
+	cw = floor(cw);
+	ch = floor(ch);
+	cp.x = floor((w - cw) / 2.0);
+	cp.y = floor((h - ch) / 2.0);
+
+	// Draw the content
+	// TODO check UpdateRect and set clipping region
+	canvas->PushState();
+	DrawContent(cp, updateRect);
+	canvas->PopState();
+}
+
+/* Returns the preferred size of the button, including the border, the padding,
+ * and the content. The button must be attached to a toolbar, or both values
+ * will be -1. If you aren't interested in one of the values, you can pass NULL.
+ */
+void
+WToolbarButton::GetPreferredSize(float *width, float *height)
+{
+	// We must be attached to a toolbar
+	if (Toolbar() == NULL) {
+		if (width != NULL) *width = -1.0;
+		if (height != NULL) *height = -1.0;
+		return;
+	}
+
+	float border, padding, w, h;
+
+	// Set infos for protected drawing hooks
+	fCanvas = Toolbar();
+	fStyle = Toolbar()->Style();
+
+	// Calculate the size
+	border = floor(BorderThickness());
+	padding = floor(Padding());
+	ContentSize(&w, &h);
+	w = floor(w) + border * 2.0 + padding * 2.0;
+	h = floor(h) + border * 2.0 + padding * 2.0;
+
+	if (width != NULL) *width = w - 1.0;
+	if (height != NULL) *height = h - 1.0;
+}
+
+void
+WToolbarButton::MouseDown(BPoint point)
+{
+	if (Toolbar() == NULL)
+		return;
+	if (fMouseOver) {
+		fMouseDown = true;
+		Invalidate();
+	}
+}
+
+void
+WToolbarButton::MouseMoved(BPoint point, uint32 transit,
+	const BMessage *message)
+{
+	if (Toolbar() == NULL) return;
+	bool oldMouseOver = fMouseOver;
+	fMouseOver = (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW);
+	if (fMouseOver != oldMouseOver)
+		Invalidate();
+}
+
+void
+WToolbarButton::MouseUp(BPoint point)
+{
+	fMouseDown = false;
+	if (Toolbar() != NULL && fMouseOver && Enabled()) {
+		if (fSwitchMode)
+			fValue = (fValue == B_CONTROL_ON ? B_CONTROL_OFF : B_CONTROL_ON);
+		Invalidate();
+		Invoke();
+	}
+}
+
+void
+WToolbarButton::Update(void)
+{
+	if (Toolbar() == NULL) return;
+
+	float picsize = Toolbar()->PictureSize();
+
+	// Label position
+	switch (Toolbar()->LabelPosition()) {
+		case W_TOOLBAR_LABEL_NONE:
+			fDecorator->SetVisible(BD_VISIBLE_PICTURE);
+			break;
+		case W_TOOLBAR_LABEL_BOTTOM:
+			fDecorator->SetPosition(BD_POSITION_ABOVE);
+			fDecorator->SetVisible(picsize == 0.0 ?
+				BD_VISIBLE_LABEL : BD_VISIBLE_BOTH);
+			break;
+		case W_TOOLBAR_LABEL_SIDE:
+			fDecorator->SetPosition(BD_POSITION_LEFT);
+			fDecorator->SetVisible(picsize == 0.0 ?
+				BD_VISIBLE_LABEL : BD_VISIBLE_BOTH);
+			break;
+	}
+
+	// Picture size
+	if (picsize > 0.0)
+		fDecorator->SetPictureSize(picsize);
+}
+
+// Other methods
+
+unsigned
+WToolbarButton::CountBitmapSets(void)
+{
+	return fDecorator->CountBitmapSets();
+}
+
+bool
+WToolbarButton::DeleteBitmapSet(unsigned size)
+{
+	if (size == 0)
+		return false;
+	return fDecorator->DeleteBitmapSet(size);
+}
+
+bool
+WToolbarButton::DeleteBitmapSetAt(unsigned index)
+{
+	return fDecorator->DeleteBitmapSetAt(index);
+}
+
+void WToolbarButton::DeletePicture(void)
+{
+	fDecorator->DeletePicture();
+}
+
+BDBitmapSet *
+WToolbarButton::GetBitmapSet(unsigned size)
+{
+	if (size == 0)
+		return NULL;
+	return fDecorator->GetBitmapSet(size);
+}
+
+BDBitmapSet *
+WToolbarButton::GetBitmapSetAt(unsigned index)
+{
+	return fDecorator->GetBitmapSetAt(index);
+}
+
+BBitmap * WToolbarButton::GetMenuCheckMark(void)
+{
+	static const unsigned char kCheckMarkBitmapData[] = {
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0C, 0x0C, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0C, 0x0C, 0x17, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0C, 0x0C, 0x17, 0x17, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0C, 0x0C, 0x17, 0xFF, 0xFF,
+		0xFF, 0x0C, 0x0C, 0xFF, 0xFF, 0xFF, 0x0C, 0x0C, 0x17, 0x17, 0xFF, 0xFF,
+		0xFF, 0x0C, 0x0C, 0xFF, 0xFF, 0xFF, 0x0C, 0x0C, 0x17, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0x0C, 0x0C, 0xFF, 0x0C, 0x0C, 0x17, 0x17, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0x0C, 0x0C, 0xFF, 0x0C, 0x0C, 0x17, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0x0C, 0x0C, 0x0C, 0x17, 0x17, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0x0C, 0x0C, 0x0C, 0x17, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0x0C, 0x17, 0x17, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+	};
+	BBitmap *ret = new BBitmap(BRect(0.0, 0.0, 11.0, 11.0), B_CMAP8);
+	memcpy(ret->Bits(), kCheckMarkBitmapData, 144);
+	return ret;
+}
+
+void
+WToolbarButton::GetPicture(BBitmap *picture[8])
+{
+	if (picture == NULL)
+		return;
+	fDecorator->GetPicture(picture);
+}
+
+int
+WToolbarButton::IndexOfBitmapSet(BDBitmapSet *set)
+{
+	if (set == NULL)
+		return -1;
+	return fDecorator->IndexOfBitmapSet(set);
+}
+
+const char *
+WToolbarButton::Label(void)
+{
+	return fDecorator->Label();
+}
+
+void
+WToolbarButton::SetLabel(const char *label)
+{
+	fDecorator->SetLabel(label);
+}
+
+bool
+WToolbarButton::SetPicture(BBitmap *picture[8])
+{
+	if (picture == NULL)
+		return false;
+	if (picture[0] == NULL)
+		return false;
+	return fDecorator->SetPicture(picture);
+}
+
+void
+WToolbarButton::SetSwitchMode(bool switchMode)
+{
+	if (fSwitchMode == switchMode) return;
+	fSwitchMode = switchMode;
+	Invalidate();
+}
+
+void
+WToolbarButton::SetValue(int32 value)
+{
+	if ((value != B_CONTROL_ON && value != B_CONTROL_OFF) || (fValue == value))
+		return;
+	fValue = value;
+	Invalidate();
+}
+
+bool
+WToolbarButton::SwitchMode(void)
+{
+	return fSwitchMode;
+}
+
+int32
+WToolbarButton::Value(void)
+{
+	return fValue;
+}
