@@ -418,7 +418,7 @@ void MainWindow::Execute(const char* script, const char* cmd)
 			command.ReplaceAll("$",fname.String());
 
 			BString echostr;
-			echostr << "echo \"\\$ " << command.String() << "\"";
+			echostr << "echo \"\\$ " << "TEXMFOUTPUT=/tmp " << command.String() << "\"";
 			echostr.ReplaceAll("\n","");
 			echostr << "\n";
 

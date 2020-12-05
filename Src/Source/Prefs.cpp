@@ -491,11 +491,11 @@ void Prefs::ResetColors()
 
 void Prefs::ResetCommands()
 {
-	latex_cmd = "latex $.tex";
-	dvipdf_cmd = "dvipdf $.dvi";
-	dvips_cmd = "dvips -o $.ps $.dvi";
-	ps2pdf_cmd = "ps2pdf $.ps";
-	pdflatex_cmd = "pdflatex $.tex";
+	latex_cmd      = "latex $.tex";
+	dvipdf_cmd     = "dvipdf $.dvi";
+	dvips_cmd      = "dvips -o $.ps $.dvi";
+	ps2pdf_cmd     = "ps2pdf $.ps";
+	pdflatex_cmd   = "pdflatex $.tex";
 	latex2html_cmd = "latex2html $.tex";
 	postscript_cmd = "gs -sDEVICE=bealpha4 $.ps";
 }
