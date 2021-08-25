@@ -110,7 +110,7 @@ void TexView::ShiftLeft()
 	int32 startline=-1;
 	int32 endline=-1;
 	//int TotalLines = CountLines();
-	for(int i=0;i<sols.size();i++)
+	for(uint i=0;i<sols.size();i++)
 	{
 		if(start >= sols[i] && start <= eols[i])
 			startline = i;
@@ -213,7 +213,7 @@ void TexView::ShiftRight()
 	int32 startline=-1;
 	int32 endline=-1;
 	
-	for(int i=0;i<sols.size();i++)
+	for(uint i=0;i<sols.size();i++)
 	{
 
 		if(start >= sols[i] && start <= eols[i])
@@ -512,7 +512,7 @@ int32 TexView::LineAt(int32 offset)
 	vector<int> eols;
 	FillSolEol(sols,eols,0,TextLength()-1);
 
-	for(int i=0;i<sols.size();i++)
+	for(uint i=0;i<sols.size();i++)
 	{
 		if(offset >= sols[i] && offset <= eols[i])
 			return i;
@@ -1115,7 +1115,7 @@ void TexView::ITwoColorPlateau(char c,int sol,int eol,rgb_color c1,vector<rgb_co
 
 int TexView::IsMathMode(int offset,vector<BString>& v,bool IsStart)
 {
-	for(int i=0;i<v.size();i++)
+	for(uint i=0;i<v.size();i++)
 	{
 		//try all possibilities....
 		if(ByteAt(offset) == v[i].ByteAt(0))
@@ -1235,7 +1235,7 @@ void TexView::DeleteText(int32 start, int32 finish)
 }
 
 
-void TexView::SetText(const char* text,int32 length,const text_run_array* runs = NULL)
+void TexView::SetText(const char* text,int32 length,const text_run_array* runs)
 {
 	BTextView::SetText(text,length,runs);
 	ParseAll(0,length-1,false);
@@ -1255,7 +1255,7 @@ void TexView::UpdateFontSize()
 	ParseAll(0,TextLength()-1,true);	
 }
 
-void TexView::SetText(BFile* file,int32 offset,int32 length,const text_run_array* runs = NULL)
+void TexView::SetText(BFile* file,int32 offset,int32 length,const text_run_array* runs)
 {
 	BTextView::SetText(file,offset,length,runs);
 	ParseAll(offset,length-1,false);

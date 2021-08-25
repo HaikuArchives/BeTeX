@@ -199,7 +199,7 @@ void ColorButton::MessageReceived(BMessage* message)
 	}
 }
 
-status_t ColorButton::Invoke(BMessage* message = NULL)
+status_t ColorButton::Invoke(BMessage* message)
 {	
 	//start up chooser window
 	if(m_colorWindow != NULL)

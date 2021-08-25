@@ -11,6 +11,8 @@
 #include <ScrollBar.h>
 #include <InterfaceDefs.h>
 #include <vector>
+using namespace std;
+
 #include "TButton.h"
 //#include "TexBarItem.h"
 #include "Constants.h"

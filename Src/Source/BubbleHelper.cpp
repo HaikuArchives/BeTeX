@@ -81,7 +81,7 @@ BubbleHelper::~BubbleHelper()
 
 void BubbleHelper::SetHelp(BView *view, const char *text)
 {
-    if(this && view)
+    if(view)
     {
         // delete previous text for this view, if any
         for(int i=0;;i++)
@@ -128,7 +128,7 @@ char *BubbleHelper::GetHelp(BView *view)
 }
 
 
-long BubbleHelper::_helper(void *arg)
+status_t BubbleHelper::_helper(void *arg)
 {
     ((BubbleHelper*)arg)->Helper();
     return 0;
@@ -172,7 +172,7 @@ void BubbleHelper::Helper()
     while(be_app_messenger.IsValid())
     {
         BPoint where;
-        ulong buttons;
+        uint32 buttons;
         if(m_enabled)
         {
             if(m_textwin->Lock())

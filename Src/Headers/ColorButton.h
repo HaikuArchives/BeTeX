@@ -28,10 +28,10 @@ class ColorButton : public BControl
 		virtual void		MouseMoved(BPoint point, uint32 transit, const BMessage* message);
 
 		virtual status_t	Invoke(BMessage* message = NULL);		
-		void				Render();
+		void			Render();
 				
-		void				SetValue(rgb_color color);
-		rgb_color			Value();
+		void                    SetValue(rgb_color color);
+		rgb_color		Value();
 		
 	private:
 		BBitmap				*m_bitmap;

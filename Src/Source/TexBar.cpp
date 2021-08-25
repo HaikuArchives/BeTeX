@@ -8,7 +8,7 @@ TexBar::TexBar(BRect r,BubbleHelper* h)
 	//helper->= new BubbleHelper();
 	UpdateHeaders();
 
-	BRect r = Bounds();
+	//BRect r = Bounds();
 	unsigned char* p;
 
 	{

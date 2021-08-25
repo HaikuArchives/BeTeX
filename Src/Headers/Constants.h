@@ -22,7 +22,7 @@ inline bool operator==(const rgb_color &a, const rgb_color &b)
 	return CompareColors(a, b);
 }
 
-inline bool operator!=(const rgb_color &a, const rgb_color &b)
+inline bool operator!=(rgb_color &a, rgb_color &b)
 {
 	return !CompareColors(a, b);
 }

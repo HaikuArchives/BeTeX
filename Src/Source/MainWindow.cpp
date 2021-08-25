@@ -2247,100 +2247,100 @@ void MainWindow::Print()
 						return;
 
 
-						//printer_settings = job.Settings();
-						//use new settings for internal use
-						//may have changed
-						paper_rect = job.PaperRect();
-						printable_rect = job.PrintableRect();
+					//printer_settings = job.Settings();
+					//use new settings for internal use
+					//may have changed
+					paper_rect = job.PaperRect();
+					printable_rect = job.PrintableRect();
 
-						BRect resize_to_me(printable_rect);
-						resize_to_me.top-=20;
-						resize_to_me.right -= 10;
-						tv->SetTextRect(resize_to_me);
+					BRect resize_to_me(printable_rect);
+					resize_to_me.top-=20;
+					resize_to_me.right -= 10;
+					tv->SetTextRect(resize_to_me);
 
-						//Time to get num of pages...
-						//pages are zero-based
-						int32 firstPage = job.FirstPage();
-						int32 lastPage = job.LastPage();
+					//Time to get num of pages...
+					//pages are zero-based
+					int32 firstPage = job.FirstPage();
+					int32 lastPage = job.LastPage();
 
-						int32 firstLine = 0;
-						int32 lastLine = tv->CountPhysicalLines();
+					int32 firstLine = 0;
+					int32 lastLine = tv->CountPhysicalLines();
 
-						int32 pagesInDocument = 1;
-						int32 linesInDocument = tv->CountPhysicalLines();
+					int32 pagesInDocument = 1;
+					int32 linesInDocument = tv->CountPhysicalLines();
 
-						int32 currentLine = 0;
-						while(currentLine < linesInDocument)
+					int32 currentLine = 0;
+					while(currentLine < linesInDocument)
+					{
+						float currentHeight = 0;
+						while((currentHeight < printable_rect.Height()) &&
+						(currentLine < linesInDocument))
 						{
-							float currentHeight = 0;
-							while((currentHeight < printable_rect.Height()) &&
-							(currentLine < linesInDocument))
-							{
-								currentHeight += tv->LineHeight(currentLine);
-								if(currentHeight < printable_rect.Height())
-									currentLine++;
-							}
-
-							if(pagesInDocument == lastPage)
-								lastLine = currentLine;
-							if(currentHeight >= printable_rect.Height())
-							{
-								pagesInDocument++;
-								if(pagesInDocument == firstPage)
-									firstLine = currentLine;
-							}
+							currentHeight += tv->LineHeight(currentLine);
+							if(currentHeight < printable_rect.Height())
+								currentLine++;
 						}
 
-						if(lastPage > pagesInDocument - 1)
+						if(pagesInDocument == lastPage)
+							lastLine = currentLine;
+						if(currentHeight >= printable_rect.Height())
 						{
-							lastPage = pagesInDocument - 1;
-							lastLine = currentLine - 1;
+							pagesInDocument++;
+							if(pagesInDocument == firstPage)
+								firstLine = currentLine;
 						}
+					}
+
+					if(lastPage > pagesInDocument - 1)
+					{
+						lastPage = pagesInDocument - 1;
+						lastLine = currentLine - 1;
+					}
 
 
 
 
-						//Verify that the range is correct
-						// 0 ... LONG_MAX -> Print all the document
-						// n ... LONG_MAX -> Print from page n to the end
-						// n ... m -> Print from page n to page m
+					//Verify that the range is correct
+					// 0 ... LONG_MAX -> Print all the document
+					// n ... LONG_MAX -> Print from page n to the end
+					// n ... m -> Print from page n to page m
 
 
-						int32 numPages = lastPage - firstPage + 1;
+					int32 numPages = lastPage - firstPage + 1;
 
-						//Verify range is correct
-						if(numPages <= 0)
-							return;
+					//Verify range is correct
+					if(numPages <= 0)
+						return;
 
-						//Now we can print the page
-						job.BeginJob();
+					//Now we can print the page
+					job.BeginJob();
 
-						//Print all pages
-						//TODO ? bool can_continue = job.CanContinue();
+					//Print all pages
+					//TODO ? bool can_continue = job.CanContinue();
 
-						int32 printLine = firstLine;
-						while (printLine < lastLine)
+					int32 printLine = firstLine;
+					while (printLine < lastLine)
+					{
+						float currentHeight = 0;
+						int32 firstLineOnPage = printLine;
+						while ((currentHeight < printable_rect.Height()) && (printLine < lastLine)) 
 						{
-							float currentHeight = 0;
-							int32 firstLineOnPage = printLine;
-							while ((currentHeight < printable_rect.Height()) && (printLine < lastLine)) 
-							{
-								currentHeight += tv->LineHeight(printLine);
-								if (currentHeight < printable_rect.Height()) 
-									printLine++;
+							currentHeight += tv->LineHeight(printLine);
+							if (currentHeight < printable_rect.Height()) 
+								printLine++;
 
-							}
-							float top = 0;
-							if (firstLineOnPage != 0)
-								top = tv->TextHeight(0,firstLineOnPage-1);
-							int TEXT_INSET = 0;
-							float bottom = tv->TextHeight(0,printLine-1);
-							BRect textRect(0.0,top+TEXT_INSET,printable_rect.Width(),bottom+TEXT_INSET);
-							job.DrawView(tv,textRect,BPoint(0.0,0.0));
-							job.SpoolPage();
 						}
-						job.CommitJob();
-						tv->SetTextRect(old_text_rect);
+						float top = 0;
+						if (firstLineOnPage != 0)
+							top = tv->TextHeight(0,firstLineOnPage-1);
+						int TEXT_INSET = 0;
+						float bottom = tv->TextHeight(0,printLine-1);
+						BRect textRect(0.0,top+TEXT_INSET,printable_rect.Width(),bottom+TEXT_INSET);
+						job.DrawView(tv,textRect,BPoint(0.0,0.0));
+						job.SpoolPage();
+					}
+					job.CommitJob();
+					tv->SetTextRect(old_text_rect);
 				}
 }
 

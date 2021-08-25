@@ -22,6 +22,8 @@
 #include <cassert>
 #include <algorithm>
 #include <vector>
+using namespace std;
+
 #include "Prefs.h"
 
 class TexView : public BTextView

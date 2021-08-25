@@ -41,7 +41,7 @@ class BubbleHelper
 		void				DisplayHelp(char *text, BPoint where);
 		void				Helper();
 		char				*GetHelp(BView *view);
-		static long 		_helper(void *arg);
+		static status_t		_helper(void *arg);
 		BView				*FindView(BPoint where);
 		
 		void				HideBubble();

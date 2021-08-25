@@ -13,7 +13,7 @@
 #include <be/interface/Font.h>
 #include "Constants.h"
 
-FastColor::FastColor(ColorView* theWell, BPoint leftTop, color_control_layout matrix, float cellSide, const char* name, BMessage* message = NULL, bool bufferedDrawing = false)
+FastColor::FastColor(ColorView* theWell, BPoint leftTop, color_control_layout matrix, float cellSide, const char* name, BMessage* message, bool bufferedDrawing)
  			:	BColorControl(leftTop,matrix,cellSide,name,message,bufferedDrawing)
 {
 	well = theWell;

@@ -7,7 +7,9 @@
 #ifndef GRADIENT_VIEW_H
 #define GRADIENT_VIEW_H
 
-#include <vector.h>
+#include <vector>
+using namespace std;
+
 #include "DoubleBufferedView.h"
 
 /**	GradientView

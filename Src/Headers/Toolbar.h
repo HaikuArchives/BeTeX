@@ -19,6 +19,7 @@
 
 // Standard C++ headers
 #include <vector>
+using namespace std;
 
 // Haiku headers
 #include <View.h>
