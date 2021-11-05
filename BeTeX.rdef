@@ -123,9 +123,7 @@ resource app_version {
 	internal = 4,
 
 	short_info = "BeTeX, LaTeX editor for BeOS and derivatives",
-	long_info = #'CSTR' array {
-
-	}
+	long_info =  "BeTeX, LaTeX editor for BeOS and derivatives"
 };
 
 resource app_flags B_SINGLE_LAUNCH;
