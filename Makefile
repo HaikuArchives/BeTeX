@@ -69,11 +69,11 @@ SRCS =  Src/Source/AboutWindow.cpp \
 
 #	Specify the resource definition files to use. Full or relative paths can be
 #	used.
-RDEFS = 
+RDEFS = BeTeX.rdef
 
 #	Specify the resource files to use. Full or relative paths can be used.
 #	Both RDEFS and RSRCS can be utilized in the same Makefile.
-RSRCS =  BeTeX.rsrc
+RSRCS = 
 
 # End Pe/Eddie support.
 # @<-src@ 
@@ -93,8 +93,7 @@ RSRCS =  BeTeX.rsrc
 #		(e.g. for mylib.a, specify "mylib.a" or "path/mylib.a")
 LIBS =  /boot/system/lib/libbe.so \
  /boot/system/lib/libroot.so \
- /boot/system/lib/libtracker.so \
- $(STDCPPLIBS)
+ /boot/system/lib/libtracker.so
 
 #	Specify additional paths to directories following the standard libXXX.so
 #	or libXXX.a naming scheme. You can specify full paths or paths relative
@@ -106,10 +105,7 @@ LIBPATHS =
 #	Additional paths to look for system headers. These use the form
 #	"#include <header>". Directories that contain the files in SRCS are
 #	NOT auto-included here.
-SYSTEM_INCLUDE_PATHS =  /boot/system/develop/headers/be \
- /boot/system/develop/headers/cpp \
- /boot/system/develop/headers/posix \
- /boot/system/develop/lib
+SYSTEM_INCLUDE_PATHS = 
 
 #	Additional paths paths to look for local headers. These use the form
 #	#include "header". Directories that contain the files in SRCS are
@@ -149,7 +145,7 @@ SYMBOLS :=
 DEBUGGER := 
 
 #	Specify any additional compiler flags to be used.
-COMPILER_FLAGS = -Woverloaded-virtual -funsigned-bitfields -Wwrite-strings 
+COMPILER_FLAGS = -I /boot/system/develop/headers
 
 #	Specify any additional linker flags to be used.
 LINKER_FLAGS = 
