@@ -98,9 +98,9 @@ MainWindow::MainWindow(BRect frame)
 	printer_settings = NULL;
 
 	BPath templatePath;
-	if (find_directory(B_SYSTEM_DATA_DIRECTORY, &templatePath) == B_OK)
-	{	templatePath.Append("BeTeX");
-		templatePath.Append("Templates"); 
+	if (find_directory(B_COMMON_VAR_DIRECTORY, &templatePath) == B_OK)
+	{	templatePath.Append("betex");
+		templatePath.Append("templates"); 
 		TemplateDir = templatePath.Path();
 	}
 	searchPanel = NULL;//new SearchWindow(BRect(100,100,250,250),this);
