@@ -19,7 +19,7 @@ TexView::TexView(BRect frame, BRect textRect)
 	SetDoesUndo(true);
 	SetAutoindent(preferences->AutoIndent);
 	//IsUndo = false;
-	
+
 	IsNormalFocus = false;
 	HasAttachedFocus = false;
 	//TextStyles
@@ -56,28 +56,28 @@ TexView::TexView(BRect frame, BRect textRect)
 	green_matches.push_back("huge");
 	green_matches.push_back("Huge");
 
-    green_matches.push_back("mathbb");
-    green_matches.push_back("mathbf");
-    green_matches.push_back("mathcal");
-    green_matches.push_back("mathfrak");
-    green_matches.push_back("mathit");
-    green_matches.push_back("mathnormal");
-    green_matches.push_back("mathrm");
-    green_matches.push_back("mathsf");
-    green_matches.push_back("mathtt");
+	green_matches.push_back("mathbb");
+	green_matches.push_back("mathbf");
+	green_matches.push_back("mathcal");
+	green_matches.push_back("mathfrak");
+	green_matches.push_back("mathit");
+	green_matches.push_back("mathnormal");
+	green_matches.push_back("mathrm");
+	green_matches.push_back("mathsf");
+	green_matches.push_back("mathtt");
 
-    green_matches.push_back("rmfamily");
-    green_matches.push_back("sffamily");
-    green_matches.push_back("ttfamily");
+	green_matches.push_back("rmfamily");
+	green_matches.push_back("sffamily");
+	green_matches.push_back("ttfamily");
 
-    green_matches.push_back("itshape");
-    green_matches.push_back("scshape");
-    green_matches.push_back("slshape");
-    green_matches.push_back("upshape");
+	green_matches.push_back("itshape");
+	green_matches.push_back("scshape");
+	green_matches.push_back("slshape");
+	green_matches.push_back("upshape");
 
-    green_matches.push_back("bfseries");
-    green_matches.push_back("mdseries");
- 	
+	green_matches.push_back("bfseries");
+	green_matches.push_back("mdseries");
+
 	purple_matches.push_back("author");
 	purple_matches.push_back("title");
 	purple_matches.push_back("section");
@@ -85,7 +85,7 @@ TexView::TexView(BRect frame, BRect textRect)
 	purple_matches.push_back("subsubsection");
 	purple_matches.push_back("subsubsubsection");
 	purple_matches.push_back("verb");
-	
+
 	IsShifting = false;
 }
 

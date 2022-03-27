@@ -18,11 +18,9 @@ SearchWindow::SearchWindow(BRect frame, BMessenger *messenger)
 	parent->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(parent);
 
-	const float
-			texViewWidth = 200.0f,
-			texViewHeight = 80.0f,
-			strViewHeight = 20.0f
-			;
+	const float texViewWidth = 200.0f,
+	            texViewHeight = 80.0f,
+		    strViewHeight = 20.0f;
 
 	BRect r = Bounds();
 	//replace this junk later!!!
@@ -38,7 +36,7 @@ SearchWindow::SearchWindow(BRect frame, BMessenger *messenger)
 	BRect findViewTextRect(0.0f, 0.0f, findViewRect.Width(), findViewRect.Height());
 	findViewTextRect.InsetBy(5.0f, 5.0f);
 
-	/*m_findView = new TexView(findViewRect,findViewTextRect);
+	m_findView = new TexView(findViewRect,findViewTextRect);
 	m_findView->SetNormalFocus();
 	m_findView->SetAttachedFocus();
 
@@ -46,7 +44,7 @@ SearchWindow::SearchWindow(BRect frame, BMessenger *messenger)
 											B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE, false, true);
 	findScroll->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	parent->AddChild(findScroll);
-	*/
+	
 	//replace this too!!!
 	r.OffsetBy(0.0f, texViewHeight + 5.0f);
 	r.bottom = r.top + strViewHeight;
@@ -58,19 +56,18 @@ SearchWindow::SearchWindow(BRect frame, BMessenger *messenger)
 	BRect replaceViewRect(r);
 	BRect replaceViewTextRect(0.0f, 0.0f, replaceViewRect.Width(), replaceViewRect.Height());
 	replaceViewTextRect.InsetBy(5.0f, 5.0f);
-	/*
-	m_replaceview = new TexView(replaceViewRect, replaceViewTextRect);
-	m_replaceview->SetNormalFocus();
+	
+	m_replaceView = new TexView(replaceViewRect, replaceViewTextRect);
+	m_replaceView->SetNormalFocus();
 
-	ScrollView* replaceScroll = new ScrollView("replaceScroll", m_replaceview, B_FOLLOW_LEFT | B_FOLLOW_TOP, 
-												B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE, false, true);
+	ScrollView* replaceScroll = new ScrollView("replaceScroll", m_replaceView, B_FOLLOW_LEFT | B_FOLLOW_TOP, 
+			B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE, false, true);
 	replaceScroll->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	parent->AddChild(replaceScroll);
-	*/
+	
 	//construct rectangel for button location/size
 	float	buttonWidth = 100.0f,
-			buttonHeight = 20.0f
-			;
+		buttonHeight = 20.0f;
 
 	BRect buttonRect(Bounds());
 	buttonRect.left = findViewRect.right + 50.0f;
@@ -121,6 +118,7 @@ SearchWindow::SearchWindow(BRect frame, BMessenger *messenger)
 
 	bool isAllDocs = false;
 	m_allDocsCheck->SetValue(isAllDocs);
+	m_findView->MakeFocus(true);
 }
 
 SearchWindow::~SearchWindow()
@@ -144,7 +142,7 @@ void SearchWindow::MessageReceived(BMessage *message)
 		break;
 		case SearchWindowConstants::K_SEARCH_WINDOW_FIND:
 		{
-			/*
+			
 			BMessage* fmsg = new BMessage(SearchWindowConstants::K_SEARCH_WINDOW_FIND);
 			if	(
 					(m_findView->TextLength() > 0) && 
@@ -153,7 +151,7 @@ void SearchWindow::MessageReceived(BMessage *message)
 			{
 				m_msgr->SendMessage(fmsg);
 			}
-			*/
+			
 
 		}
 		break;
