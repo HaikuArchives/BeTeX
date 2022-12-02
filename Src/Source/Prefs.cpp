@@ -136,48 +136,48 @@ Prefs::Prefs(BMessage* archive)
 		}
 
 		if(archive->FindString("latex_cmd",&str_tmp) == B_OK)
-			latex_cmd = str_tmp;
+			commands["latex_cmd"] = str_tmp;
 		else
 		{
 			ResetToDefaults();
 		}
 
 		if(archive->FindString("dvipdf_cmd",&str_tmp) == B_OK)
-			dvipdf_cmd = str_tmp;
+			commands["dvipdf_cmd"] = str_tmp;
 		else
 		{
 			ResetToDefaults();
 		}
 
 		if(archive->FindString("dvips_cmd",&str_tmp) == B_OK)
-			dvips_cmd = str_tmp;
+			commands["dvips_cmd"] = str_tmp;
 		else
 		{
 			ResetToDefaults();
 		}
 
 		if(archive->FindString("ps2pdf_cmd",&str_tmp) == B_OK)
-			ps2pdf_cmd = str_tmp;
+			commands["ps2pdf_cmd"] = str_tmp;
 		else
 		{
 			ResetToDefaults();
 		}
 
 		if(archive->FindString("pdflatex_cmd",&str_tmp) == B_OK)
-			pdflatex_cmd = str_tmp;
+			commands["pdflatex_cmd"] = str_tmp;
 		else
 		{
 			ResetToDefaults();
 		}
 
 		if(archive->FindString("latex2html_cmd",&str_tmp) == B_OK)
-			latex2html_cmd = str_tmp;
+			commands["latex2html_cmd"] = str_tmp;
 		else
 		{
 			ResetToDefaults();
 		}
 		if(archive->FindString("postscript_cmd",&str_tmp) == B_OK)
-			postscript_cmd = str_tmp;
+			commands["postscript_cmd"] = str_tmp;
 		else
 		{
 			ResetToDefaults();
@@ -425,13 +425,13 @@ Prefs::Archive(BMessage * archive, bool deep) const
 	archive->AddBool("IsSearchBackwards",IsSearchBackwards);
 	archive->AddBool("IsAllDocs",IsAllDocs);
 
-	archive->AddString("latex_cmd",latex_cmd);
-	archive->AddString("dvipdf_cmd",dvipdf_cmd);
-	archive->AddString("dvips_cmd",dvips_cmd);
-	archive->AddString("ps2pdf_cmd",ps2pdf_cmd);
-	archive->AddString("pdflatex_cmd",pdflatex_cmd);
-	archive->AddString("latex2html_cmd",latex2html_cmd);
-	archive->AddString("postscript_cmd",postscript_cmd);
+	archive->AddString("latex_cmd",commands.find("latex_cmd")->second);
+	archive->AddString("dvipdf_cmd",commands.find("dvipdf_cmd")->second);
+	archive->AddString("dvips_cmd",commands.find("dvips_cmd")->second);
+	archive->AddString("ps2pdf_cmd",commands.find("ps2pdf_cmd")->second);
+	archive->AddString("pdflatex_cmd",commands.find("pdflatex_cmd")->second);
+	archive->AddString("latex2html_cmd",commands.find("latex2html_cmd")->second);
+	archive->AddString("postscript_cmd",commands.find("postscript_cmd")->second);
 
 	archive->AddBool("IsGreekHidden",IsGreekHidden);
 	archive->AddBool("IsBigHidden",IsBigHidden);
@@ -491,13 +491,13 @@ void Prefs::ResetColors()
 
 void Prefs::ResetCommands()
 {
-	latex_cmd      = "latex $.tex";
-	dvipdf_cmd     = "dvipdf $.dvi";
-	dvips_cmd      = "dvips -o $.ps $.dvi";
-	ps2pdf_cmd     = "ps2pdf $.ps";
-	pdflatex_cmd   = "pdflatex $.tex";
-	latex2html_cmd = "latex2html $.tex";
-	postscript_cmd = "gs -sDEVICE=bealpha4 $.ps";
+	commands["latex_cmd"]      = "latex $.tex";
+	commands["dvipdf_cmd"]    = "dvipdf $.dvi";
+	commands["dvips_cmd"]      = "dvips -o $.ps $.dvi";
+	commands["ps2pdf_cmd"]     = "ps2pdf $.ps";
+	commands["pdflatex_cmd"]   = "pdflatex $.tex";
+	commands["latex2html_cmd"] = "latex2html $.tex";
+	commands["postscript_cmd"] = "gs -sDEVICE=bealpha4 $.ps";
 }
 
 void Prefs::ResetToolbar()

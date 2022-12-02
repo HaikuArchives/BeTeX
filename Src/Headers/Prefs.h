@@ -2,6 +2,8 @@
 #define _PREFS_H_
 
 #include <iostream>
+#include <map>
+
 #include <Archivable.h>
 #include <View.h>
 #include <String.h>
@@ -68,14 +70,14 @@ static	BArchivable *Instantiate(BMessage*);
 		bool IsSyntax;		//true
 		
 		//Latex Commands ($ represents filename "basename")
-		BString latex_cmd;			//latex $.tex
-		BString dvipdf_cmd;			//dvipdf $.dvi
-		BString dvips_cmd;			//dvips -o $.ps $.dvi
-		BString ps2pdf_cmd;			//ps2pdf $.ps
-		BString pdflatex_cmd;		//pdflatex $.tex
-		BString latex2html_cmd;		//latex2html $.tex
-		BString postscript_cmd;		//gs -sDEVICE=bealpha4 $.ps
-		
+		//BString latex_cmd;			//latex $.tex
+		//BString dvipdf_cmd;			//dvipdf $.dvi
+	    //BString dvips_cmd;			//dvips -o $.ps $.dvi
+		//BString ps2pdf_cmd;			//ps2pdf $.ps
+		//BString pdflatex_cmd;		//pdflatex $.tex
+		//BString latex2html_cmd;		//latex2html $.tex
+		//BString postscript_cmd;		//gs -sDEVICE=bealpha4 $.ps
+		std::map<std::string, BString> commands;
 		
 		bool IsCaseSensitive;
 		bool IsWrapAround;

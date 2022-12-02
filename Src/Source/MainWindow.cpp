@@ -1671,7 +1671,7 @@ void MainWindow::MessageReceived(BMessage* message)
 							break;
 							case K_CMD_LAUNCH_PSVIEWER:
 							{
-									Execute("/tmp/psview.sh",preferences->postscript_cmd.String());
+									Execute("/tmp/psview.sh",preferences->commands["postscript_cmd"]);
 							}
 							break;
 							case K_CMD_LAUNCH_HTMLVIEWER:
@@ -1725,32 +1725,32 @@ void MainWindow::MessageReceived(BMessage* message)
 							break;
 							case K_CMD_COMPILE_TEXDVI:
 							{
-									Execute("/tmp/textodvi.sh",preferences->latex_cmd.String());
+									Execute("/tmp/textodvi.sh",preferences->commands["latex_cmd"]);
 							}
 							break;
 							case K_CMD_COMPILE_DVIPDF:
 							{
-									Execute("/tmp/dvitopdf.sh",preferences->dvipdf_cmd.String());
+									Execute("/tmp/dvitopdf.sh",preferences->commands["dvipdf_cmd"]);
 							}
 							break;
 							case K_CMD_COMPILE_DVIPS:
 							{
-									Execute("/tmp/dvitops.sh",preferences->dvips_cmd.String());
+									Execute("/tmp/dvitops.sh",preferences->commands["dvips_cmd"]);
 							}
 							break;
 							case K_CMD_COMPILE_PSPDF:
 							{
-									Execute("/tmp/pstopdf.sh",preferences->ps2pdf_cmd.String());
+									Execute("/tmp/pstopdf.sh",preferences->commands["ps2pdf_cmd"]);
 							}
 							break;
 							case K_CMD_COMPILE_TEXPDF:
 							{
-									Execute("/tmp/textopdf.sh",preferences->pdflatex_cmd.String());
+									Execute("/tmp/textopdf.sh",preferences->commands["pdflatex_cmd"]);
 							}
 							break;
 							case K_CMD_COMPILE_TEXHTML:
 							{
-									Execute("/tmp/textohtml.sh",preferences->latex2html_cmd.String());
+									Execute("/tmp/textohtml.sh",preferences->commands["latex2html_cmd"]);
 							}
 							break;
 							case B_SIMPLE_DATA:

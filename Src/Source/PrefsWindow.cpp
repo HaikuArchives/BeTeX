@@ -106,6 +106,13 @@ void PrefsWindow::MessageReceived(BMessage* message)
 	{
 		case PrefsConstants::K_PREFS_VIEW_OK:
 		{
+			string commands[] = {K_LATEX_CMD, K_DVIPDF_CMD, K_DVIPS_CMD, K_PS2PDF_CMD, K_PDFLATEX_CMD, K_LATEX2HTML_CMD, K_POSTSCRIPT_CMD};
+			prefsLock.Lock();
+			for(int i=0; i < 7 ; i++ ) {
+				BTextControl *tc = (BTextControl *)FindView(commands[i].c_str());
+				preferences->commands[commands[i]] = tc->Text();
+			}
+			prefsLock.Unlock();
 			Quit();
 		}
 		break;
@@ -319,7 +326,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	commandBox->AddChild(new BitmapView(bitRect, texDviBitmap));
 
 	BTextControl *texDviCtrl = new BTextControl(bitctrlRect, K_LATEX_CMD, NULL, "", GetPrefsMessage(K_LATEX_CMD));
-	texDviCtrl->SetText(preferences->latex_cmd);
+	texDviCtrl->SetText(preferences->commands["latex_cmd"]);
 	commandBox->AddChild(texDviCtrl);
 	bitctrlRect.OffsetBy(0.0, bitoffset);
 
@@ -330,7 +337,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	commandBox->AddChild(new BitmapView(bitRect, dviPdfBitmap));
 
 	BTextControl *dviPdfCtrl = new BTextControl(bitctrlRect, K_DVIPDF_CMD, NULL, "",  GetPrefsMessage(K_DVIPDF_CMD));
-	dviPdfCtrl->SetText(preferences->dvipdf_cmd);
+	dviPdfCtrl->SetText(preferences->commands["dvipdf_cmd"]);
 	commandBox->AddChild(dviPdfCtrl);
 	bitctrlRect.OffsetBy(0.0, bitoffset);
 
@@ -341,7 +348,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	commandBox->AddChild(new BitmapView(bitRect, dviPsBitmap));
 
 	BTextControl *dviPsCtrl = new BTextControl(bitctrlRect, K_DVIPS_CMD, NULL, "",  GetPrefsMessage(K_DVIPS_CMD));
-	dviPsCtrl->SetText(preferences->dvips_cmd);
+	dviPsCtrl->SetText(preferences->commands["dvips_cmd"]);
 	commandBox->AddChild(dviPsCtrl);
 	bitctrlRect.OffsetBy(0.0, bitoffset);
 
@@ -352,7 +359,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	commandBox->AddChild(new BitmapView(bitRect, psPdfBitmap));
 
 	BTextControl *psPdfCtrl = new BTextControl(bitctrlRect, K_PS2PDF_CMD, NULL, "",  GetPrefsMessage(K_PS2PDF_CMD));
-	psPdfCtrl->SetText(preferences->ps2pdf_cmd);
+	psPdfCtrl->SetText(preferences->commands["ps2pdf_cmd"]);
 	commandBox->AddChild(psPdfCtrl);
 	bitctrlRect.OffsetBy(0.0, bitoffset);
 
@@ -363,7 +370,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	commandBox->AddChild(new BitmapView(bitRect, texPdfBitmap));
 
 	BTextControl *texPdfCtrl = new BTextControl(bitctrlRect, K_PDFLATEX_CMD, NULL, "",  GetPrefsMessage(K_PDFLATEX_CMD));
-	texPdfCtrl->SetText(preferences->pdflatex_cmd);
+	texPdfCtrl->SetText(preferences->commands["pdflatex_cmd"]);
 	commandBox->AddChild(texPdfCtrl);
 	bitctrlRect.OffsetBy(0.0, bitoffset);
 
@@ -374,7 +381,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	commandBox->AddChild(new BitmapView(bitRect, texHtmlBitmap));
 
 	BTextControl *texHtmlCtrl = new BTextControl(bitctrlRect, K_LATEX2HTML_CMD, NULL, "",  GetPrefsMessage(K_LATEX2HTML_CMD));
-	texHtmlCtrl->SetText(preferences->latex2html_cmd);
+	texHtmlCtrl->SetText(preferences->commands["latex2html_cmd"]);
 	commandBox->AddChild(texHtmlCtrl);
 	bitctrlRect.OffsetBy(0.0, bitoffset);
 
@@ -385,7 +392,7 @@ BView* PrefsWindow::constructCommandBox(BRect frame)
 	commandBox->AddChild(new BitmapView(secCol, postScriptBitmap));
 
 	BTextControl *postScriptCtrl = new BTextControl(secColCtrl, K_POSTSCRIPT_CMD, NULL, "", GetPrefsMessage(K_POSTSCRIPT_CMD));
-	postScriptCtrl->SetText(preferences->postscript_cmd);
+	postScriptCtrl->SetText(preferences->commands["postscript_cmd"]);
 	commandBox->AddChild(postScriptCtrl);
 
 	BRect comboxRect = commandBox->Bounds();
@@ -633,25 +640,25 @@ void PrefsWindow::ResetToDefaults(uint32 resetFlag)
 		preferences->ResetCommands();
 
 		BTextControl *texDvi = (BTextControl *)FindView(K_LATEX_CMD);
-		texDvi->SetText(preferences->latex_cmd);
+		texDvi->SetText(preferences->commands["latex_cmd"]);
 
 		BTextControl *dvipdf = (BTextControl *)FindView(K_DVIPDF_CMD);
-		dvipdf->SetText(preferences->dvipdf_cmd);
+		dvipdf->SetText(preferences->commands["dvipdf_cmd"]);
 
 		BTextControl *dvips = (BTextControl *)FindView(K_DVIPS_CMD);
-		dvips->SetText(preferences->dvips_cmd);
+		dvips->SetText(preferences->commands["dvips_cmd"]);
 
 		BTextControl *ps2pdf = (BTextControl *)FindView(K_PS2PDF_CMD);
-		ps2pdf->SetText(preferences->ps2pdf_cmd);
+		ps2pdf->SetText(preferences->commands["ps2pdf_cmd"]);
 
 		BTextControl *pdflatex = (BTextControl *)FindView(K_PDFLATEX_CMD);
-		pdflatex->SetText(preferences->pdflatex_cmd);
+		pdflatex->SetText(preferences->commands["pdflatex_cmd"]);
 
 		BTextControl *latex2html = (BTextControl *)FindView(K_LATEX2HTML_CMD);
-		latex2html->SetText(preferences->latex2html_cmd);
+		latex2html->SetText(preferences->commands["latex2html_cmd"]);
 
 		BTextControl *postscript = (BTextControl *)FindView(K_POSTSCRIPT_CMD);
-		postscript->SetText(preferences->postscript_cmd);
+		postscript->SetText(preferences->commands["postscript_cmd"]);
 
 	}
 
