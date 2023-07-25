@@ -192,8 +192,7 @@ void MainWindow::CreateMenuBar(BMenuBar *menuBar)
 	fileMenu->AddItem(fpgsetup = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_PAGE_SETUP)));
 	fileMenu->AddItem(fprint = new BMenuItem("Print" B_UTF8_ELLIPSIS, new BMessage(MenuConstants::K_MENU_FILE_PRINT),'P'));
 	fileMenu->AddSeparatorItem();
-	fileMenu->AddItem(fprefs = new BMenuItem("Preferences" B_UTF8_ELLIPSIS,new BMessage(MenuConstants::K_MENU_FILE_PREFS)));
-	fprefs->SetShortcut('P',B_SHIFT_KEY);
+	fileMenu->AddItem(fprefs = new BMenuItem("Preferences" B_UTF8_ELLIPSIS,new BMessage(MenuConstants::K_MENU_FILE_PREFS), ','));
 	fileMenu->AddItem(freset_layout = new BMenuItem("Reset Layout", new BMessage(MenuConstants::K_MENU_FORMAT_RESET_LAYOUT)));
 	fileMenu->AddItem(fabout = new BMenuItem("About BeTeX" B_UTF8_ELLIPSIS,new BMessage(MenuConstants::K_MENU_FILE_ABOUT)));
 	fileMenu->AddItem(fquit = new BMenuItem("Quit",new BMessage(MenuConstants::K_MENU_FILE_QUIT),'Q'));
