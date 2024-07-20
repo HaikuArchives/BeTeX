@@ -1,3 +1,9 @@
+/*****************************************************************
+ * Copyright (c) 2005 Tim de Jong, Brent Miszalski               *
+ *                                                               *
+ * All rights reserved.                                          *
+ * Distributed under the terms of the MIT License.               *
+ *****************************************************************/
 #ifndef _TLISTITEM_H_
 #define _TLISTITEM_H_
 
