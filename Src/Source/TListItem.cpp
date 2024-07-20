@@ -1,3 +1,10 @@
+/*****************************************************************
+ * Copyright (c) 2005 Tim de Jong, Brent Miszalski               *
+ *                                                               *
+ * All rights reserved.                                          *
+ * Distributed under the terms of the MIT License.               *
+ *****************************************************************/
+
 #include "TListItem.h"
 #include "TWindow.h"
 TListItem::TListItem(SplitPane* sp,BScrollView* docScroll,BString label,Prefs* p) : BListItem()
