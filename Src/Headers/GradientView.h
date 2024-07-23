@@ -7,7 +7,6 @@
 #ifndef GRADIENT_VIEW_H
 #define GRADIENT_VIEW_H
 
-using namespace std;
 #include <vector>
 using std::vector;
 
