@@ -2,7 +2,7 @@
 #include "Constants.h"
 #include <app/Messenger.h>
 #include <string>
-using namespace std;
+using std::string;
 
 HeaderItem::HeaderItem(BRect f,const char* n,uint32 rm,uint32 fl) 
 	: BView(f,"TexBarItem",B_FOLLOW_TOP,B_WILL_DRAW)

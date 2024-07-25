@@ -11,7 +11,8 @@
 #include <File.h>
 #include <String.h>
 #include <vector>
-using namespace std;
+using std::vector;
+using std::string;
 
 class TButton : public BControl
 {

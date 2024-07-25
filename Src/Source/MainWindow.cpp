@@ -21,7 +21,8 @@
 
 #include <unistd.h>
 //#include <stdio.h>
-
+using std::cout;
+using std::endl;
 
 #include "Constants.h"
 #include "Toolbar.h"

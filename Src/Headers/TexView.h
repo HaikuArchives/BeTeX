@@ -22,7 +22,9 @@
 #include <cassert>
 #include <algorithm>
 #include <vector>
-using namespace std;
+using std::vector;
+using std::max;
+using std::min;
 
 #include "Prefs.h"
 

@@ -14,7 +14,7 @@
 #include <be/storage/NodeMonitor.h>
 #include <be/support/String.h>
 #include <vector>
-using namespace std;
+using std::vector;
 
 #include "iconheaders/ConverterIcons.h"
 #include "BubbleHelper.h"
