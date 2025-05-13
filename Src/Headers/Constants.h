@@ -193,7 +193,6 @@ namespace ToolbarConstants
 			K_CMD_COMPILE_TEXHTML =			'txhl',
 			K_CMD_LAUNCH_TERMINAL =			'ltrm',
 			K_CMD_LAUNCH_TRACKER =			'ltrk',
-			K_CMD_LAUNCH_DVIVIEWER =		'ldvv',
 			K_CMD_LAUNCH_PSVIEWER =			'lpsv',
 			K_CMD_LAUNCH_BE_PDF =			'lbpf',
 			K_CMD_LAUNCH_HTMLVIEWER =		'lhlv',

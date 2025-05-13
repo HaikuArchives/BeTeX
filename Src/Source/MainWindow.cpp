@@ -1666,9 +1666,6 @@ void MainWindow::MessageReceived(BMessage* message)
 									}
 							}
 							break;
-
-							case K_CMD_LAUNCH_DVIVIEWER:
-							break;
 							case K_CMD_LAUNCH_PSVIEWER:
 							{
 									Execute("/tmp/psview.sh",preferences->commands["postscript_cmd"]);

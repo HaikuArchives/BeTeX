@@ -497,7 +497,7 @@ void Prefs::ResetCommands()
 	commands["ps2pdf_cmd"]     = "ps2pdf $.ps";
 	commands["pdflatex_cmd"]   = "pdflatex $.tex";
 	commands["latex2html_cmd"] = "latex2html $.tex";
-	commands["postscript_cmd"] = "gs -sDEVICE=bealpha4 $.ps";
+	commands["postscript_cmd"] = "BGhostview $.ps";
 }
 
 void Prefs::ResetToolbar()

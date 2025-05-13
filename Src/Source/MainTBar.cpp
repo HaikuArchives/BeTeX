@@ -120,13 +120,13 @@ MainTBar::MainTBar(BRect r,BubbleHelper* h) : BView(r,"maintbar",B_FOLLOW_NONE,B
 	tiler.OffsetBy(offset,0);		
 	
 	//Previewers
-	
+	/*
 	BBitmap* PrevDVIBitmap = new BBitmap(BRect(0,0,31,31),B_CMAP8);
 	PrevDVIBitmap->SetBits(IconPrevDVI,3072,0,B_CMAP8);
 	AddChild(TBPrevDVI = new TButton(NULL, tiler,new BMessage(K_CMD_LAUNCH_DVIVIEWER),PrevDVIBitmap));
 	helper->SetHelp(TBPrevDVI,"View DVI Document");
 	tiler.OffsetBy(offset,0);			
-	
+	*/
 	BBitmap* PrevPSBitmap = new BBitmap(BRect(0,0,31,31),B_CMAP8);
 	PrevPSBitmap->SetBits(IconPrevPS,3072,0,B_CMAP8);
 	AddChild(TBPrevPS = new TButton(NULL, tiler,new BMessage(K_CMD_LAUNCH_PSVIEWER),PrevPSBitmap));
