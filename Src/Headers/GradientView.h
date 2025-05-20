@@ -1,13 +1,15 @@
-/*****************************************************************
- * Copyright (c) 2005 Tim de Jong, Brent Miszalski				 *
- *							       								 *
- * All rights reserved.											 *
- * Distributed under the terms of the MIT License.               *
- *****************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2005 Tim de Jong, Brent Miszalski                             *
+ *                                                                             *
+ * All rights reserved.                                                        *
+ * Distributed under the terms of the MIT License.                             *
+ ******************************************************************************/
 #ifndef GRADIENT_VIEW_H
 #define GRADIENT_VIEW_H
 
-#include <vector.h>
+#include <vector>
+using std::vector;
+
 #include "DoubleBufferedView.h"
 
 /**	GradientView
@@ -15,12 +17,12 @@
 	@author Tim de Jong
 	@comment cleaned up code, moved orientation enum into class, added virtual
 	destructor, added Orientation() method, made some methods private.
-	
+
 	TODO: implement correct bool code for diagonals!!!
  */
 class GradientView : public DoubleBufferedView
 {
-	public:	
+	public:
 		//for GradientView - used to specify gradient orientation
 		enum gradient_orientation 
 		{
@@ -35,41 +37,41 @@ class GradientView : public DoubleBufferedView
 								K_CENTER_PYRAMID,
 								K_BORDER_PYRAMID
 		};
-		
+
 	public:
 		GradientView(BRect frame, rgb_color top, rgb_color bottom, gradient_orientation orientation = K_TOP_BOTTOM);
 		virtual					~GradientView();
-				
+
 		void					DrawContent(BView* backView);
 		void					SetOrientation(gradient_orientation orientation);
 		gradient_orientation	Orientation();
-		
-		void					SetTopColour(rgb_color top);
-		rgb_color				TopColour();
-		
-		void					SetBottomColour(rgb_color bottom);
-		rgb_color				BottomColour();			
-		
-	private:			
-		void					SwitchColours();
+
+		void					SetTopColor(rgb_color top);
+		rgb_color				TopColor();
+
+		void					SetBottomColor(rgb_color bottom);
+		rgb_color				BottomColor();
+
+	private:
+		void					SwitchColors();
 		void					Refill();
-		void					RestoreColours();
+		void					RestoreColors();
 		void					FillDiagonal(vector<rgb_color> &vert_vec,vector<rgb_color> &horiz_vec, bool switch_vertical, bool switch_horizontal);
-		void					DrawDiagonal(BView *backView, BRect r, vector<rgb_color>& draw_vert, vector<rgb_color>& draw_horiz);		
+		void					DrawDiagonal(BView *backView, BRect r, vector<rgb_color>& draw_vert, vector<rgb_color>& draw_horiz);
 		void					FillGradientVector(vector<rgb_color>& v, rgb_color c1, rgb_color c2, int hi, int lo);
-		rgb_color				GetMidColour(rgb_color c1, rgb_color c2);
-		
+		rgb_color				GetMidColor(rgb_color c1, rgb_color c2);
+
 	private:
 		gradient_orientation	m_orientation;
-		rgb_color 				m_topColour,
-								m_bottomColour,
-								m_oldTopColour,						
-								m_oldBottomColour
+		rgb_color 				m_topColor,
+								m_bottomColor,
+								m_oldTopColor,
+								m_oldBottomColor
 								;
-							
+
 		vector<rgb_color>		m_v,
 								m_v_horiz,
-								m_v_vert,		
+								m_v_vert,
 								m_pvh_tl,
 								m_pvv_tl,
 								m_pvh_tr,
@@ -78,7 +80,7 @@ class GradientView : public DoubleBufferedView
 								m_pvv_bl,
 								m_pvh_br,
 								m_pvv_br
-								;			
-	
+								;
+
 };
 #endif

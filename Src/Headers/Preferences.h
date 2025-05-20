@@ -10,10 +10,8 @@
 #include <be/storage/File.h>
 
 extern BLocker prefsLock;
-extern BMessage preferences;
 
-
-status_t SavePreferences(const char *path);
-status_t LoadPreferences(const char *path);
+status_t SavePreferences(BMessage *preferences_archive, const char *path);
+status_t LoadPreferences(const char *path, BMessage *preferences_archive);
 
 #endif

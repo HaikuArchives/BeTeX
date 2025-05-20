@@ -9,7 +9,7 @@
 #endif
 
 #include <be/interface/Font.h>
-#include "constants.h"
+#include "Constants.h"
 
 ProjectItem::ProjectItem(SplitPane* splitPane, BString label, BView *childView) 
 				:	BListItem(),
@@ -19,18 +19,22 @@ ProjectItem::ProjectItem(SplitPane* splitPane, BString label, BView *childView)
 					m_needToSave(false),
 					m_hasHome(false)
 {
-	m_splitPane->AddChildTwo(m_childView, false, false);	
+	m_splitPane->RemoveChild(m_childView);
+	m_splitPane->AddChildTwo(m_childView, false, false);
 }
 
 ProjectItem::~ProjectItem()
-{	
+{
 	m_splitPane->RemoveChild(m_childView);
 	delete m_childView;
 }
 
+
+//TODO preferences->fontSize
+//TODO preferences->FontFace
 void ProjectItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
-	rgb_color colour = owner->ViewColor();	
+	rgb_color color = owner->ViewColor();
 	float fontSize = 12.0f;
 	if(IsSelected() || complete)
 	{
@@ -40,12 +44,13 @@ void ProjectItem::DrawItem(BView* owner, BRect frame, bool complete)
 			font.SetSize(fontSize);
 			if(m_needToSave)
 			{
+
 				font.SetFace(B_ITALIC_FACE|B_BOLD_FACE);
-				colour = ui_color(B_WINDOW_TAB_COLOR);	
+				color = ui_color(B_WINDOW_TAB_COLOR);
 			}
 			else
 			{
-				colour = ui_color(B_WINDOW_TAB_COLOR);
+				color = ui_color(B_WINDOW_TAB_COLOR);
 			}
 			owner->SetFont(&font);
 		}
@@ -54,18 +59,18 @@ void ProjectItem::DrawItem(BView* owner, BRect frame, bool complete)
 			BFont font(be_plain_font);
 			font.SetSize(fontSize);
 			if(m_needToSave)
-			{	
+			{
 				font.SetFace(B_ITALIC_FACE);
-				colour = owner->ViewColor();
+				color = owner->ViewColor();
 			}
 			else
 			{
-				colour = owner->ViewColor();
+				color = owner->ViewColor();
 			}
-			owner->SetFont(&font);			
+			owner->SetFont(&font);
 		}
-		owner->SetHighColor(colour);
-		owner->SetLowColor(colour);
+		owner->SetHighColor(color);
+		owner->SetLowColor(color);
 		owner->FillRect(frame);
 	}
 	else
@@ -73,37 +78,37 @@ void ProjectItem::DrawItem(BView* owner, BRect frame, bool complete)
 		BFont font(be_plain_font);
 		font.SetSize(fontSize);
 		if(m_needToSave)
-		{	
+		{
 			font.SetFace(B_ITALIC_FACE);
 		}
-		owner->SetFont(&font);	
-		owner->SetHighColor(colour);
-		owner->SetLowColor(colour);	
+		owner->SetFont(&font);
+		owner->SetHighColor(color);
+		owner->SetLowColor(color);
 		owner->FillRect(frame);
 	}
 	owner->MovePenTo(frame.left + 4.0f, frame.bottom - 2.0f);
-	
+
 	if(IsEnabled())
 	{
 		owner->SetHighColor(0,0,0);
 	}
 	else
 	{
-		owner->SetHighColor(0,0,0);				
+		owner->SetHighColor(0,0,0);
 	}
-	
+
 	if(m_needToSave)
-	{			
-		owner->SetHighColor(ColourConstants::K_UNSAVED_TEXT_COLOUR);
+	{
+		owner->SetHighColor(ColorConstants::K_UNSAVED_TEXT_COLOR);
 	}
-	owner->SetLowColor(colour);
-	owner->DrawString(m_label.String());	
+	owner->SetLowColor(color);
+	owner->DrawString(m_label.String());
 }
 
 
 void ProjectItem::ShowTextView()
 {
-	m_splitPane->AddChildTwo(m_childView, true, true);		
+	m_splitPane->AddChildTwo(m_childView, true, true);
 }
 
 void ProjectItem::HideTextView()
@@ -111,14 +116,9 @@ void ProjectItem::HideTextView()
 	m_splitPane->AddChildTwo(m_childView, true, false);
 }
 
-BView* ProjectItem::ChildView()
+TexView* ProjectItem::ChildView()
 {
-	return m_childView;
-}
-
-BTextView* ProjectItem::TextView()
-{
-	return (BTextView*)m_childView;
+	return ((TexView* )((BScrollView*)m_childView)->Target());
 }
 
 void ProjectItem::SetSaveNeeded(bool needsSave)
@@ -141,6 +141,7 @@ bool ProjectItem::IsHomely()
 	return m_hasHome;
 }
 
+
 void ProjectItem::SetLabel(BString str)
 {
 	m_label = str;
@@ -151,9 +152,13 @@ BString ProjectItem::Label()
 	return m_label;
 }
 
-void ProjectItem::SetRef(entry_ref* ref)
+void ProjectItem::SetRef(entry_ref *ref)
 {
 	m_ref = *ref;
+	BPath path(&m_ref);
+	m_label = "";
+	m_label << path.Leaf();
+	m_hasHome = true;
 }
 
 entry_ref ProjectItem::GetRef() const

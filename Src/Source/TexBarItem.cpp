@@ -116,7 +116,7 @@ void TexBarItem::Draw(BRect r)
 	font.SetSize(12);
 	SetFont(&font);
 	
-	SetHighColor(ColourConstants::K_BLACK);
+	SetHighColor(ColorConstants::K_BLACK);
 	SetLowColor(low);
 	MovePenTo(5,ItemHeight-5);
 	DrawString(label);

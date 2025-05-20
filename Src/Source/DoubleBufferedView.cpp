@@ -1,18 +1,20 @@
-/*****************************************************************
- * Copyright (c) 2005 Tim de Jong								 *
- *							       								 *
- * All rights reserved.											 *
- * Distributed under the terms of the MIT License.               *
- *****************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2005 Tim de Jong                                              *
+ *                                                                             *
+ * All rights reserved.                                                        *
+ * Distributed under the terms of the MIT License.                             *
+ ******************************************************************************/
 #ifndef DOUBLE_BUFFERED_VIEW
 #include "DoubleBufferedView.h"
 #endif
 
+#include <Window.h>
+#include <iostream>
 /**	Constructor
  */
 DoubleBufferedView::DoubleBufferedView(BRect frame, const char *name, 
 										uint32 resizingMode, uint32 flags)
-					:BView(frame, name, resizingMode, flags | B_FRAME_EVENTS)
+					:BView(frame, name, resizingMode, flags | B_FRAME_EVENTS) 
 {
 	m_backBitmap = new BBitmap(Bounds(),B_RGB32,true);
 	m_backView = new BView(Bounds(),"backView",B_FOLLOW_ALL,flags);
@@ -42,15 +44,17 @@ void DoubleBufferedView::AttachedToWindow()
 	@param height, the new view height.
 */
 void DoubleBufferedView::FrameResized(float width, float height)
-{	
+{
 	//First make sure our background bitmap is large enough for our image.
    	if (m_backBitmap)
-	{		
+	{
 		m_backBitmap->RemoveChild(m_backView);
 		delete m_backBitmap;
 	}
 	m_backBitmap = new BBitmap(BRect(0,0,width,height), B_RGB32, true);
 	m_backView->ResizeTo(width, height);
+
+	//RenderView();
 	m_backBitmap->AddChild(m_backView);     		  
 }
 
@@ -59,7 +63,21 @@ void DoubleBufferedView::FrameResized(float width, float height)
  */
 void DoubleBufferedView::Draw(BRect updateRect)
 {
-	RenderView();
+	if (!Parent()) {
+		m_backView->Window()->Lock();
+		BRect bounds = m_backView->Bounds();
+		m_backView->Window()->Unlock();
+
+		float newWidth = updateRect.right;
+		float newHeight =  updateRect.bottom;
+		if (   newHeight != bounds.Height()
+		    || newWidth != bounds.Width())
+		{
+		   	FrameResized(newWidth, newHeight);
+		}
+		RenderView();
+
+	}
 }
 
 /** Hook function: refreshes the view content.
@@ -79,9 +97,9 @@ void DoubleBufferedView::RenderView()
 	m_backBitmap->Lock();
 	//Draw content here, the DrawContent method will be implemented by the subclasses.
 	DrawContent(m_backView);
-	//Sync the view, its very important we do this	
+	//Sync the view, its very important we do this
 	m_backView->Sync();
-	DrawBitmapAsync(m_backBitmap, Bounds(), Bounds());
+	DrawBitmapAsync(m_backBitmap, m_backView->Bounds(), m_backView->Bounds());
 	//Unlock the bitmap again
 	m_backBitmap->Unlock();
 }

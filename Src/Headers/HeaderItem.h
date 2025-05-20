@@ -10,7 +10,7 @@
 class HeaderItem : public BView
 {
 	public:
-		HeaderItem(BRect f,const char* n,uint32 rm,uint32 fl,Prefs* p);
+		HeaderItem(BRect f,const char* n,uint32 rm,uint32 fl);
 		virtual void Draw(BRect r);
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage* msg);
@@ -23,7 +23,6 @@ class HeaderItem : public BView
 		virtual void FrameResized(float w, float h);
 		void SetHidden(bool tohideornottohide);
 	private:
-		Prefs* prefs;
 		const char* label;
 		bool OkToInvoke;
 		bool IsDown;

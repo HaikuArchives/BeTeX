@@ -24,6 +24,7 @@ class DoubleBufferedView : public BView
 		virtual void		AttachedToWindow();		
 		virtual void		FrameResized(float width, float height);			
 		virtual void		Draw(BRect updateRect);		
+
 		virtual void		Invalidate();
 				
 		virtual void		RenderView();

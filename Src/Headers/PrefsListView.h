@@ -16,7 +16,7 @@
 class PrefsListView : public BListView
 {
 	public:
-		PrefsListView(BRect frame, BView* parent);
+		PrefsListView(BRect frame, BView* parent,BMessenger *messenger);
 		virtual				~PrefsListView();
 		
 		virtual void		SelectionChanged();	
@@ -27,6 +27,7 @@ class PrefsListView : public BListView
 		void				Prev(int32 decrement = 1);
 		
 	private:
+		BMessenger 			*m_msgr;
 		BView				*m_parent;
 		int32				m_lastSelectedIndex;		
 };

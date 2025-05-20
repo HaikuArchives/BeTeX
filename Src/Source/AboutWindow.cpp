@@ -11,15 +11,15 @@
 #include <be/app/Roster.h>
 #include <be/support/String.h>
 #include "BeTeXLogoSmall.h"
-#include "constants.h"
+#include "Constants.h"
 
 AboutView::AboutView(BRect frame) 
 			:	BView(frame,"about",B_FOLLOW_ALL_SIDES,B_WILL_DRAW)
 {
-	float w = 169.0f;
-	float h = 73.0f;
-	m_logo = new BBitmap(BRect(0.0f,0.0f,w,h),B_RGB32);
-	m_logo->SetBits(betex_logo_small,(w+1)*(h+1)*3,0,B_RGB32);
+	int w = 169;
+	int h = 73;
+	m_logo = new BBitmap(BRect(0,0,w,h),B_RGB32);
+	m_logo->ImportBits(betex_logo_small,(w+1)*(h+1)*3, (w+1)*3,0,B_RGB24_BIG);
 }
 
 AboutView::~AboutView()
@@ -186,20 +186,20 @@ void AboutWindow::MessageReceived(BMessage* msg)
 			else
 			{
 				if(m_bottom.blue == 0)
-				{	
+				{
 					m_bottom.blue++;
 					m_bottom.red--;
 					m_bup = true;
 				}
 				else
-				{	
+				{
 					m_bottom.blue--;
 					m_bottom.red++;
 				}
 			}
-			
-			m_gradient->SetTopColour(m_top);
-			m_gradient->SetBottomColour(m_bottom);			
+
+			m_gradient->SetTopColor(m_top);
+			m_gradient->SetBottomColor(m_bottom);
 		}
 		break;
 		case AboutMessages::K_ABOUT_WINDOW_QUIT:

@@ -10,7 +10,7 @@
 #include <Font.h>
 #include <Messenger.h>
 #include "TButton.h"
-#include "constants.h"
+#include "Constants.h"
 
 class TexBarItemView : public BView
 {

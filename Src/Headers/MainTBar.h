@@ -8,14 +8,14 @@
 #include <Roster.h>
 #include <Mime.h>
 #include "TButton.h"
-#include "constants.h"
+
+#include "Constants.h"
 #include "ConverterIcons.h"
 #include "TexView.h"
+#include "ProjectItem.h"
 #include <NodeMonitor.h>
 #include <Node.h>
 #include "BubbleHelper.h"
-#include <Path.h>
-
 class MainTBar : public BView
 {
 	public:
@@ -29,7 +29,7 @@ class MainTBar : public BView
 		TButton* TBTexPdf;
 		TButton* TBTexHtml;
 	
-		//TButton* TBPrevDVI;
+		TButton* TBPrevDVI;
 		TButton* TBPrevPS;
 		TButton* TBPrevPDF;
 		TButton* TBPrevHTML;
@@ -38,7 +38,8 @@ class MainTBar : public BView
 		TButton* TBSave;
 		TButton* TBPrint;
 		
-		//TButton* TBDelTmp;
+		TButton* TBDelTmp;
+		TButton* TBEmptyTmp;
 		TButton* TBViewLog;
 	
 		TButton* TBOpenTracker;
