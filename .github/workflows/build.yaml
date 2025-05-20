@@ -27,5 +27,5 @@ jobs:
           version: ${{ matrix.config.version }}
           architecture: ${{ matrix.config.architecture }}
           run: |
-            ssh user@localhost "pkgman update -y cmd:bison cmd:flex cmd:jam cmd:gcc" &&
+            ssh user@localhost "pkgman update -y gcc_syslibs_devel makefile_engine cmd:gcc" &&
             make -j2 OBJ_DIR=objects
