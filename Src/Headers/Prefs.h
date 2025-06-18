@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <map>
+#include <string>
 
 #include <Archivable.h>
 #include <View.h>
