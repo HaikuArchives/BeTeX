@@ -8,11 +8,12 @@
 #include "PrefsListView.h"
 #endif
 
-#include "constants.h"
+#include "Constants.h"
 #include "PrefsListItem.h"
 
-PrefsListView::PrefsListView(BRect frame, BView* parent) 
+PrefsListView::PrefsListView(BRect frame, BView* parent, BMessenger *messenger) 
 				:	BListView(frame,"listview",B_SINGLE_SELECTION_LIST,B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE),
+					m_msgr(messenger),
 					m_parent(parent),
 					m_lastSelectedIndex(-1)
 {
@@ -21,7 +22,6 @@ PrefsListView::PrefsListView(BRect frame, BView* parent)
 PrefsListView::~PrefsListView()
 {
 }
-
 void PrefsListView::SelectionChanged()
 {
 	

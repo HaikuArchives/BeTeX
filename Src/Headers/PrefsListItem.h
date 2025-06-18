@@ -14,17 +14,16 @@
 class PrefsListItem : public BListItem
 {
 	public:
-		PrefsListItem(BView* prefsView, BView* bView, BString label);			 
+		PrefsListItem(BView* prefsView, BView* bView, BString label);
 		virtual				~PrefsListItem();
 		
 		virtual void		DrawItem(BView* owner, BRect frame, bool complete=false);
 		void				Hide();
 		void				Show();
-		
+		BMessenger*			GetTarget();		
 	private:
 		BView				*m_prefsView,
 							*m_backgroundView;
-								
 		BString				m_label;		
 };
 #endif

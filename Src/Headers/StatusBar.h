@@ -7,6 +7,8 @@
 #ifndef STATUS_BAR_H
 #define STATUS_BAR_H
 
+#include <iostream>
+
 #include <be/interface/Rect.h>
 #include <be/support/String.h>
 #include "DoubleBufferedView.h"
@@ -21,17 +23,17 @@
 	SetText(BString) method	and the Text() method.
 */
 
-class StatusBar : public DoubleBufferedView
+class StatusBar : public /*DoubleBuffered*/BView
 {
 	public:
 		StatusBar(BRect frame);
 		virtual				~StatusBar();
 				
-		void				DrawContent(BView* backView);
+		void				Draw(BRect updateRect/*BView* backView*/);
 		void				SetText(BString statusText);
 		void				SetText(const char* statusText);
 		BString				Text();
-	
+
 	private:
 		BString				m_statusText;	
 };

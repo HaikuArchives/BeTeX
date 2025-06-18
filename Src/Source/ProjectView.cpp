@@ -1,9 +1,9 @@
-/*****************************************************************
- * Copyright (c) 2005 Tim de Jong, Brent Miszalski				 *
- *							       								 *
- * All rights reserved.											 *
- * Distributed under the terms of the MIT License.               *
- *****************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2005 Tim de Jong, Brent Miszalski                             *
+ *                                                                             *
+ * All rights reserved.                                                        *
+ * Distributed under the terms of the MIT License.                             *
+ ******************************************************************************/
 #ifndef PROJECT_VIEW_H
 #include "ProjectView.h"
 #endif
@@ -11,14 +11,14 @@
 #include <be/app/Messenger.h>
 #include <be/interface/Window.h>
 #include "ProjectItem.h"
-#include "constants.h"
+#include "Constants.h"
 
 ProjectView::ProjectView(BRect frame, BScrollView *dView) 
 				:	BListView(frame, "listview", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE),
 					m_docView(dView),
 					m_lastSelectedIndex(-1),
 					m_isDocViewHidden(false)
-{			
+{
 }
 
 ProjectView::~ProjectView()
@@ -32,23 +32,23 @@ void ProjectView::SelectionChanged()
 		ProjectItem *selected = dynamic_cast<ProjectItem*>(ItemAt(m_lastSelectedIndex));
 		selected->HideTextView();
 	}
-	
+
 	BString title;
 	title << "BeTeX";
-	
+
 	int32 current = CurrentSelection();
 	if (current >= 0)
-	{		
+	{
 		ProjectItem *selected = dynamic_cast<ProjectItem*>(ItemAt(current));
-				
+
 		title << " - " << selected->Label();
 		Window()->SetTitle(title.String());
-		
+
 		//send message to owner, update the statusbar and the textview shortcuts
 		BMessenger msgr(Window());
 		msgr.SendMessage(new BMessage(ToolbarConstants::K_UPDATE_TEXTVIEW_SHORTCUTS));
 		msgr.SendMessage(new BMessage(InterfaceConstants::K_UPDATE_STATUSBAR));
-					
+
 		if(!m_isDocViewHidden)
 		{
 			m_ownerSplitPane->AddChildTwo(m_docView, true, false);
@@ -60,7 +60,7 @@ void ProjectView::SelectionChanged()
 	else
 	{
 		m_lastSelectedIndex = -1;
-		//???	
+		//???
 		if(m_isDocViewHidden)
 		{
 			m_ownerSplitPane->AddChildTwo(m_docView,true,true);
@@ -75,9 +75,9 @@ void ProjectView::SelectionChanged()
 		BMessenger msgr(Window());
 		msgr.SendMessage(new BMessage(InterfaceConstants::K_UPDATE_STATUSBAR));
 	    
-	 	Window()->SetTitle(title.String());		
+	 	Window()->SetTitle(title.String());
 	}
-	ScrollToSelection();	
+	ScrollToSelection();
 }
 
 void ProjectView::MouseMoved(BPoint point,uint32 transit,const BMessage* msg)
@@ -156,7 +156,7 @@ void ProjectView::KeyDown(const char* bytes,int32 numBytes)
 		{
 			int32 items = CountItems();
 			if(items > 0)
-				Select(0);			
+				Select(0);
 		}
 		break;
 		case B_END:
@@ -169,17 +169,17 @@ void ProjectView::KeyDown(const char* bytes,int32 numBytes)
 		case B_PAGE_UP:
 		{
 			int32 dec = NoVisibleItems();
-			Prev(dec);		
+			Prev(dec);
 		}
-		break;	
+		break;
 		case B_PAGE_DOWN:
 		{
 			int32 inc = NoVisibleItems();
 			Next(inc);
 		}
-		break;		
+		break;
 		case B_UP_ARROW:
-			Prev(1);	
+			Prev(1);
 		break;
 		case B_DOWN_ARROW:
 			Next(1);
@@ -190,7 +190,7 @@ void ProjectView::KeyDown(const char* bytes,int32 numBytes)
 		break;
 		default:
 			BListView::KeyDown(bytes,numBytes);
-		break;	
+		break;
 	}
 }
 
@@ -206,12 +206,21 @@ int32 ProjectView::NoVisibleItems()
 	return noitems;
 }
 
+
+bool updateItem(BListItem *item)
+{
+	ProjectItem *it = (ProjectItem *)item;
+	it->ChildView()->UpdateColors();
+	it->ChildView()->UpdateFontSize();
+	return false;
+}
+
 void ProjectView::MessageReceived(BMessage* message)
 {
 	switch(message->what)
 	{
 		case B_MOUSE_WHEEL_CHANGED:
-		{	
+		{
 			//We have a mouse wheel event when the focus is on the desktop.
 			float delta_y;
 			if(message->FindFloat("be:wheel_delta_y",&delta_y) == B_OK)
@@ -225,18 +234,24 @@ void ProjectView::MessageReceived(BMessage* message)
 					//move wheel down/back
 					Next(boost);
 				}
-				else if(delta_y < 0)	
+				else if(delta_y < 0)
 				{
 					//move wheel up/forward
-					Prev(boost);	
+					Prev(boost);
 				}
 			}
-						
+
+		}
+		case B_OBSERVER_NOTICE_CHANGE:
+		{
+			if (message->GetInt32(B_OBSERVE_ORIGINAL_WHAT,0) == (int32)PrefsConstants::K_PREFS_UPDATE) 
+			{
+				DoForEach(updateItem);
+			}
 		}
 		break;
 		default:
-			BListView::MessageReceived(message);	
+			BListView::MessageReceived(message);
 		break;
 	}
 }
-

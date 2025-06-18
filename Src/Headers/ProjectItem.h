@@ -1,9 +1,9 @@
-/*****************************************************************
- * Copyright (c) 2005 Tim de Jong, Brent Miszalski				 *
- *							       								 *
- * All rights reserved.											 *
- * Distributed under the terms of the MIT License.               *
- *****************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2005 Tim de Jong, Brent Miszalski                             *
+ *                                                                             *
+ * All rights reserved.                                                        *
+ * Distributed under the terms of the MIT License.                             *
+ ******************************************************************************/
 #ifndef PROJECT_ITEM_H
 #define PROJECT_ITEM_H
 
@@ -11,8 +11,12 @@
 #include <be/interface/View.h>
 #include <be/interface/ListItem.h>
 #include <be/interface/ScrollView.h>
+#include <be/storage/Path.h>
+
+
 #include <be/support/String.h>
 #include "SplitPane.h"
+#include "TexView.h"
 
 class ProjectItem : public BListItem
 {
@@ -24,8 +28,7 @@ class ProjectItem : public BListItem
 		
 		void				ShowTextView();
 		void				HideTextView();
-		BView*				ChildView();
-		BTextView*			TextView();
+		TexView*			ChildView();
 		
 		void				SetLabel(BString label);
 		BString				Label();

@@ -22,7 +22,7 @@
 
 class SplitPane : public BView {
    public:
-      SplitPane(BRect,BView*,BView*,uint32);
+      SplitPane(BRect,const char*,BView*,BView*,uint32);
       void AddChildOne(BView*);
       void AddChildTwo(BView* v,bool IsAdded,bool ShowAfterHide);
       void SetAlignment(uint);
