@@ -91,9 +91,7 @@ RSRCS =
 #	- 	if your library does not follow the standard library naming scheme,
 #		you need to specify the path to the library and it's name.
 #		(e.g. for mylib.a, specify "mylib.a" or "path/mylib.a")
-LIBS =  /boot/system/lib/libbe.so \
- /boot/system/lib/libroot.so \
- /boot/system/lib/libtracker.so
+LIBS =  be tracker $(STDCPPLIBS)
 
 #	Specify additional paths to directories following the standard libXXX.so
 #	or libXXX.a naming scheme. You can specify full paths or paths relative
@@ -145,10 +143,10 @@ SYMBOLS :=
 DEBUGGER := 
 
 #	Specify any additional compiler flags to be used.
-COMPILER_FLAGS = -g -I /boot/system/develop/headers
+COMPILER_FLAGS =
 
 #	Specify any additional linker flags to be used.
-LINKER_FLAGS = -lstdc++
+LINKER_FLAGS =
 
 #	(Only used when "TYPE" is "DRIVER"). Specify the desired driver install
 #	location in the /dev hierarchy. Example:
