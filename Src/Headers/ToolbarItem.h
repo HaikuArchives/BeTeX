@@ -32,7 +32,7 @@ class WToolbar;
 // WToolbarItem
 // =============================================================================
 
-class WToolbarItem : public BHandler{
+class WToolbarItem : public BHandler {
 friend class WToolbar;
 public:
 
