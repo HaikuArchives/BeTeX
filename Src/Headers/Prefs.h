@@ -87,15 +87,15 @@ static	BArchivable *Instantiate(BMessage*);
 		
 		bool IsTexBarInverted;
 		
-        bool IsGreekHidden;
-        bool IsBigHidden;
-        bool IsBinaryHidden;
-        bool IsMiscHidden;
-        bool IsBinRelHidden;
-        bool IsMMAHidden;
-        bool IsIntlHidden;
-        bool IsTypeFaceHidden;
-        bool IsFunctionHidden;
+		bool IsGreekHidden;
+		bool IsBigHidden;
+		bool IsBinaryHidden;
+		bool IsMiscHidden;
+		bool IsBinRelHidden;
+		bool IsMMAHidden;
+		bool IsIntlHidden;
+		bool IsTypeFaceHidden;
+		bool IsFunctionHidden;
         
 		bool IsGreekAbsent;
 		bool IsBigAbsent;
