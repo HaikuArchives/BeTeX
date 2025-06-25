@@ -1,4 +1,4 @@
-## Haiku Generic Makefile v2.6 ## 
+## Haiku Generic Makefile v2.6 ##
 
 ## Fill in this file to specify the project being created, and the referenced
 ## Makefile-Engine will do all of the hard work for you. This handles any
@@ -6,6 +6,7 @@
 
 # The name of the binary.
 NAME = BeTeX
+TARGET_DIR = .
 
 # The type of binary, must be one of:
 #	APP:	Application
@@ -28,49 +29,51 @@ APP_MIME_SIG =
 #	means this Makefile will not work correctly if two source files with the
 #	same name (source.c or source.cpp) are included from different directories.
 #	Also note that spaces in folder names do not work well with this Makefile.
-SRCS = Src/Source/AboutWindow.cpp \
-	   Src/Source/ColourWindow.cpp \
-	   Src/Source/Preferences.cpp \
-	   Src/Source/SearchWindow.cpp \
-	   Src/Source/TexView.cpp \
-	   Src/Source/BeTeX.cpp \
-	   Src/Source/DimensionWindow.cpp \
-	   Src/Source/Prefs.cpp \
-	   Src/Source/SplitPane.cpp \
-	   Src/Source/ToolbarButton.cpp \
-	   Src/Source/BitmapUtils.cpp \
-	   Src/Source/DocView.cpp \
-	   Src/Source/PrefsListItem.cpp \
-	   Src/Source/StatusBar.cpp \
-	   Src/Source/ToolbarControl.cpp \
-	   Src/Source/BubbleHelper.cpp \
-	   Src/Source/DoubleBufferedView.cpp \
-	   Src/Source/PrefsListView.cpp \
-	   Src/Source/TButton.cpp \
-	   Src/Source/Toolbar.cpp \
-	   Src/Source/ButtonDecorator.cpp \
-	   Src/Source/GradientView.cpp PrefsWindow.cpp \
-	   Src/Source/TexBar.cpp \
-	   Src/Source/ToolbarItem.cpp \
-	   Src/Source/ColourButton.cpp \
-	   Src/Source/HeaderItem.cpp \
-	   Src/Source/ProjectItem.cpp \
-	   Src/Source/TexBarItem.cpp \
-	   Src/Source/ToolbarSeparator.cpp \
-	   Src/Source/ColourView.cpp \
-	   Src/Source/MainWindow.cpp \
-	   Src/Source/ProjectView.cpp \
-	   Src/Source/TexFileFilter.cpp \
-	   Src/Source/ToolbarSupport.cpp \
-	   Src/Source/MainTBar.cpp
+SRCS =  Src/Source/AboutWindow.cpp \
+ Src/Source/BeTeX.cpp \
+ Src/Source/GoToLineWindow.cpp \
+ Src/Source/MainWindow.cpp \
+ Src/Source/SearchWindow.cpp \
+ Src/Source/TexFileFilter.cpp \
+ Src/Source/BubbleHelper.cpp \
+ Src/Source/DimensionWindow.cpp \
+ Src/Source/DocView.cpp \
+ Src/Source/DoubleBufferedView.cpp \
+ Src/Source/GradientView.cpp \
+ Src/Source/HeaderItem.cpp \
+ Src/Source/MainTBar.cpp \
+ Src/Source/ProjectItem.cpp \
+ Src/Source/ProjectView.cpp \
+ Src/Source/SplitPane.cpp \
+ Src/Source/StatusBar.cpp \
+ Src/Source/TButton.cpp \
+ Src/Source/TexBar.cpp \
+ Src/Source/TexBarItem.cpp \
+ Src/Source/TexView.cpp \
+ Src/Source/BitmapUtils.cpp \
+ Src/Source/ButtonDecorator.cpp \
+ Src/Source/Toolbar.cpp \
+ Src/Source/ToolbarButton.cpp \
+ Src/Source/ToolbarControl.cpp \
+ Src/Source/ToolbarItem.cpp \
+ Src/Source/ToolbarSeparator.cpp \
+ Src/Source/ToolbarSupport.cpp \
+ Src/Source/ColorButton.cpp \
+ Src/Source/ColorView.cpp \
+ Src/Source/ColorWindow.cpp \
+ Src/Source/Preferences.cpp \
+ Src/Source/Prefs.cpp \
+ Src/Source/PrefsListItem.cpp \
+ Src/Source/PrefsListView.cpp \
+ Src/Source/PrefsWindow.cpp
 
 #	Specify the resource definition files to use. Full or relative paths can be
 #	used.
-RDEFS = 
+RDEFS = BeTeX.rdef
 
 #	Specify the resource files to use. Full or relative paths can be used.
 #	Both RDEFS and RSRCS can be utilized in the same Makefile.
-RSRCS = BeTeX.rsrc
+RSRCS = 
 
 # End Pe/Eddie support.
 # @<-src@ 
@@ -105,11 +108,13 @@ SYSTEM_INCLUDE_PATHS =
 #	Additional paths paths to look for local headers. These use the form
 #	#include "header". Directories that contain the files in SRCS are
 #	automatically included.
-LOCAL_INCLUDE_PATHS = Src/Headers Src/Headers/iconheaders
+LOCAL_INCLUDE_PATHS =  Src/Source \
+ Src/Headers \
+ Src/Headers/iconheaders
 
 #	Specify the level of optimization that you want. Specify either NONE (O0),
 #	SOME (O1), FULL (O2), or leave blank (for the default optimization level).
-OPTIMIZE := 
+OPTIMIZE := NONE
 
 # 	Specify the codes for languages you are going to support in this
 # 	application. The default "en" one must be provided too. "make catkeys"
@@ -138,15 +143,10 @@ SYMBOLS :=
 DEBUGGER := 
 
 #	Specify any additional compiler flags to be used.
-COMPILER_FLAGS = 
+COMPILER_FLAGS =
 
 #	Specify any additional linker flags to be used.
-LINKER_FLAGS = 
-
-#	Specify the version of this binary. Example:
-#		-app 3 4 0 d 0 -short 340 -long "340 "`echo -n -e '\302\251'`"1999 GNU GPL"
-#	This may also be specified in a resource.
-APP_VERSION := 
+LINKER_FLAGS =
 
 #	(Only used when "TYPE" is "DRIVER"). Specify the desired driver install
 #	location in the /dev hierarchy. Example:

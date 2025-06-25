@@ -3,24 +3,23 @@
 #endif
 
 #include <StopWatch.h>
-#include "constants.h"
+#include "Constants.h"
 
-TexView::TexView(BRect frame, BRect textRect, Prefs* p) 
+TexView::TexView(BRect frame, BRect textRect) 
 			:	BTextView(frame,"texview",textRect,B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_PULSE_NEEDED/*|B_NAVIGABLE*/)
 {
-	prefs = p;
 	IsColSel = false;
 	DontSel = false;
 	BFont fontie(be_fixed_font);
 	f = fontie;
-	f.SetSize(prefs->FontSize);
-	SetFontAndColor(0,1,&f,B_FONT_ALL,&prefs->fg_color);
-	SetStylable(prefs->IsSyntax);
+	f.SetSize(preferences->FontSize);
+	SetFontAndColor(0,1,&f,B_FONT_ALL,&preferences->fg_color);
+	SetStylable(preferences->IsSyntax);
 	SetAlignment(B_ALIGN_LEFT);
 	SetDoesUndo(true);
-	SetAutoindent(prefs->AutoIndent);
+	SetAutoindent(preferences->AutoIndent);
 	//IsUndo = false;
-	
+
 	IsNormalFocus = false;
 	HasAttachedFocus = false;
 	//TextStyles
@@ -57,28 +56,28 @@ TexView::TexView(BRect frame, BRect textRect, Prefs* p)
 	green_matches.push_back("huge");
 	green_matches.push_back("Huge");
 
-    green_matches.push_back("mathbb");
-    green_matches.push_back("mathbf");
-    green_matches.push_back("mathcal");
-    green_matches.push_back("mathfrak");
-    green_matches.push_back("mathit");
-    green_matches.push_back("mathnormal");
-    green_matches.push_back("mathrm");
-    green_matches.push_back("mathsf");
-    green_matches.push_back("mathtt");
+	green_matches.push_back("mathbb");
+	green_matches.push_back("mathbf");
+	green_matches.push_back("mathcal");
+	green_matches.push_back("mathfrak");
+	green_matches.push_back("mathit");
+	green_matches.push_back("mathnormal");
+	green_matches.push_back("mathrm");
+	green_matches.push_back("mathsf");
+	green_matches.push_back("mathtt");
 
-    green_matches.push_back("rmfamily");
-    green_matches.push_back("sffamily");
-    green_matches.push_back("ttfamily");
+	green_matches.push_back("rmfamily");
+	green_matches.push_back("sffamily");
+	green_matches.push_back("ttfamily");
 
-    green_matches.push_back("itshape");
-    green_matches.push_back("scshape");
-    green_matches.push_back("slshape");
-    green_matches.push_back("upshape");
+	green_matches.push_back("itshape");
+	green_matches.push_back("scshape");
+	green_matches.push_back("slshape");
+	green_matches.push_back("upshape");
 
-    green_matches.push_back("bfseries");
-    green_matches.push_back("mdseries");
- 	
+	green_matches.push_back("bfseries");
+	green_matches.push_back("mdseries");
+
 	purple_matches.push_back("author");
 	purple_matches.push_back("title");
 	purple_matches.push_back("section");
@@ -86,7 +85,7 @@ TexView::TexView(BRect frame, BRect textRect, Prefs* p)
 	purple_matches.push_back("subsubsection");
 	purple_matches.push_back("subsubsubsection");
 	purple_matches.push_back("verb");
-	
+
 	IsShifting = false;
 }
 
@@ -111,7 +110,7 @@ void TexView::ShiftLeft()
 	int32 startline=-1;
 	int32 endline=-1;
 	//int TotalLines = CountLines();
-	for(int i=0;i<sols.size();i++)
+	for(uint i=0;i<sols.size();i++)
 	{
 		if(start >= sols[i] && start <= eols[i])
 			startline = i;
@@ -214,7 +213,7 @@ void TexView::ShiftRight()
 	int32 startline=-1;
 	int32 endline=-1;
 	
-	for(int i=0;i<sols.size();i++)
+	for(uint i=0;i<sols.size();i++)
 	{
 
 		if(start >= sols[i] && start <= eols[i])
@@ -282,7 +281,7 @@ bool TexView::IsBrace(char c)
 
 void TexView::AttachedToWindow()
 {
-	SetViewColor(prefs->bg_color);
+	SetViewColor(preferences->bg_color);
 	SetColorSpace(B_RGB32);
 	BTextView::AttachedToWindow();
 	MakeFocus(true);
@@ -353,7 +352,7 @@ bool TexView::IsUrlCommented(int32 start,int32 finish)
 	text_run_array* tra = RunArray(start,finish);
 	if(tra == NULL)
 		return false;
-	return (tra->count == 1 && tra->runs[0].color == prefs->comment_color);
+	return (tra->count == 1 && tra->runs[0].color == preferences->comment_color);
 }
 BString TexView::FindUrl(int32 offset)
 {
@@ -513,7 +512,7 @@ int32 TexView::LineAt(int32 offset)
 	vector<int> eols;
 	FillSolEol(sols,eols,0,TextLength()-1);
 
-	for(int i=0;i<sols.size();i++)
+	for(uint i=0;i<sols.size();i++)
 	{
 		if(offset >= sols[i] && offset <= eols[i])
 			return i;
@@ -521,7 +520,7 @@ int32 TexView::LineAt(int32 offset)
 	return -1;
 }
 
-void TexView::FillSolEol(vector<int>& s,vector<int>& e,int start,int finish)
+void TexView::FillSolEol(vector<int>& s, vector<int>& e, int start, int finish)
 {
 	int i=start;
 	int text_length = TextLength();
@@ -584,7 +583,7 @@ int32 TexView::CountLines()
 void TexView::ParseAll(int start,int finish,bool IsInteractive)
 {
 	BFont font(be_fixed_font);
-	font.SetSize(prefs->FontSize);
+	font.SetSize(preferences->FontSize);
 	
 	int text_length = TextLength();
 	if(text_length > 0)
@@ -595,12 +594,13 @@ void TexView::ParseAll(int start,int finish,bool IsInteractive)
 		
 		int i;
 		int size;
+		size = text_length;
+		vector<rgb_color> colorVec(size,preferences->fg_color);
 		
+		SetMathModes(colorVec);
+
 		if(!IsInteractive)
 		{
-			size = text_length;
-			vector<rgb_color> colorVec(size,prefs->fg_color);
-
 			for(i=0;i<sols.size();i++)
 			{
 				ParseLine(sols[i],eols[i],colorVec);		
@@ -635,31 +635,26 @@ void TexView::ParseAll(int start,int finish,bool IsInteractive)
 			Select(start,start);
 			for(i=0;i<sols.size();i++)
 			{
-				IParseLine(sols[i],eols[i]);		
+				IParseLine(sols[i],eols[i], colorVec);
 			}
 			Select(start,finish);
 		}
 	}
 }
 
-void TexView::IParseLine(int sol,int eol)
+void TexView::IParseLine(int sol, int eol, vector<rgb_color>& colorVecFullText)
 {
 		int size = eol-sol+1;
-		vector<rgb_color> colorVec(size,prefs->fg_color);
-		
-		for(int k=0;k<size;k++)
-		{
-			colorVec[k] = prefs->fg_color;
-		}
-	
+		vector<rgb_color> colorVec(colorVecFullText.begin()+sol, colorVecFullText.begin()+sol+size-1);
+
 		int i;
 		int offset = sol;
 		int pos;
 		int text_length = TextLength();
 		//Setup some defaults....
-		ITwoColorPlateau('\'',sol,eol,prefs->comma_color,colorVec);
-		ITwoColorPlateau('`',sol,eol,prefs->comma_color,colorVec);
-		ITwoColorPlateau('\\',sol,eol,prefs->punc_symbol_color,colorVec);
+		ITwoColorPlateau('\'',sol,eol,preferences->comma_color,colorVec);
+		ITwoColorPlateau('`',sol,eol,preferences->comma_color,colorVec);
+		ITwoColorPlateau('\\',sol,eol,preferences->punc_symbol_color,colorVec);
 
 		for(i=sol;i<eol;i++)
 		{
@@ -667,40 +662,40 @@ void TexView::IParseLine(int sol,int eol)
 			{
 				if(i-1 >= 0 && ByteAt(i-1) == '\\')
 				{
-					colorVec[i-1-sol] = prefs->punc_symbol_color;
+					colorVec[i-1-sol] = preferences->punc_symbol_color;
 				}
-					
-				colorVec[i-sol] = prefs->punc_symbol_color;			
-				
+
+				colorVec[i-sol] = preferences->punc_symbol_color;			
+
 			}
 			else if(ByteAt(i) == '&' || ByteAt(i) == '{' || ByteAt(i) == '}')//
 			{
 				if(i-1 >= 0 && ByteAt(i-1) == '\\')
 				{
-					colorVec[i-1-sol] = prefs->punc_symbol_color;
+					colorVec[i-1-sol] = preferences->punc_symbol_color;
 				}
-					
-				colorVec[i-sol] = prefs->punc_symbol_color;			
-				
+
+				colorVec[i-sol] = preferences->punc_symbol_color;
+
 			}
 			else if(ByteAt(i) == '$')
 			{
 				if(i-1 >= 0 && ByteAt(i-1) == '\\')
 				{
-					colorVec[i-1-sol] = prefs->fg_color;
-					colorVec[i-sol] = prefs->fg_color;
+					colorVec[i-1-sol] = preferences->fg_color;
+					colorVec[i-sol] = preferences->fg_color;
 				}
 			}
 			else if(ByteAt(i) == '\\' && i+1 < eol)
 			{
 				if(ByteAt(i+1) == '#')
 				{	
-					colorVec[i-sol] = prefs->punc_symbol_color;
-					colorVec[i+1-sol] = prefs->punc_symbol_color;
+					colorVec[i-sol] = preferences->punc_symbol_color;
+					colorVec[i+1-sol] = preferences->punc_symbol_color;
 				}else if(ByteAt(i+1) == '\'' || ByteAt(i+1) == '`')
 				{
-					colorVec[i-sol] = prefs->fg_color;
-					colorVec[i+1-sol] = prefs->fg_color;
+					colorVec[i-sol] = preferences->fg_color;
+					colorVec[i+1-sol] = preferences->fg_color;
 				}
 			}			
 		}
@@ -710,22 +705,22 @@ void TexView::IParseLine(int sol,int eol)
 		{			
 			if(pos - 1 >= 0 && ByteAt(pos-1) == '\\')
 			{
-				colorVec[pos-1-sol] = prefs->punc_symbol_color;
-				colorVec[pos-sol] = prefs->punc_symbol_color;
+				colorVec[pos-1-sol] = preferences->punc_symbol_color;
+				colorVec[pos-sol] = preferences->punc_symbol_color;
 			}
 			else 
 			{
 				for(i=pos;i<eol;i++)
-					colorVec[i-sol] = prefs->comment_color;
+					colorVec[i-sol] = preferences->comment_color;
 				break;
 			}
 			offset= pos+1;
 		}	
 		
-		//START COLOURING***********************************
+		//START COLORING***********************************
 			
 		BFont default_font(be_fixed_font);
-		default_font.SetSize(prefs->FontSize);
+		default_font.SetSize(preferences->FontSize);
 
 		int plLength=0;
 		int plStart=0;
@@ -761,9 +756,9 @@ void TexView::ParseLine(int sol,int eol,vector<rgb_color>& colorVec)
 		int pos;
 		int text_length = TextLength();
 		//Setup some defaults....
-		TwoColorPlateau('\'',sol,eol,prefs->comma_color,colorVec);
-		TwoColorPlateau('`',sol,eol,prefs->comma_color,colorVec);
-		TwoColorPlateau('\\',sol,eol,prefs->punc_symbol_color,colorVec);
+		TwoColorPlateau('\'',sol,eol,preferences->comma_color,colorVec);
+		TwoColorPlateau('`',sol,eol,preferences->comma_color,colorVec);
+		TwoColorPlateau('\\',sol,eol,preferences->punc_symbol_color,colorVec);
 
 		for(i=sol;i<eol;i++)
 		{
@@ -771,40 +766,40 @@ void TexView::ParseLine(int sol,int eol,vector<rgb_color>& colorVec)
 			{
 				if(i-1 >= 0 && ByteAt(i-1) == '\\')
 				{
-					colorVec[i-1] = prefs->punc_symbol_color;
+					colorVec[i-1] = preferences->punc_symbol_color;
 				}
 					
-				colorVec[i] = prefs->punc_symbol_color;			
+				colorVec[i] = preferences->punc_symbol_color;			
 				
 			}
 			else if(ByteAt(i) == '&' || ByteAt(i) == '{' || ByteAt(i) == '}')//
 			{
 				if(i-1 >= 0 && ByteAt(i-1) == '\\')
 				{
-					colorVec[i-1] = prefs->punc_symbol_color;
+					colorVec[i-1] = preferences->punc_symbol_color;
 				}
 					
-				colorVec[i] = prefs->punc_symbol_color;			
+				colorVec[i] = preferences->punc_symbol_color;			
 				
 			}
 			else if(ByteAt(i) == '$')
 			{
 				if(i-1 >= 0 && ByteAt(i-1) == '\\')
 				{
-					colorVec[i-1] = prefs->fg_color;
-					colorVec[i] = prefs->fg_color;
+					colorVec[i-1] = preferences->fg_color;
+					colorVec[i] = preferences->fg_color;
 				}
 			}
 			else if(ByteAt(i) == '\\' && i+1 < eol)
 			{
 				if(ByteAt(i+1) == '#')
 				{	
-					colorVec[i] = prefs->punc_symbol_color;
-					colorVec[i+1] = prefs->punc_symbol_color;
+					colorVec[i] = preferences->punc_symbol_color;
+					colorVec[i+1] = preferences->punc_symbol_color;
 				}else if(ByteAt(i+1) == '\'' || ByteAt(i+1) == '`')
 				{
-					colorVec[i] = prefs->fg_color;
-					colorVec[i+1] = prefs->fg_color;
+					colorVec[i] = preferences->fg_color;
+					colorVec[i+1] = preferences->fg_color;
 				}
 			}			
 		}
@@ -814,13 +809,13 @@ void TexView::ParseLine(int sol,int eol,vector<rgb_color>& colorVec)
 		{			
 			if(pos - 1 >= 0 && ByteAt(pos-1) == '\\')
 			{
-					colorVec[pos-1] = prefs->punc_symbol_color;
-					colorVec[pos] = prefs->punc_symbol_color;
+					colorVec[pos-1] = preferences->punc_symbol_color;
+					colorVec[pos] = preferences->punc_symbol_color;
 			}
 			else 
 			{
 				for(i=pos;i<eol;i++)
-					colorVec[i] = prefs->comment_color;
+					colorVec[i] = preferences->comment_color;
 				break;
 			}			
 			offset= pos+1;
@@ -885,23 +880,23 @@ void TexView::TwoColorPlateau(char c,int sol,int eol,rgb_color c1,vector<rgb_col
 							if(Contains(green_matches,match))
 							{
 									for(int k=i-1;k<j;k++)
-										colorVec[k] = prefs->format_cmd_color;
+										colorVec[k] = preferences->format_cmd_color;
 							}
 							else if(Contains(purple_matches,match))
 							{
 									for(int k=i-1;k<j;k++)
-										colorVec[k] = prefs->special_cmd_color;
+										colorVec[k] = preferences->special_cmd_color;
 							}
 							else 
 							{	for(int k=i-1;k<j;k++)
-										colorVec[k] = prefs->generic_cmd_color;
+										colorVec[k] = preferences->generic_cmd_color;
 							}
 						}
 					}	
 					else
 					{
-							colorVec[plStart+plLength-1] = prefs->fg_color;
-							colorVec[plStart+plLength] = prefs->fg_color;
+							colorVec[plStart+plLength-1] = preferences->fg_color;
+							colorVec[plStart+plLength] = preferences->fg_color;
 					}
 					
 				}
@@ -943,24 +938,24 @@ void TexView::TwoColorPlateau(char c,int sol,int eol,rgb_color c1,vector<rgb_col
 							if(Contains(green_matches,match))
 							{
 									for(int k=i-1;k<j;k++)
-										colorVec[k] = prefs->format_cmd_color;
+										colorVec[k] = preferences->format_cmd_color;
 							}
 							else if(Contains(purple_matches,match))
 							{
 									for(int k=i-1;k<j;k++)
-										colorVec[k] = prefs->special_cmd_color;
+										colorVec[k] = preferences->special_cmd_color;
 							}
 							else 
 							{
 									for(int k=i-1;k<j;k++)
-										colorVec[k] = prefs->generic_cmd_color;
+										colorVec[k] = preferences->generic_cmd_color;
 							}
 						}
 					}	
 					else
 					{
-							colorVec[plStart+plLength-1] = prefs->fg_color;
-							colorVec[plStart+plLength] = prefs->fg_color;						
+							colorVec[plStart+plLength-1] = preferences->fg_color;
+							colorVec[plStart+plLength] = preferences->fg_color;						
 					}
 				
 				}
@@ -1011,7 +1006,7 @@ void TexView::ITwoColorPlateau(char c,int sol,int eol,rgb_color c1,vector<rgb_co
 					{
 							colorVec[k-sol] = c1;
 					}
-					colorVec[plStart+plLength-sol] = prefs->fg_color;
+					colorVec[plStart+plLength-sol] = preferences->fg_color;
 				
 					if(c == '\\' && isalpha(ByteAt(i)))
 					{
@@ -1030,24 +1025,24 @@ void TexView::ITwoColorPlateau(char c,int sol,int eol,rgb_color c1,vector<rgb_co
 							if(Contains(green_matches,match))
 							{
 									for(int k=i-1;k<j;k++)
-										colorVec[k-sol] = prefs->format_cmd_color;
+										colorVec[k-sol] = preferences->format_cmd_color;
 							}
 							else if(Contains(purple_matches,match))
 							{
 									for(int k=i-1;k<j;k++)
-										colorVec[k-sol] = prefs->special_cmd_color;
+										colorVec[k-sol] = preferences->special_cmd_color;
 							}
 							else 
 							{	for(int k=i-1;k<j;k++)
-										colorVec[k-sol] = prefs->generic_cmd_color;
+										colorVec[k-sol] = preferences->generic_cmd_color;
 							}
 						}
 					}
 					else
 					{
-							colorVec[plStart+plLength-1-sol] = prefs->fg_color;
+							colorVec[plStart+plLength-1-sol] = preferences->fg_color;
 							//if(plLength %2 == 0)
-							colorVec[plStart+plLength-sol] = prefs->fg_color;
+							colorVec[plStart+plLength-sol] = preferences->fg_color;
 					}
 					
 				}				
@@ -1071,7 +1066,7 @@ void TexView::ITwoColorPlateau(char c,int sol,int eol,rgb_color c1,vector<rgb_co
 					{
 							colorVec[k-sol] = c1;
 					}
-					colorVec[plStart+plLength-sol] = prefs->fg_color;
+					colorVec[plStart+plLength-sol] = preferences->fg_color;
 					if(c == '\\' && isalpha(ByteAt(i)))
 					{
 						BString match="";
@@ -1089,24 +1084,24 @@ void TexView::ITwoColorPlateau(char c,int sol,int eol,rgb_color c1,vector<rgb_co
 							if(Contains(green_matches,match))
 							{
 									for(int k=i-1;k<j;k++)
-										colorVec[k-sol] = prefs->format_cmd_color;
+										colorVec[k-sol] = preferences->format_cmd_color;
 							}
 							else if(Contains(purple_matches,match))
 							{
 									for(int k=i-1;k<j;k++)
-										colorVec[k-sol] = prefs->special_cmd_color;
+										colorVec[k-sol] = preferences->special_cmd_color;
 							}
 							else 
 							{	for(int k=i-1;k<j;k++)
-										colorVec[k-sol] = prefs->generic_cmd_color;
+										colorVec[k-sol] = preferences->generic_cmd_color;
 							}
 						}
 					}	
 					else
 					{
-							colorVec[plStart+plLength-1-sol] = prefs->fg_color;
+							colorVec[plStart+plLength-1-sol] = preferences->fg_color;
 						//	if(plLength %2 == 0)
-							colorVec[plStart+plLength-sol] = prefs->fg_color;
+							colorVec[plStart+plLength-sol] = preferences->fg_color;
 					}
 					
 				}	
@@ -1120,7 +1115,7 @@ void TexView::ITwoColorPlateau(char c,int sol,int eol,rgb_color c1,vector<rgb_co
 
 int TexView::IsMathMode(int offset,vector<BString>& v,bool IsStart)
 {
-	for(int i=0;i<v.size();i++)
+	for(uint i=0;i<v.size();i++)
 	{
 		//try all possibilities....
 		if(ByteAt(offset) == v[i].ByteAt(0))
@@ -1204,7 +1199,7 @@ void TexView::SetMathModes(vector<rgb_color>& colorVec)
 			
 			for(int p=spos;p<fpos;p++)
 			{
-				colorVec[p] = prefs->math_mode_color;
+				colorVec[p] = preferences->math_mode_color;
 			}
 			i = k;
 		}
@@ -1240,25 +1235,27 @@ void TexView::DeleteText(int32 start, int32 finish)
 }
 
 
-void TexView::SetText(const char* text,int32 length,const text_run_array* runs = NULL)
+void TexView::SetText(const char* text,int32 length,const text_run_array* runs)
 {
 	BTextView::SetText(text,length,runs);
 	ParseAll(0,length-1,false);
 }
 void TexView::UpdateColors()
 {
-	SetFontAndColor(0,TextLength(),&f,B_FONT_ALL,&prefs->fg_color);
+	SetViewColor(preferences->bg_color);
+	Invalidate();
+	SetFontAndColor(0,TextLength(),&f,B_FONT_ALL,&preferences->fg_color);
 	ParseAll(0,TextLength()-1,true);	
 }
 
 void TexView::UpdateFontSize()
 {
-	f.SetSize(prefs->FontSize);
-	SetFontAndColor(0,TextLength(),&f,B_FONT_ALL,&prefs->fg_color);
+	f.SetSize(preferences->FontSize);
+	SetFontAndColor(0,TextLength(),&f,B_FONT_ALL,&preferences->fg_color);
 	ParseAll(0,TextLength()-1,true);	
 }
 
-void TexView::SetText(BFile* file,int32 offset,int32 length,const text_run_array* runs = NULL)
+void TexView::SetText(BFile* file,int32 offset,int32 length,const text_run_array* runs)
 {
 	BTextView::SetText(file,offset,length,runs);
 	ParseAll(offset,length-1,false);
@@ -1306,6 +1303,7 @@ int32 TexView::GetMathSol(int sol)
 	return sol;
 }
 
+// #pragma mark -
 void TexView::MessageReceived(BMessage* msg)
 {	
 	switch(msg->what)
@@ -1359,6 +1357,17 @@ void TexView::MessageReceived(BMessage* msg)
 			BMessage msg(InterfaceConstants::K_UPDATE_CLIPBOARD_MENU_STATUS);
 			Window()->PostMessage(&msg,this);
 		}
+		case B_OBSERVER_NOTICE_CHANGE:
+		{
+			if (msg->GetInt32(B_OBSERVE_ORIGINAL_WHAT,0) == (int32)PrefsConstants::K_PREFS_UPDATE) 
+			{
+					UpdateColors();
+			}
+			else 
+			{
+				BTextView::MessageReceived(msg);
+			}
+		}break;
 		default:
 			BTextView::MessageReceived(msg);
 		break;	

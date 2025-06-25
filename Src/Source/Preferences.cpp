@@ -5,9 +5,8 @@
 #include "Preferences.h"
 
 BLocker prefsLock;
-BMessage preferences;
 
-status_t SavePreferences(const char *path)
+status_t SavePreferences(BMessage *preferences_archive, const char *path)
 {
 	if(!path)
 		return B_ERROR;
@@ -23,13 +22,13 @@ status_t SavePreferences(const char *path)
 		return status;
 	}
 	
-	status=preferences.Flatten(&file);
+	status=preferences_archive->Flatten(&file);
 		
 	prefsLock.Unlock();
 	return status;
 }
 
-status_t LoadPreferences(const char *path)
+status_t LoadPreferences(const char *path, BMessage *preferences_archive)
 {
 	if(!path)
 		return B_ERROR;
@@ -47,10 +46,8 @@ status_t LoadPreferences(const char *path)
 		return status;
 	}
 	
-	status=msg.Unflatten(&file);
-	if(status==B_OK)
-		preferences=msg;
-		
+	status=preferences_archive->Unflatten(&file);
+			
 	prefsLock.Unlock();
 	return status;
 	

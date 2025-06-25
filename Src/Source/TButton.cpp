@@ -1,5 +1,6 @@
 #include "TButton.h"
 #include <Screen.h>
+
 BBitmap* ConvertCMAP8ToGreyRGB32(BBitmap* b)
 {
 		
@@ -34,9 +35,15 @@ BBitmap* ConvertCMAP8ToGreyRGB32(BBitmap* b)
 	return NULL;
 }
 
-TButton::TButton(BRect frame,BMessage* msg,BBitmap* Icon/*,BBitmap* ColoredIcon*/) : BControl(frame,"tbutton",NULL,msg,B_FOLLOW_NONE,B_WILL_DRAW)
+TButton::TButton(const char* name, BRect frame,BMessage* msg,BBitmap* Icon/*,BBitmap* ColoredIcon*/) :
+	BControl(frame,"tbutton", NULL, msg, B_FOLLOW_NONE, B_WILL_DRAW)
 {
 	
+	if (name)
+	{
+		string sname = string("tbutton_") + name;
+		SetName(sname.c_str());
+	}
 	frame = Bounds();
 	icon = Icon;
 	disabledicon = ConvertCMAP8ToGreyRGB32(icon);

@@ -9,10 +9,12 @@
 #include <be/interface/MenuItem.h>
 #include <be/interface/ScrollView.h>
 #include <be/storage/Path.h>
+#include <be/storage/FindDirectory.h>
 #include <be/storage/FilePanel.h>
 #include <be/storage/NodeMonitor.h>
 #include <be/support/String.h>
 #include <vector>
+using std::vector;
 
 #include "iconheaders/ConverterIcons.h"
 #include "BubbleHelper.h"
@@ -20,7 +22,7 @@
 #include "TexView.h"
 #include "AboutWindow.h"
 #include "SearchWindow.h"
-#include "ColourWindow.h"
+#include "ColorWindow.h"
 #include "DimensionWindow.h"
 #include "PrefsWindow.h"
 #include "ProjectView.h"
@@ -28,6 +30,7 @@
 #include "StatusBar.h"
 #include "TexBar.h"
 #include "MainTBar.h"
+#include "GoToLineWindow.h"
 
 class MainWindow : public BWindow
 {
@@ -49,10 +52,10 @@ class MainWindow : public BWindow
 		void				InsertText(const char* text);
 		virtual void		MenusBeginning();
 		void				UpdateStatusBar();
-		
+		ProjectView*		GetProjectView();
 		TexView*			CurrentTexView();
 		ProjectItem*		CurrentTListItem();		
-		void				Execute(char* script, const char* command);
+		void				Execute(const char* script, const char* command);
 		
 		void				SetShortcuts();
 		void				ResetPermissions();
@@ -77,7 +80,7 @@ class MainWindow : public BWindow
 		bool RemoveAfterSave;
 		bool RemoveAfterSaveIndex;
 				
-		int32 cbfqindex;
+		uint32 cbfqindex;
 		int untitled_no;			
 		int TLIST_VIEW_WIDTH;
 		float LEFT_BAR_V_POS;
@@ -90,9 +93,9 @@ class MainWindow : public BWindow
 		
 		PrefsWindow* prefsPanel;
 		SearchWindow* searchPanel;
-		//GoToLineWindow* gtlPanel;
+		GoToLineWindow* gtlPanel;
 		AboutWindow* aboutPanel;
-		ColourWindow* rgbTxtChooser;
+		ColorWindow* rgbTxtChooser;
 		DimensionWindow* dimChooser;		
 				
 		BMenuItem* fnew;
@@ -196,11 +199,10 @@ class MainWindow : public BWindow
 			*/
 		TexView* tv;
 
+
 		MainTBar* m_toolBar;
 		StatusBar* m_statusBar;
 		BMessage* printer_settings;		
-
-		Prefs* prefs;
 };
 #endif
 

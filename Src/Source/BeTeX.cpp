@@ -13,7 +13,7 @@
 #include <be/interface/Bitmap.h>
 #include <be/support/String.h>
 #include "TeXDocIcons.h"
-#include "constants.h"
+#include "Constants.h"
 #include "Preferences.h"
 #include "MessageFields.h"
 
@@ -22,10 +22,16 @@ BeTeX::BeTeX()
 {	
 	//construct user settings dir
 	find_directory(B_USER_SETTINGS_DIRECTORY,&m_prefsPath);
-	m_prefsPath.Append("settings.betex");		
+	m_prefsPath.Append("betex.settings");		
 	//load app's preferences
-	LoadPreferences(m_prefsPath.Path());
-	
+	BMessage preferences_archive;
+	status_t result = LoadPreferences(m_prefsPath.Path(), &preferences_archive);
+	if (result == B_OK) 
+	{
+		prefsLock.Lock();
+		preferences = (Prefs *)Prefs::Instantiate(&preferences_archive);
+		prefsLock.Unlock();
+	}
 	BMimeType mime(TEX_FILETYPE);
 	BMessage ex_msg;
 	bool install = true;
@@ -80,15 +86,8 @@ BeTeX::BeTeX()
 	}
 	//I could also add some attributes to the tex file
 	//such as author, etc.....
-	BRect frame;
-	prefsLock.Lock();
-	if (preferences.FindRect(K_MAIN_WINDOW_RECT,&frame) != B_OK)
-	{
-		frame = BRect(100,100,500,500);	
-	}	
-	prefsLock.Unlock();	
-	
-	m_mainWindow = new MainWindow(frame);
+
+	m_mainWindow = new MainWindow(preferences->main_window_rect);
 	m_mainWindow->Show();
 }
 
@@ -104,6 +103,10 @@ void BeTeX::RefsReceived(BMessage* message)
 
 bool BeTeX::QuitRequested()
 {
+	//TODO : at this point splitPane may have gone
+	BMessage preferences_archive;
+	preferences->Archive(&preferences_archive);
+	
 	if(m_mainWindow->PromptToQuit())
 	{
 		BString text;
@@ -121,12 +124,13 @@ bool BeTeX::QuitRequested()
 			}			
 			case 1:
 			{
-				SavePreferences(m_prefsPath.Path());
+				SavePreferences(&preferences_archive, m_prefsPath.Path());
 				return true;
 			}
 		}
 		delete alert;
 	}
+	SavePreferences(&preferences_archive, m_prefsPath.Path());
 	return true;
 }
 

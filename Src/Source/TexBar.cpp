@@ -1,51 +1,20 @@
 #include "TexBar.h"
 
-TexBar::TexBar(BRect r,BubbleHelper* h,Prefs* pr) 
+TexBar::TexBar(BRect r,BubbleHelper* h) 
 			:	BView(r,"TexBar",B_FOLLOW_ALL_SIDES,B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));//tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),B_DARKEN_2_TINT));
-	prefs = pr;
 	helper = h;
 	//helper->= new BubbleHelper();
-	r = Bounds();
-	IsGreekHidden = prefs->IsGreekHidden;
-	IsBigHidden = prefs->IsBigHidden;
-	IsBinaryHidden = prefs->IsBinaryHidden;
-	IsMiscHidden = prefs->IsMiscHidden;
-	IsBinRelHidden = prefs->IsBinRelHidden;
-	IsMMAHidden = prefs->IsMMAHidden;
-	IsIntlHidden = prefs->IsIntlHidden;
-	IsTypeFaceHidden = prefs->IsTypeFaceHidden;
-	IsFunctionHidden = prefs->IsFunctionHidden;
+	UpdateHeaders();
 
-	IsGreekAbsent = prefs->IsGreekAbsent;
-	IsBigAbsent = prefs->IsBigAbsent;
-	IsBinaryAbsent = prefs->IsBinaryAbsent;
-	IsMiscAbsent = prefs->IsMiscAbsent;
-	IsBinRelAbsent = prefs->IsBinRelAbsent;
-	IsMMAAbsent = prefs->IsMMAAbsent;
-	IsIntlAbsent = prefs->IsIntlAbsent;
-	IsTypeFaceAbsent = prefs->IsTypeFaceAbsent;
-	IsFunctionAbsent = prefs->IsFunctionAbsent;
-
-	GreekHeader = NULL;
-	BigHeader = NULL;
-	BinaryHeader = NULL;
-	MiscHeader = NULL;
-	BinRelHeader = NULL;
-	MMAHeader = NULL;
-	IntlHeader = NULL;
-	TypeFaceHeader = NULL;
-	FunctionHeader = NULL;         
-	
+	//BRect r = Bounds();
 	unsigned char* p;
-	
-	if(!IsGreekAbsent)
+
 	{
-		GreekHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Greek Letters",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS,prefs);
-		AddChild(GreekHeader);
-		
-		
+		GreekHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Greek Letters",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS);
+		GreekHeader->SetHidden(IsGreekHidden);
+
 		for(int i=0;i<greek_items;i++)
 		{
 			greekbitvec.push_back(new BBitmap(BRect(0,0,greek_data[i].w,greek_data[i].h),B_RGB32));
@@ -56,12 +25,12 @@ TexBar::TexBar(BRect r,BubbleHelper* h,Prefs* pr)
 			}
 		}
 	}
-	//IsGreekHidden = false;
-	if(!IsBigAbsent)
+
+
 	{
-		BigHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Big Operators",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS,prefs);
-		AddChild(BigHeader);
-		
+		BigHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Big Operators",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS);
+		BigHeader->SetHidden(IsBigHidden);
+
 		for(int i=0;i<big_items;i++)
 		{
 			bigbitvec.push_back(new BBitmap(BRect(0,0,big_data[i].w,big_data[i].h),B_RGB32));
@@ -73,29 +42,32 @@ TexBar::TexBar(BRect r,BubbleHelper* h,Prefs* pr)
 		}
 		//IsBigHidden = false;
 	}
-	
-	if(!IsBinaryAbsent)
+
+
 	{
-		BinaryHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Binary Operators",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS,prefs);
-		AddChild(BinaryHeader);
-		
-		for(int i=0;i<binary_items;i++)
+		BinaryHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Binary Operators",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS);
+		BinaryHeader->SetHidden(IsBinaryHidden);
+
+		//binrel uses binary
+		if (binarybitvec.size() == 0)
 		{
-			binarybitvec.push_back(new BBitmap(BRect(0,0,binary_data[i].w,binary_data[i].h),B_RGB32));
-			p = (unsigned char*)binarybitvec[i]->Bits();
-			for(int k=0;k<binary_data[i].n;k++)
+			for(int i=0;i<binary_items;i++)
 			{
-				p[k] = binary_data[i].p[k];
+				binarybitvec.push_back(new BBitmap(BRect(0,0,binary_data[i].w,binary_data[i].h),B_RGB32));
+				p = (unsigned char*)binarybitvec[i]->Bits();
+				for(int k=0;k<binary_data[i].n;k++)
+				{
+					p[k] = binary_data[i].p[k];
+				}
 			}
+			//IsBinaryHidden = false;
 		}
-		//IsBinaryHidden = false;
 	}
-	
-	if(!IsMiscAbsent)
+
 	{
-		MiscHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Misc Symbols",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS,prefs);
-		AddChild(MiscHeader);
-		
+		MiscHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Misc Symbols",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS);
+		MiscHeader->SetHidden(IsMiscHidden);
+
 		for(int i=0;i<misc_items;i++)
 		{
 			miscbitvec.push_back(new BBitmap(BRect(0,0,misc_data[i].w,misc_data[i].h),B_RGB32));
@@ -107,12 +79,10 @@ TexBar::TexBar(BRect r,BubbleHelper* h,Prefs* pr)
 		}
 		//IsMiscHidden = false;
 	}
-	
-	if(!IsBinRelAbsent)
+
 	{
-		BinRelHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Binary Relations",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS,prefs);
-		AddChild(BinRelHeader);
-		
+		BinRelHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Binary Relations",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS);
+
 		for(int i=0;i<bin_rel_items;i++)
 		{
 			bin_relbitvec.push_back(new BBitmap(BRect(0,0,bin_rel_data[i].w,bin_rel_data[i].h),B_RGB32));
@@ -122,14 +92,22 @@ TexBar::TexBar(BRect r,BubbleHelper* h,Prefs* pr)
 				p[k] = bin_rel_data[i].p[k];
 			}
 		}
-		//IsBinRelHidden = false;
+
+		for(int i=0;i<binary_items;i++)
+		{
+			binarybitvec.push_back(new BBitmap(BRect(0,0,binary_data[i].w,binary_data[i].h),B_RGB32));
+			p = (unsigned char*)binarybitvec[i]->Bits();
+			for(int k=0;k<binary_data[i].n;k++)
+			{
+				p[k] = binary_data[i].p[k];
+			}
+		}
 	}
-	
-	if(!IsMMAAbsent)
+
 	{
-		MMAHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Math Mode Accents",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS,prefs);
-		AddChild(MMAHeader);
-		
+		MMAHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Math Mode Accents",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS);
+		MMAHeader->SetHidden(IsMMAHidden);
+
 		for(int i=0;i<mmacc_items;i++)
 		{
 			mmaccbitvec.push_back(new BBitmap(BRect(0,0,mmacc_data[i].w,mmacc_data[i].h),B_RGB32));
@@ -141,13 +119,12 @@ TexBar::TexBar(BRect r,BubbleHelper* h,Prefs* pr)
 		}
 		//IsMMAHidden = false;
 	}
-	
-	if(!IsIntlAbsent)
+
 	{
-		
-		IntlHeader = new HeaderItem(BRect(0,0,r.Width(),20),"International",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS,prefs);
-		AddChild(IntlHeader);
-		
+
+		IntlHeader = new HeaderItem(BRect(0,0,r.Width(),20),"International",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS);
+		IntlHeader->SetHidden(IsIntlHidden);
+
 		for(int i=0;i<intl_items;i++)
 		{
 			intlbitvec.push_back(new BBitmap(BRect(0,0,intl_data[i].w,intl_data[i].h),B_RGB32));
@@ -159,20 +136,20 @@ TexBar::TexBar(BRect r,BubbleHelper* h,Prefs* pr)
 		}
 		//IsIntlHidden = false;
 	}
-	if(!IsTypeFaceAbsent)
+
 	{
-			
-		TypeFaceHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Type Faces",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS,prefs);
-		AddChild(TypeFaceHeader);
+		TypeFaceHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Type Faces",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS);
+		TypeFaceHeader->SetHidden(IsTypeFaceHidden);
 		//IsTypeFaceHidden = false;
 	}
-	if(!IsFunctionAbsent)
+
 	{
-		FunctionHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Functions",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS,prefs);
-		AddChild(FunctionHeader);
+		FunctionHeader = new HeaderItem(BRect(0,0,r.Width(),20),"Functions",B_FOLLOW_NONE,B_WILL_DRAW|B_FRAME_EVENTS);
+		FunctionHeader->SetHidden(IsFunctionHidden);
+
 		//IsFunctionHidden = false;
 	}
-	
+
 	if(!IsGreekAbsent) GreekHeader->SetHidden(IsGreekHidden);
 	if(!IsBigAbsent) BigHeader->SetHidden(IsBigHidden);
 	if(!IsBinaryAbsent) BinaryHeader->SetHidden(IsBinaryHidden);
@@ -181,21 +158,21 @@ TexBar::TexBar(BRect r,BubbleHelper* h,Prefs* pr)
 	if(!IsMMAAbsent) MMAHeader->SetHidden(IsMMAHidden);
 	if(!IsIntlAbsent) IntlHeader->SetHidden(IsIntlHidden);
 	if(!IsTypeFaceAbsent) TypeFaceHeader->SetHidden(IsTypeFaceHidden);
-	if(!IsFunctionAbsent) FunctionHeader->SetHidden(IsFunctionHidden);		
+	if(!IsFunctionAbsent) FunctionHeader->SetHidden(IsFunctionHidden);
 
 	IsResizing = false;
 	Tile(this,false);
 }
+
+//Must be called after UpdateHeadersAndAbsent
 void TexBar::Tile(BView* v,bool IsOnlyResizing)
 {
-	
 	if(IsResizing)
 		return;
-		
-	BMessage* msg;	
-	IsResizing = true;	
-	
-	int child_offset = 0;
+
+	BMessage* msg;
+	IsResizing = true;
+
 	const int TileSize=23; 
 	BRect tiler(0,0,TileSize,TileSize);
 	BScrollBar* bar = ScrollBar(B_VERTICAL);
@@ -207,32 +184,13 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 	}
 	//ConvertToP
 	BRect f = v->Bounds();
-	int j=1;
-	int i;
+	int j=1;//index on a row
+	int i; //index for bit vectors
 	int num_across=0;
 	float width = f.Width();
 	float twidth = tiler.Width()+1;
-	
-	if(!IsGreekAbsent)
-		child_offset++;
-	if(!IsBigAbsent)
-		child_offset++;
-	if(!IsBinaryAbsent)
-		child_offset++;
-	if(!IsMiscAbsent)
-		child_offset++;
-	if(!IsBinRelAbsent)
-		child_offset++;
-	if(!IsMMAAbsent)
-		child_offset++;
-	if(!IsIntlAbsent)
-		child_offset++;
-	if(!IsTypeFaceAbsent)
-		child_offset++;
-	if(!IsFunctionAbsent)
-		child_offset++;
 
-	num_across=0;
+	num_across=0; //number of items per line
 	width = f.Width();
 	twidth = tiler.Width()+1;
 	while(width >=0)
@@ -241,31 +199,71 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 		num_across++;
 	}
 	if(width != -1)
-		num_across--;	
-	
-	bool NeedInitCorr = true;
-		
-	if(!IsGreekAbsent)
+		num_across--;
+
+	if (!IsGreekAbsent)
 	{
+		bool addingGreek = false;
+		if (!IsOnlyResizing && !GreekHeader->Parent()) {
+			addingGreek = true;
+			AddChild(GreekHeader);
+		}
+
 		GreekHeader->ResizeTo(f.Width(),20);
-		GreekHeader->Invalidate();
-		//child_offset = 9;	//we have this many header items
-						
-			j=1;
-			tiler.OffsetBy(0,GreekHeader->Bounds().Height()+1);
-			for(i=0;i<greek_items;i++)
+		GreekHeader->Invalidate(); //TODO : invalidate old BRect ?
+
+		tiler.OffsetBy(0,GreekHeader->Bounds().Height()+1);
+
+		BView *button = GreekHeader;
+		j=1;
+		for(i=0;i<greek_items;i++)
+		{
+			if(!IsOnlyResizing && addingGreek)
 			{
-					if(!IsOnlyResizing)
-					{	
-						msg = new BMessage(InterfaceConstants::K_CMD_TBUTTON_INSERT);
-						if(msg->AddString("cmd",greek_data[i].cmd) == B_OK)
-						{
-							v->AddChild(temp_button = new TButton(tiler,msg,greekbitvec[i]));
-							helper->SetHelp(temp_button,greek_data[i].cmd);
-						}
-						
-						
+				msg = new BMessage(InterfaceConstants::K_CMD_TBUTTON_INSERT);
+				if(msg->AddString("cmd",greek_data[i].cmd) == B_OK)
+				{
+					v->AddChild(temp_button = new TButton(greek_data[i].s, tiler,msg,greekbitvec[i]));
+
+					if(IsGreekHidden)
+						temp_button->Hide();
+
+					helper->SetHelp(temp_button,greek_data[i].cmd);
+				}
+
+				//Move tiler only if not hidden
+				if (!IsGreekHidden)
+				{
+					tiler.OffsetBy(TileSize+1,0);
+					if(j == num_across)
+					{
+						tiler.left=0;
+						tiler.right=TileSize;
+						tiler.OffsetBy(0,TileSize+1);
+						j = 0;
+					}
+					j++;
+				}
+			}
+			else
+			{
+				button = button->NextSibling();
+				if(button != NULL)
+				{
+					if(IsGreekHidden)
+					{
+						if(!button->IsHidden())
+							button->Hide();
+					}
+					else
+					{
+						if(button->IsHidden())
+							button->Show();
+
+						button->MoveTo(tiler.LeftTop());
+
 						tiler.OffsetBy(TileSize+1,0);
+
 						if(j == num_across)
 						{
 							tiler.left=0;
@@ -274,75 +272,70 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 							j = 0;
 						}
 						j++;
+
+
 					}
-					else
-					{
-						int child_index = i+child_offset;
-						BView* child = v->ChildAt(child_index);
-						if(child != NULL)
-						{
-							if(IsGreekHidden)
-							{
-								if(!child->IsHidden())
-								child->Hide();
-							}
-							else
-							{
-								if(child->IsHidden())
-									child->Show();
-						
-								child->MoveTo(tiler.LeftTop());
-								
-								tiler.OffsetBy(TileSize+1,0);
-								
-								if(j == num_across)
-								{
-									tiler.left=0;
-									tiler.right=TileSize;
-									tiler.OffsetBy(0,TileSize+1);
-									j = 0;
-								}
-								j++;
-							
-							
-							}
-						}
-					}
-					
-					
+				}
+			}
+
 		}
-			tiler.left=0;
-			tiler.right=TileSize;
-			if(j <= num_across && j != 1)		
-				tiler.OffsetBy(0,TileSize+1);
-		
-		child_offset += greek_items-1;
-		NeedInitCorr = false;	
-	}	
+		tiler.left=0;
+		tiler.right=TileSize;
+		if(j <= num_across && j != 1)
+			tiler.OffsetBy(0,TileSize+1);
+	}
+	else
+	{
+		BView *buttonNext = GreekHeader->NextSibling();
+		BView *button;
+		for(i=0;i<greek_items && buttonNext;i++)
+		{
+			button = buttonNext;
+			buttonNext = button->NextSibling();
+			RemoveChild(button);
+			delete button;
+
+		}
+
+		if (GreekHeader->Parent())
+			RemoveChild(GreekHeader);
+	}
 	if(!IsBigAbsent)
 	{
-		
+		bool addingBig = false;
+		if (!IsOnlyResizing && !BigHeader->Parent()) {
+			addingBig = true;
+			AddChild(BigHeader);
+		}
 		//if(!IsGreekAbsent)
 		//{
 			BigHeader->MoveTo(tiler.LeftTop());
 		//}
-		
+
 		BigHeader->ResizeTo(f.Width(),20);
 		BigHeader->Invalidate();
-		
+
 		tiler.OffsetBy(0,BigHeader->Bounds().Height()+1);
-			j=1;
-			for(i=0;i<big_items;i++)
-			{
-					if(!IsOnlyResizing)
+
+		BView *button = BigHeader;
+		j=1;
+		for(i=0;i<big_items;i++)
+		{
+				if(!IsOnlyResizing && addingBig)
+				{
+					msg = new BMessage(InterfaceConstants::K_CMD_TBUTTON_INSERT);
+					if(msg->AddString("cmd",big_data[i].cmd) == B_OK)
 					{
-						msg = new BMessage(InterfaceConstants::K_CMD_TBUTTON_INSERT);
-						if(msg->AddString("cmd",big_data[i].cmd) == B_OK)
-						{
-							v->AddChild(temp_button = new TButton(tiler,msg,bigbitvec[i]));
-							helper->SetHelp(temp_button,big_data[i].cmd);
-						}
-	
+						v->AddChild(temp_button = new TButton(big_data[i].s, tiler,msg,bigbitvec[i]));
+
+						if(IsBigHidden)
+							temp_button->Hide();
+
+						helper->SetHelp(temp_button,big_data[i].cmd);
+					}
+					//Move tiler only if not hidden
+					if (!IsBigHidden)
+					{
 						tiler.OffsetBy(TileSize+1,0);
 						if(j == num_across)
 						{
@@ -353,76 +346,93 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 						}
 						j++;
 					}
-					else
+				}
+				else
+				{
+					button = button->NextSibling();
+					if(button != NULL)
 					{
-						int child_index = i+child_offset;
-						if(!IsGreekAbsent)
-							child_index++;
-						BView* child = v->ChildAt(child_index);
-						if(child != NULL)
+						if(IsBigHidden)
 						{
-							if(IsBigHidden)
+							if(!button->IsHidden())
+								button->Hide();
+						}
+						else
+						{
+							if(button->IsHidden())
+								button->Show();
+
+							button->MoveTo(tiler.LeftTop());
+
+							tiler.OffsetBy(TileSize+1,0);
+
+							if(j == num_across)
 							{
-								if(!child->IsHidden())
-								child->Hide();
+								tiler.left=0;
+								tiler.right=TileSize;
+								tiler.OffsetBy(0,TileSize+1);
+								j = 0;
 							}
-							else
-							{
-								if(child->IsHidden())
-									child->Show();
-						
-								child->MoveTo(tiler.LeftTop());
-								
-								tiler.OffsetBy(TileSize+1,0);
-								
-								if(j == num_across)
-								{
-									tiler.left=0;
-									tiler.right=TileSize;
-									tiler.OffsetBy(0,TileSize+1);
-									j = 0;
-								}
-								j++;
-							
-							
-							}
+							j++;
+
+
 						}
 					}
-					
-					
+				}
+
+
 			}
-	
-		tiler.left=0;
-		tiler.right=TileSize;
-		if(j <= num_across && j != 1)		
-			tiler.OffsetBy(0,TileSize+1);
-		child_offset += big_items;	
-		if(NeedInitCorr)
-		{
-			child_offset--;
-			NeedInitCorr = false;
-		}
+
+			tiler.left=0;
+			tiler.right=TileSize;
+			if(j <= num_across && j != 1)
+				tiler.OffsetBy(0,TileSize+1);
+
 	}
+	else
+	{
+		BView *buttonNext = BigHeader->NextSibling();
+		BView *button;
+		for(i=0;i<big_items && buttonNext;i++)
+		{
+			button = buttonNext;
+			buttonNext = button->NextSibling();
+			RemoveChild(button);
+			delete button;
+
+		}
+		if (BigHeader->Parent())
+			RemoveChild(BigHeader);
+	}
+
 	if(!IsBinaryAbsent)
-	{	
+	{
 		/*if(!IsGreekAbsent || !IsBigAbsent)
 		{
 			tiler.left=0;
 			tiler.right=TileSize;
-			if(j <= num_across && j != 1)		
+			if(j <= num_across && j != 1)
 				tiler.OffsetBy(0,TileSize+1);
-				
-			*/
-			BinaryHeader->MoveTo(tiler.LeftTop());
+
+		*/
+		bool addingBinary = false;
+		if (!IsOnlyResizing && !BinaryHeader->Parent()) {
+			addingBinary = true;
+			AddChild(BinaryHeader);
+		}
+
+		BinaryHeader->MoveTo(tiler.LeftTop());
 		//}
 		BinaryHeader->ResizeTo(f.Width(),20);
 		BinaryHeader->Invalidate();
-		
+
 		tiler.OffsetBy(0,BinaryHeader->Bounds().Height()+1);
+
+		BView *button = BinaryHeader;
 			j=1;
 			for(i=0;i<binary_items;i++)
 			{
-					if(!IsOnlyResizing)
+					if(!IsOnlyResizing && addingBinary) 
 					{
 						msg = new BMessage(InterfaceConstants::K_CMD_TBUTTON_INSERT);
 						if(msg->AddString("cmd",binary_data[i].cmd) == B_OK)
@@ -431,49 +441,53 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 							{
 								vector<BBitmap*> Icons;
 								vector<BPoint> Origins;
-	
+
 								Icons.push_back(binarybitvec[i]);
 								Origins.push_back(BPoint(0,-2));
 								v->AddChild(temp_button = new  TButton(tiler,msg,Icons,Origins));
 							}
 							else
-								v->AddChild(temp_button = new TButton(tiler,msg,binarybitvec[i]));
-							
+								v->AddChild(temp_button = new TButton(binary_data[i].s, tiler,msg,binarybitvec[i]));
+
+							if(IsBinaryHidden)
+								temp_button->Hide();
+
+
 							helper->SetHelp(temp_button,binary_data[i].cmd);
 						}
-	
-						tiler.OffsetBy(TileSize+1,0);
-						if(j == num_across)
+
+						if (!IsBinaryHidden) 
 						{
-							tiler.left=0;
-							tiler.right=TileSize;
-							tiler.OffsetBy(0,TileSize+1);
-							j = 0;
+							tiler.OffsetBy(TileSize+1,0);
+							if(j == num_across)
+							{
+								tiler.left=0;
+								tiler.right=TileSize;
+								tiler.OffsetBy(0,TileSize+1);
+								j = 0;
+							}
+							j++;
 						}
-						j++;
 					}
 					else
 					{
-						int child_index = i+child_offset;
-						if(!IsGreekAbsent || !IsBigAbsent)
-							child_index++;
-						BView* child = v->ChildAt(child_index);
-						if(child != NULL)
+						button = button->NextSibling();
+						if(button != NULL)
 						{
 							if(IsBinaryHidden)
 							{
-								if(!child->IsHidden())
-								child->Hide();
+								if(!button->IsHidden())
+									button->Hide();
 							}
 							else
 							{
-								if(child->IsHidden())
-									child->Show();
-						
-								child->MoveTo(tiler.LeftTop());
-								
+								if(button->IsHidden())
+									button->Show();
+
+								button->MoveTo(tiler.LeftTop());
+
 								tiler.OffsetBy(TileSize+1,0);
-								
+
 								if(j == num_across)
 								{
 									tiler.left=0;
@@ -482,46 +496,64 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 									j = 0;
 								}
 								j++;
-							
-							
+
+
 							}
 						}
 					}
-					
-					
+
+
 			}
 			tiler.left=0;
 			tiler.right=TileSize;
-			if(j <= num_across && j != 1)		
+			if(j <= num_across && j != 1)
 				tiler.OffsetBy(0,TileSize+1);
-		child_offset += binary_items;	
-		if(NeedInitCorr)
+	}
+	else
+	{
+		BView *buttonNext = BinaryHeader->NextSibling();
+		BView *button;
+		for(i=0;i<binary_items && buttonNext;i++)
 		{
-			child_offset--;
-			NeedInitCorr = false;
+			button = buttonNext;
+			buttonNext = button->NextSibling();
+			RemoveChild(button);
+			delete button;
+
 		}
-	}		
+		if (BinaryHeader->Parent())
+			RemoveChild(BinaryHeader);
+	}
 	if(!IsMiscAbsent)
 	{
+		bool addingMisc = false;
+		if (!IsOnlyResizing && !MiscHeader->Parent()) {
+			addingMisc = true;
+			AddChild(MiscHeader);
+		}
 		//if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent)
 		//{
-		
-			MiscHeader->MoveTo(tiler.LeftTop());
+
+		MiscHeader->MoveTo(tiler.LeftTop());
 		//}
 		MiscHeader->ResizeTo(f.Width(),20);
 		MiscHeader->Invalidate();
-		
+
 		tiler.OffsetBy(0,MiscHeader->Bounds().Height()+1);
+
+		BView *button = MiscHeader;
 			j=1;
 			for(i=0;i<misc_items;i++)
 			{
-					if(!IsOnlyResizing)
+					if(!IsOnlyResizing && addingMisc)
 					{
 						msg = new BMessage(InterfaceConstants::K_CMD_TBUTTON_INSERT);
 						if(msg->AddString("cmd",misc_data[i].cmd) == B_OK)
 						{
 							if(i!=0)
-							v->AddChild(temp_button = new TButton(tiler,msg,miscbitvec[i]));
+							{
+								v->AddChild(temp_button = new TButton(misc_data[i].s, tiler,msg,miscbitvec[i]));
+							}
 							else
 							{
 								vector<BBitmap*> Icons;
@@ -529,43 +561,48 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								Icons.push_back(miscbitvec[i]);
 								Origins.push_back(BPoint(0,5));
 								v->AddChild(temp_button = new TButton(tiler,msg,Icons,Origins));
-							
+
 							}
+							if (IsMiscHidden)
+								temp_button->Hide();
+
 							helper->SetHelp(temp_button,misc_data[i].cmd);
 						}
-	
-						tiler.OffsetBy(TileSize+1,0);
-						if(j == num_across)
+
+						//Move tiler only if not hidden
+						if (!IsMiscHidden)
 						{
-							tiler.left=0;
-							tiler.right=TileSize;
-							tiler.OffsetBy(0,TileSize+1);
-							j = 0;
+							tiler.OffsetBy(TileSize+1,0);
+							if(j == num_across)
+							{
+								tiler.left=0;
+								tiler.right=TileSize;
+								tiler.OffsetBy(0,TileSize+1);
+								j = 0;
+							}
+							j++;
 						}
-						j++;
 					}
 					else
 					{
-						int child_index = i+child_offset;
-						if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent)
-							child_index++;
-						BView* child = v->ChildAt(child_index);
-						if(child != NULL)
+						button = button->NextSibling();
+
+						if(button != NULL)
 						{
 							if(IsMiscHidden)
 							{
-								if(!child->IsHidden())
-								child->Hide();
+								if(!button->IsHidden())
+									button->Hide();
 							}
 							else
 							{
-								if(child->IsHidden())
-									child->Show();
-						
-								child->MoveTo(tiler.LeftTop());
-								
+								if(button->IsHidden())
+									button->Show();
+
+								button->MoveTo(tiler.LeftTop());
+
 								tiler.OffsetBy(TileSize+1,0);
-								
+
 								if(j == num_across)
 								{
 									tiler.left=0;
@@ -574,55 +611,72 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 									j = 0;
 								}
 								j++;
-							
-							
+
+
 							}
 						}
 					}
-					
-					
+
+
 			}
-		//Binary Relations
 			tiler.left=0;
 			tiler.right=TileSize;
-			if(j <= num_across && j != 1)		
+			if(j <= num_across && j != 1)
 				tiler.OffsetBy(0,TileSize+1);
-		child_offset += misc_items;	
-		if(NeedInitCorr)
+	}
+	else
+	{
+		BView *buttonNext = MiscHeader->NextSibling();
+		BView *button;
+		for(i=0;i<misc_items && buttonNext;i++)
 		{
-			child_offset--;
-			NeedInitCorr = false;
+			button = buttonNext;
+			buttonNext = button->NextSibling();
+			RemoveChild(button);
+			delete button;
+
 		}
-	}	
+		if (MiscHeader->Parent())
+			RemoveChild(MiscHeader);
+	}
+
+	//Binary Relations
 	if(!IsBinRelAbsent)
-	{	
+	{
+		bool addingBinRel = false;
+		if (!IsOnlyResizing && !BinRelHeader->Parent()) {
+			addingBinRel = true;
+			AddChild(BinRelHeader);
+		}
 		//if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent)
 		//{
-		
+
 			BinRelHeader->MoveTo(tiler.LeftTop());
 		//}
 		BinRelHeader->ResizeTo(f.Width(),20);
 		BinRelHeader->Invalidate();
-		
+
 		tiler.OffsetBy(0,BinRelHeader->Bounds().Height()+1);
+
+			BView *button = BinRelHeader;
 			j=1;
 			//we have two "blanks" at the end
-			
+
 			for(i=0;i<bin_rel_items-2;i++)
 			{
-					if(!IsOnlyResizing)
+					if(!IsOnlyResizing && addingBinRel)
 					{
 						msg = new BMessage(InterfaceConstants::K_CMD_TBUTTON_INSERT);
 						if(msg->AddString("cmd",bin_rel_data[i].cmd) == B_OK)
 						{
 							vector<BBitmap*> Icons;
 							vector<BPoint> Origins;
-		
+
 							if(bin_rel_data[i].s == "notin")
 							{
 								Icons.push_back(bin_relbitvec[39]);
 								Origins.push_back(BPoint(0,0));
-								
+
 								Icons.push_back(bin_relbitvec[16]);
 								Origins.push_back(BPoint(0,0));
 								v->AddChild(temp_button = new  TButton(tiler,msg,Icons,Origins));
@@ -631,7 +685,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 							{
 								Icons.push_back(bin_relbitvec[38]);
 								Origins.push_back(BPoint(0,3));
-								
+
 								Icons.push_back(bin_relbitvec[30]);
 								Origins.push_back(BPoint(0,-4));
 								v->AddChild(temp_button = new  TButton(tiler,msg,Icons,Origins));
@@ -640,7 +694,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 							{
 								Icons.push_back(bin_relbitvec[38]);
 								Origins.push_back(BPoint(0,0));
-								
+
 								Icons.push_back(bin_relbitvec[22]);
 								Origins.push_back(BPoint(-6,0));
 								v->AddChild(temp_button = new  TButton(tiler,msg,Icons,Origins));
@@ -649,7 +703,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 							{
 								Icons.push_back(bin_relbitvec[38]);
 								Origins.push_back(BPoint(0,0));
-								
+
 								Icons.push_back(bin_relbitvec[39]);
 								Origins.push_back(BPoint(0,0));
 								v->AddChild(temp_button = new  TButton(tiler,msg,Icons,Origins));
@@ -658,7 +712,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 							{
 								Icons.push_back(bin_relbitvec[38]);
 								Origins.push_back(BPoint(0,0));
-								
+
 								Icons.push_back(binarybitvec[2]);
 								Origins.push_back(BPoint(0,-6));
 								v->AddChild(temp_button = new  TButton(tiler,msg,Icons,Origins));
@@ -667,7 +721,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 							{
 								Icons.push_back(binarybitvec[24]);
 								Origins.push_back(BPoint(3,0));
-								
+
 								Icons.push_back(binarybitvec[25]);
 								Origins.push_back(BPoint(-3,0));
 								v->AddChild(temp_button = new  TButton(tiler,msg,Icons,Origins));
@@ -685,46 +739,47 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								Origins.push_back(BPoint(0,-2));
 								v->AddChild(temp_button = new  TButton(tiler,msg,Icons,Origins));
 							}
-							
-							else v->AddChild(temp_button = new  TButton(tiler,msg,bin_relbitvec[i]));
-							
+
+							else 
+								v->AddChild(temp_button = new  TButton(NULL, tiler,msg,bin_relbitvec[i]));
+
+							if (IsBinRelHidden)
+								temp_button->Hide();
 							helper->SetHelp(temp_button,bin_rel_data[i].cmd);
 						}
-							
-					
-				
-						tiler.OffsetBy(TileSize+1,0);
-						if(j == num_across)
-						{
-							tiler.left=0;
-							tiler.right=TileSize;
-							tiler.OffsetBy(0,TileSize+1);
-							j = 0;
+
+
+						if (!IsBinRelHidden) {
+							tiler.OffsetBy(TileSize+1,0);
+							if(j == num_across)
+							{
+								tiler.left=0;
+								tiler.right=TileSize;
+								tiler.OffsetBy(0,TileSize+1);
+								j = 0;
+							}
+							j++;
 						}
-						j++;
 					}
 					else
 					{
-						int child_index = i+child_offset;
-						if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent)
-							child_index++;
-						BView* child = v->ChildAt(child_index);
-						if(child != NULL)
+						button = button->NextSibling();
+						if(button != NULL)
 						{
 							if(IsBinRelHidden)
 							{
-								if(!child->IsHidden())
-								child->Hide();
+								if(!button->IsHidden())
+								button->Hide();
 							}
 							else
 							{
-								if(child->IsHidden())
-									child->Show();
-						
-								child->MoveTo(tiler.LeftTop());
-								
+								if(button->IsHidden())
+									button->Show();
+
+								button->MoveTo(tiler.LeftTop());
+
 								tiler.OffsetBy(TileSize+1,0);
-								
+
 								if(j == num_across)
 								{
 									tiler.left=0;
@@ -733,43 +788,58 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 									j = 0;
 								}
 								j++;
-							
-							
+
+
 							}
 						}
 					}
-					
-					
+
+
 			}
 			//Math Mode Accents
 			tiler.left=0;
 			tiler.right=TileSize;
-			if(j <= num_across && j != 1)		
+			if(j <= num_across && j != 1)
 				tiler.OffsetBy(0,TileSize+1);
-				
-		child_offset += bin_rel_items-2;	
-		if(NeedInitCorr)
+	}
+	else
+	{
+		BView *buttonNext = BinRelHeader->NextSibling();
+		BView *button;
+		for(i=0;i<bin_rel_items-2 && buttonNext;i++)
 		{
-			child_offset--;
-			NeedInitCorr = false;
+			button = buttonNext;
+			buttonNext = button->NextSibling();
+			RemoveChild(button);
+			delete button;
+
 		}
-	}	
+		if (BinRelHeader->Parent())
+			RemoveChild(BinRelHeader);
+	}
+
 	if(!IsMMAAbsent)
 	{
-			
+		bool addingMMA = false;
+		if (!IsOnlyResizing && !MMAHeader->Parent()) {
+			addingMMA = true;
+			AddChild(MMAHeader);
+		}
 		//if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent || !IsBinRelAbsent)
 		//{
 			MMAHeader->MoveTo(tiler.LeftTop());
 		//}
 		MMAHeader->ResizeTo(f.Width(),20);
 		MMAHeader->Invalidate();
-		
+
 		tiler.OffsetBy(0,MMAHeader->Bounds().Height()+1);
+
+		BView *button = MMAHeader;
 			j=1;
 			//we have two "blanks" at the end
 			for(i=0;i<mmacc_items-2;i++)
 			{
-					if(!IsOnlyResizing)
+					if(!IsOnlyResizing && addingMMA)
 					{
 						vector<BBitmap*> Icons;
 						vector<BPoint> Origins;
@@ -779,7 +849,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 							BPoint offset(0,-5);
 							BPoint aoffset(0,3);
 							if(mmacc_data[i].s == "widehat" || mmacc_data[i].s == "widetilde")
-							{		
+							{
 								Icons.push_back(mmaccbitvec[13]);
 								offset.x = 3;
 								offset.y = -10;
@@ -787,50 +857,51 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 							}
 							else
 								Icons.push_back(mmaccbitvec[12]);	//the "a"
-								
+
 							Origins.push_back(aoffset);
-							
+
 							Icons.push_back(mmaccbitvec[i]);
 							Origins.push_back(offset);
 							v->AddChild(temp_button = new TButton(tiler,msg,Icons,Origins));
-									
+
+							if (IsMMAHidden) 
+								temp_button->Hide();
 							helper->SetHelp(temp_button,mmacc_data[i].cmd);
 						}
-							
-					
-				
-						tiler.OffsetBy(TileSize+1,0);
-						if(j == num_across)
+
+						//Move tiler only if not hidden
+						if (!IsMMAHidden)
 						{
-							tiler.left=0;
-							tiler.right=TileSize;
-							tiler.OffsetBy(0,TileSize+1);
-							j = 0;
+							tiler.OffsetBy(TileSize+1,0);
+							if(j == num_across)
+							{
+								tiler.left=0;
+								tiler.right=TileSize;
+								tiler.OffsetBy(0,TileSize+1);
+								j = 0;
+							}
+							j++;
 						}
-						j++;
 					}
 					else
 					{
-						int child_index = i+child_offset;
-						if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent || !IsBinRelAbsent)
-							child_index++;
-						BView* child = v->ChildAt(child_index);
-						if(child != NULL)
+						button = button->NextSibling();
+						if(button != NULL)
 						{
 							if(IsMMAHidden)
 							{
-								if(!child->IsHidden())
-								child->Hide();
+								if(!button->IsHidden())
+								button->Hide();
 							}
 							else
 							{
-								if(child->IsHidden())
-									child->Show();
-						
-								child->MoveTo(tiler.LeftTop());
-								
+								if(button->IsHidden())
+									button->Show();
+
+								button->MoveTo(tiler.LeftTop());
+
 								tiler.OffsetBy(TileSize+1,0);
-								
+
 								if(j == num_across)
 								{
 									tiler.left=0;
@@ -839,44 +910,61 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 									j = 0;
 								}
 								j++;
-							
-							
+
+
 							}
 						}
 					}
-					
-					
+
+
 			}
 		//Intl accents and things
 		tiler.left=0;
 		tiler.right=TileSize;
-		if(j <= num_across && j != 1)		
+		if(j <= num_across && j != 1)
 			tiler.OffsetBy(0,TileSize+1);
-		child_offset += mmacc_items-2;	
-		if(NeedInitCorr)
-		{
-			child_offset--;
-			NeedInitCorr = false;
-		}
-		
+
+
 	}
+	else
+	{
+		BView *buttonNext = MMAHeader->NextSibling();
+		BView *button;
+		for(i=0; i < (mmacc_items - 2) && buttonNext;i++)
+		{
+			button = buttonNext;
+			buttonNext = button->NextSibling();
+			RemoveChild(button);
+			delete button;
+
+		}
+		if (MMAHeader->Parent())
+			RemoveChild(MMAHeader);
+	}
+
 	if(!IsIntlAbsent)
-	{	
-	//	if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent || !IsBinRelAbsent|| !IsMMAAbsent)	
-	//	{		
-					
-			IntlHeader->MoveTo(tiler.LeftTop());
+	{
+		bool addingIntl = false;
+		if (!IsOnlyResizing && !IntlHeader->Parent()) {
+			addingIntl = true;
+			AddChild(IntlHeader);
+		}
+	//	if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent || !IsBinRelAbsent|| !IsMMAAbsent)
+	//	{
+
+		IntlHeader->MoveTo(tiler.LeftTop());
 	//	}
-		
+
 		IntlHeader->ResizeTo(f.Width(),20);
 		IntlHeader->Invalidate();
-		
+
 		tiler.OffsetBy(0,IntlHeader->Bounds().Height()+1);
+			BView *button = IntlHeader;
 			j=1;
 			//we have 4 "blanks" at the end
 			for(i=0;i<intl_items-13;i++)
 			{
-					if(!IsOnlyResizing)
+					if(!IsOnlyResizing && addingIntl)
 					{
 						vector<BBitmap*> Icons;
 						vector<BPoint> Origins;
@@ -897,7 +985,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 							int Oidx=Iidx+1;
 							int Uidx=Oidx+1;
 							int Yidx=Uidx+1;
-							
+
 							if(intl_data[i].s == "ograve" 
 							|| intl_data[i].s == "oacute"
 							|| intl_data[i].s == "ohat"
@@ -909,31 +997,31 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 							|| intl_data[i].s == "obreve"
 							|| intl_data[i].s == "ocheck"
 							|| intl_data[i].s == "oddash")
-							{		
-								
-								
+							{
+
+
 									BPoint offset(1,-7);
 								if(intl_data[i].s == "intlodot")
 									offset.x = 0;
-									
+
 								BPoint ooffset(0,0);
 								Icons.push_back(intlbitvec[oidx]);
-								Origins.push_back(ooffset);	
+								Origins.push_back(ooffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
-			
-							}	
+
+							}
 							else if(intl_data[i].s == "obelowdot" 
 							|| intl_data[i].s == "obelowbar")
 							{
 								BPoint offset(1,7);
 								if(intl_data[i].s == "obelowdot")
 									offset.x = 0;
-								
+
 								BPoint ooffset(0,0);
 								Icons.push_back(intlbitvec[oidx]);
 								Origins.push_back(ooffset);
-								
+
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -943,7 +1031,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint coffset(0,0);
 								Icons.push_back(intlbitvec[cidx]);
 								Origins.push_back(coffset);
-								
+
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -953,7 +1041,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint ooffset(0,0);
 								Icons.push_back(intlbitvec[oidx]);
 								Origins.push_back(ooffset);
-								
+
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -962,7 +1050,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-7);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[aidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -971,7 +1059,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-10);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[Aidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -981,10 +1069,10 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								//BPoint ooffset(0,0);
 								Icons.push_back(intlbitvec[oidx]);
 								Origins.push_back(BPoint(-5,0));
-								
+
 								Icons.push_back(intlbitvec[oidx]);
 								Origins.push_back(BPoint(5,0));
-								
+
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -993,7 +1081,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-7);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[aidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1002,7 +1090,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-7);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[eidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1011,7 +1099,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-7);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[24]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1020,7 +1108,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-7);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[oidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1029,7 +1117,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-7);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[uidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1038,7 +1126,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-9);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[yidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1047,7 +1135,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-10);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[Aidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1056,7 +1144,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-10);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[Eidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1065,7 +1153,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-10);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[Iidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1074,7 +1162,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-10);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[Oidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1083,7 +1171,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-10);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[Uidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1092,7 +1180,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(0,-10);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[Yidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1103,7 +1191,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(1,-10);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[Eidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1114,7 +1202,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(1,-10);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[Oidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1124,7 +1212,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint coffset(0,-3);
 								Icons.push_back(intlbitvec[Cidx]);
 								Origins.push_back(coffset);
-								
+
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
@@ -1135,57 +1223,61 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 								BPoint offset(1,-7);
 								BPoint aoffset(0,0);
 								Icons.push_back(intlbitvec[eidx]);
-								Origins.push_back(aoffset);	
+								Origins.push_back(aoffset);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
 							}
-							
+
 							else
-							{	
+							{
 								BPoint offset(0,0);
 								Icons.push_back(intlbitvec[i]);
 								Origins.push_back(offset);
-								
-							}			
+
+							}
 							v->AddChild(temp_button = new TButton(tiler,msg,Icons,Origins));
+
+							if (IsIntlHidden)
+								temp_button->Hide();
+
 							helper->SetHelp(temp_button,intl_data[i].cmd);
 						}
-							
-					
-				
+
+
+
 						tiler.OffsetBy(TileSize+1,0);
-						if(j == num_across)
+						//Move tiler only if not hidden
+						if (!IsIntlHidden)
 						{
-							tiler.left=0;
-							tiler.right=TileSize;
-							tiler.OffsetBy(0,TileSize+1);
-							j = 0;
+							if(j == num_across)
+							{
+								tiler.left=0;
+								tiler.right=TileSize;
+								tiler.OffsetBy(0,TileSize+1);
+								j = 0;
+							}
+							j++;
 						}
-						j++;
 					}
 					else
 					{
-						int child_index = i+child_offset;
-						if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent || !IsBinRelAbsent
-						|| !IsMMAAbsent)
-							child_index++;
-						BView* child = v->ChildAt(child_index);
-						if(child != NULL)
+						button = button->NextSibling();
+						if(button != NULL)
 						{
 							if(IsIntlHidden)
 							{
-								if(!child->IsHidden())
-								child->Hide();
+								if(!button->IsHidden())
+								button->Hide();
 							}
 							else
 							{
-								if(child->IsHidden())
-									child->Show();
-						
-								child->MoveTo(tiler.LeftTop());
-								
+								if(button->IsHidden())
+									button->Show();
+
+								button->MoveTo(tiler.LeftTop());
+
 								tiler.OffsetBy(TileSize+1,0);
-								
+
 								if(j == num_across)
 								{
 									tiler.left=0;
@@ -1194,56 +1286,67 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 									j = 0;
 								}
 								j++;
-							
-							
+
+
 							}
 						}
 					}
-					
-					
+
+
 			}
 			tiler.left=0;
 			tiler.right=TileSize;
-			if(j <= num_across && j != 1)		
+			if(j <= num_across && j != 1)
 				tiler.OffsetBy(0,TileSize+1);
-		child_offset += intl_items-13;	
-		if(NeedInitCorr)
-		{
-			child_offset--;
-			NeedInitCorr = false;
-		}
-		
-		
 	}
+	else
+	{
+		BView *buttonNext = IntlHeader->NextSibling();
+		BView *button;
+		for(i=0; i < (intl_items - 13) && buttonNext;i++)
+		{
+			button = buttonNext;
+			buttonNext = button->NextSibling();
+			RemoveChild(button);
+			delete button;
+
+		}
+		if (IntlHeader->Parent())
+			RemoveChild(IntlHeader);
+	}
+
 
 	int extra = 5;
 	//int maxwidth=0;
 	int num_text_items = 10;
 	int TileWidth=75;
-	int TileHeight=23;
-		struct text_item
-		{
-			const char* text;
-			BFont font;
-			float width;
-			const char* cmd;
-		};
+	struct text_item
+	{
+		const char* text;
+		BFont font;
+		float width;
+		const char* cmd;
+	};
 	BPoint tiler_lt;
-	
+
 	if(!IsTypeFaceAbsent)
-	{	
-		
+	{
+		bool addingTypeFace = false;
+		if (!IsOnlyResizing &&  !TypeFaceHeader->Parent()) {
+			addingTypeFace = true;
+			AddChild(TypeFaceHeader);
+		}
 		//if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent || !IsBinRelAbsent
 		//|| !IsMMAAbsent || !IsIntlAbsent)
-		//{		
-	
+		//{
+
 			TypeFaceHeader->MoveTo(tiler.LeftTop());
 		//}
 		TypeFaceHeader->ResizeTo(f.Width(),20);
 		TypeFaceHeader->Invalidate();
-		
+
 		tiler.OffsetBy(0,TypeFaceHeader->Bounds().Height()+1);
-		
+
 		BFont boldfont(be_bold_font);
 		BFont romanfont(be_plain_font);
 		BFont emphfont(be_plain_font);
@@ -1252,7 +1355,7 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 		BFont italicfont(be_plain_font);
 		italicfont.SetFace(B_ITALIC_FACE);
 		italicfont.SetSize(12);//Face(B_ITALIC_FACE);
-		
+
 		emphfont.SetFace(B_ITALIC_FACE|B_BOLD_FACE);
 		boldfont.SetSize(12);
 		emphfont.SetSize(12);
@@ -1261,13 +1364,13 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 		sansfont.SetSize(12);
 		typefont.SetFamilyAndStyle("Monospac821 BT","Roman");
 		typefont.SetSize(12);
-		
+
 		BFont mediumfont(romanfont);
 		mediumfont.SetSize(14);
 		BFont slantfont(be_plain_font);
 		slantfont.SetShear(120);
 		slantfont.SetSize(12);
-		
+
 		extra = 5;
 		text_item textitems[] = {
 		{"Emph",emphfont,emphfont.StringWidth("Emph")+extra,"\\emph{}"},
@@ -1288,16 +1391,15 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 			if(textitems[m].width > maxwidth)
 				maxwidth = 	(int)textitems[m].width;
 		}*/
-		//cout << maxwidth << endl;
-		//IsResizing = true;	
+		//IsResizing = true;
 		//TileWidth=maxwidth;
 		//TileHeight=23;
-		
+
 		tiler_lt = tiler.LeftTop();
-		
-		tiler = BRect(tiler_lt.x,tiler_lt.y,tiler_lt.x+TileWidth,tiler_lt.y+TileHeight);
+
+		tiler = BRect(tiler_lt.x,tiler_lt.y,tiler_lt.x+TileWidth,tiler_lt.y+TileSize);
 		f = v->Bounds();
-		
+
 		num_across=0;
 		width = f.Width();
 		twidth = tiler.Width()+1;
@@ -1307,97 +1409,116 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 			num_across++;
 		}
 		if(width != -1)
-			num_across--;	
-					
+			num_across--;
+
+		BView *button =TypeFaceHeader;
 		j=1;
 		for(i=0;i<num_text_items;i++)
 		{
-				
-				if(!IsOnlyResizing)
-				{	
+
+				if(!IsOnlyResizing && addingTypeFace)
+				{
 					//BFont font(be_bold_font);
 					//const char* text = "Bold";
 					msg = new BMessage(InterfaceConstants::K_CMD_TBUTTON_INSERT);
 					if(msg->AddString("cmd",textitems[i].cmd) == B_OK)
 					{
 						v->AddChild(temp_button = new TButton(tiler,msg,textitems[i].text,textitems[i].font));
+
+						if (IsTypeFaceHidden)
+							temp_button->Hide();
 						helper->SetHelp(temp_button,textitems[i].cmd);
 					}
-					tiler.OffsetBy(TileWidth+1,0);
-					
-					if(j == num_across)
+
+					if (!IsTypeFaceHidden)
 					{
-						tiler.left=0;
-						tiler.right=TileWidth;
-						tiler.OffsetBy(0,TileHeight+1);
-						j = 0;
+						tiler.OffsetBy(TileWidth+1,0);
+
+						if(j == num_across)
+						{
+							tiler.left=0;
+							tiler.right=TileWidth;
+							tiler.OffsetBy(0,TileSize+1);
+							j = 0;
+						}
+						j++;
 					}
-					j++;
 				}
 				else
 				{
-						int child_index = i+child_offset;
-						if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent || !IsBinRelAbsent
-						|| !IsMMAAbsent || !IsIntlAbsent)
-							child_index++;
-						BView* child = v->ChildAt(child_index);
-						if(child != NULL)
+						button = button->NextSibling();
+						if(button != NULL)
 						{
 							if(IsTypeFaceHidden)
 							{
-								if(!child->IsHidden())
-								child->Hide();
+								if(!button->IsHidden())
+								button->Hide();
 							}
 							else
 							{
-								if(child->IsHidden())
-									child->Show();
-						
-								child->MoveTo(tiler.LeftTop());
-								
+								if(button->IsHidden())
+									button->Show();
+
+								button->MoveTo(tiler.LeftTop());
+
 								tiler.OffsetBy(TileWidth+1,0);
-								
+
 								if(j == num_across)
 								{
 									tiler.left=0;
 									tiler.right=TileWidth;
-									tiler.OffsetBy(0,TileHeight+1);
+									tiler.OffsetBy(0,TileSize+1);
 									j = 0;
 								}
 								j++;
-							
-							
+
+
 							}
 						}
 				}
-				
-		}		
-		
+
+		}
+
 		tiler.left=0;
 			tiler.right=TileSize;
-			if(j <= num_across && j != 1)		
+			if(j <= num_across && j != 1)
 				tiler.OffsetBy(0,TileSize+1);
-			child_offset += num_text_items;	
-		if(NeedInitCorr)
+	}
+	else
+	{
+		BView *buttonNext = TypeFaceHeader->NextSibling();
+		BView *button;
+		for(i=0;i<num_text_items && buttonNext;i++)
 		{
-			child_offset--;
-			NeedInitCorr = false;
+			button = buttonNext;
+			buttonNext = button->NextSibling();
+			RemoveChild(button);
+			delete button;
+
 		}
-		
-	}		
+		if (TypeFaceHeader->Parent())
+			RemoveChild(TypeFaceHeader);
+	}
+
+	int num_func_items = 30;
 	if(!IsFunctionAbsent)
 	{
+		bool addingFunction = false;
+		if (!IsOnlyResizing && !FunctionHeader->Parent()) {
+			addingFunction = true;
+			AddChild(FunctionHeader);
+		}
 		//if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent || !IsBinRelAbsent
 		//|| !IsMMAAbsent || !IsIntlAbsent || !IsTypeFaceAbsent)
 		//{
-		
+
 			FunctionHeader->MoveTo(tiler.LeftTop());
 		//}
 		FunctionHeader->ResizeTo(f.Width(),20);
 		FunctionHeader->Invalidate();
-		
+
 		tiler.OffsetBy(0,FunctionHeader->Bounds().Height()+1);
-		
+
 		/*struct text_item
 		{
 			const char* text;
@@ -1405,11 +1526,11 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 			float width;
 			const char* cmd;
 		};*/
-		
+
 		BFont funcfont(be_plain_font);
-		
+
 		funcfont.SetSize(12);
-		
+
 		extra = 5;
 		text_item functextitems[] = {
 		{"arccos",funcfont,funcfont.StringWidth("arccos")+extra,"\\arccos"},
@@ -1418,14 +1539,14 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 		{"lim",funcfont,funcfont.StringWidth("lim")+extra,"\\lim"},
 		{"lim inf",funcfont,funcfont.StringWidth("lim inf")+extra,"\\liminf"},
 		{"lim sup",funcfont,funcfont.StringWidth("lim sup")+extra,"\\limsup"},
-	
+
 		{"arg",funcfont,funcfont.StringWidth("arg")+extra,"\\arg"},
 		{"cos",funcfont,funcfont.StringWidth("cos")+extra,"\\cos"},
 		{"cosh",funcfont,funcfont.StringWidth("cosh")+extra,"\\cosh"},
 		{"cot",funcfont,funcfont.StringWidth("cot")+extra,"\\cot"},
 		{"coth",funcfont,funcfont.StringWidth("coth")+extra,"\\coth"},
 		{"csc",funcfont,funcfont.StringWidth("csc")+extra,"\\csc"},
-	
+
 		{"det",funcfont,funcfont.StringWidth("det")+extra,"\\det"},
 		{"dim",funcfont,funcfont.StringWidth("dim")+extra,"\\dim"},
 		{"exp",funcfont,funcfont.StringWidth("exp")+extra,"\\exp"},
@@ -1446,22 +1567,21 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 		{"tanh",funcfont,funcfont.StringWidth("tanh")+extra,"\\tanh"},
 		};
 		//maxwidth=0;
-		int num_func_items = 30;
+
 		/*for(int n=0;n<num_func_items;n++)
 		{
 			if(functextitems[n].width > maxwidth)
 				maxwidth = 	(int)functextitems[n].width;
 		}
 		*/
-		//IsResizing = true;	
+		//IsResizing = true;
 		//TileWidth=maxwidth;
-		TileHeight=23;
-		
+
 		tiler_lt = tiler.LeftTop();
-		
-		tiler = BRect(tiler_lt.x,tiler_lt.y,tiler_lt.x+TileWidth,tiler_lt.y+TileHeight);
+
+		tiler = BRect(tiler_lt.x,tiler_lt.y,tiler_lt.x+TileWidth,tiler_lt.y+TileSize);
 		f = v->Bounds();
-		
+
 		num_across=0;
 		width = f.Width();
 		twidth = tiler.Width()+1;
@@ -1471,76 +1591,102 @@ void TexBar::Tile(BView* v,bool IsOnlyResizing)
 			num_across++;
 		}
 		if(width != -1)
-			num_across--;	
-					
+			num_across--;
+
+		BView *button = FunctionHeader;
 		j=1;
 		for(i=0;i<num_func_items;i++)
 		{
-				
-				if(!IsOnlyResizing)
-				{	
+
+				if(!IsOnlyResizing && addingFunction)
+				{
 					//BFont font(be_bold_font);
 					//const char* text = "Bold";
 					msg = new BMessage(InterfaceConstants::K_CMD_TBUTTON_INSERT);
 					if(msg->AddString("cmd",functextitems[i].cmd) == B_OK)
 					{
 						v->AddChild(temp_button = new TButton(tiler,msg,functextitems[i].text,functextitems[i].font));
+
+						if (IsFunctionHidden)
+							temp_button->Hide();
+
 						helper->SetHelp(temp_button,functextitems[i].cmd);
 					}
-					tiler.OffsetBy(TileWidth+1,0);
-					
-					if(j == num_across)
+
+					if (!IsFunctionHidden)
 					{
-						tiler.left=0;
-						tiler.right=TileWidth;
-						tiler.OffsetBy(0,TileHeight+1);
-						j = 0;
+						tiler.OffsetBy(TileWidth+1,0);
+						if(j == num_across)
+						{
+							tiler.left=0;
+							tiler.right=TileWidth;
+							tiler.OffsetBy(0,TileSize+1);
+							j = 0;
+						}
+						j++;
 					}
-					j++;
 				}
 				else
 				{
-						int child_index = i+child_offset;
-						if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent || !IsBinRelAbsent
-						|| !IsMMAAbsent || !IsIntlAbsent || !IsTypeFaceAbsent)
-							child_index++;
-						BView* child = v->ChildAt(child_index);
-						if(child != NULL)
+						button = button->NextSibling();
+						if(button != NULL)
 						{
 							if(IsFunctionHidden)
 							{
-								if(!child->IsHidden())
-								child->Hide();
+								if(!button->IsHidden())
+								button->Hide();
 							}
 							else
 							{
-								if(child->IsHidden())
-									child->Show();
-						
-								child->MoveTo(tiler.LeftTop());
-								
+								if(button->IsHidden())
+									button->Show();
+
+								button->MoveTo(tiler.LeftTop());
+
 								tiler.OffsetBy(TileWidth+1,0);
-								
+
 								if(j == num_across)
 								{
 									tiler.left=0;
 									tiler.right=TileWidth;
-									tiler.OffsetBy(0,TileHeight+1);
+									tiler.OffsetBy(0,TileSize+1);
 									j = 0;
 								}
 								j++;
-							
-							
+
+
 							}
 						}
 				}
-				
-		}		
+
+		}
+		/*As functions is the last, no need to adjust the tiler before next header
+		tiler.left=0;
+		tiler.right=TileSize;
+		if(j <= num_across && j != 1)
+			tiler.OffsetBy(0,TileSize+1);
+		*/
 	}
-	TotalHeight = tiler.bottom+fabs(ScrollBarOffset)-24;
+	else
+	{
+		BView *buttonNext = FunctionHeader->NextSibling();
+		BView *button;
+		for(i=0;i<num_func_items && buttonNext;i++)
+		{
+			button = buttonNext;
+			buttonNext = button->NextSibling();
+			RemoveChild(button);
+			delete button;
+
+		}
+		if (FunctionHeader->Parent())
+			RemoveChild(FunctionHeader);
+	}
+	TotalHeight = tiler.bottom+fabs(ScrollBarOffset);//TODO why -24 here ?    --> -24;
 	IsResizing = false;
-		
+
 }
+
 
 void TexBar::ScrollBy(float h,float v)
 {
@@ -1560,7 +1706,7 @@ void TexBar::FrameResized(float w, float h)
 	//Invalidate();
 	BView::FrameResized(w,h);
 }
-void TexBar::RefreshColours()
+void TexBar::RefreshColors()
 {
 	if(!IsGreekAbsent) GreekHeader->Invalidate();
 	if(!IsBigAbsent) BigHeader->Invalidate();
@@ -1579,7 +1725,6 @@ void TexBar::AdjustScrollBar()
 	{
 		BRect f = Frame();
 		//float h = ToolBarHeight();
-		//cout << h << endl;
 		float vh = f.Height();
 		if(TotalHeight < vh)
 		{
@@ -1587,10 +1732,10 @@ void TexBar::AdjustScrollBar()
 		}
 		else
 		{
-			bar->SetRange(0,TotalHeight-vh);	
+			bar->SetRange(0,TotalHeight-vh);
 			bar->SetProportion(vh/TotalHeight);
 		}
-		
+
 	}
 }
 
@@ -1599,9 +1744,9 @@ void TexBar::AttachedToWindow()
 	BScrollBar* bar = ScrollBar(B_VERTICAL);
 	if(bar)
 		bar->SetSteps(50,100);
-		
+
 	AdjustScrollBar();
-	BView::AttachedToWindow();	
+	BView::AttachedToWindow();
 }
 
 void TexBar::MouseMoved(BPoint point,uint32 transit,const BMessage* msg)
@@ -1623,67 +1768,76 @@ void TexBar::MessageReceived(BMessage* msg)
 	switch(msg->what)
 	{
 		case InterfaceConstants::K_HANDLE_HIERARCHY:
-		{	
+		{
 			bool value;
 			if(msg->FindBool("Greek Letters",&value) == B_OK)
 			{
 				IsGreekHidden = value;
-				prefs->IsGreekHidden = IsGreekHidden;
+				preferences->IsGreekHidden = IsGreekHidden;
 				Tile(this,true);
 			}
 			else if(msg->FindBool("Big Operators",&value) == B_OK)
 			{
 				IsBigHidden = value;
-				prefs->IsBigHidden = IsBigHidden;
+				preferences->IsBigHidden = IsBigHidden;
 				Tile(this,true);
 			}
 			else if(msg->FindBool("Binary Operators",&value) == B_OK)
 			{
 				IsBinaryHidden = value;
-				prefs->IsBinaryHidden = IsBinaryHidden;
+				preferences->IsBinaryHidden = IsBinaryHidden;
 				Tile(this,true);
 			}
 			else if(msg->FindBool("Misc Symbols",&value) == B_OK)
 			{
 				IsMiscHidden = value;
-				prefs->IsMiscHidden = IsMiscHidden;
+				preferences->IsMiscHidden = IsMiscHidden;
 				Tile(this,true);
 			}
 			else if(msg->FindBool("Binary Relations",&value) == B_OK)
 			{
 				IsBinRelHidden = value;
-				prefs->IsBinRelHidden = IsBinRelHidden;
+				preferences->IsBinRelHidden = IsBinRelHidden;
 				Tile(this,true);
 			}
 			else if(msg->FindBool("Math Mode Accents",&value) == B_OK)
 			{
 				IsMMAHidden = value;
-				prefs->IsMMAHidden = IsMMAHidden;
+				preferences->IsMMAHidden = IsMMAHidden;
 				Tile(this,true);
 			}
 			else if(msg->FindBool("International",&value) == B_OK)
 			{
 				IsIntlHidden = value;
-				prefs->IsIntlHidden = IsIntlHidden;
+				preferences->IsIntlHidden = IsIntlHidden;
 				Tile(this,true);
 			}
 			else if(msg->FindBool("Type Faces",&value) == B_OK)
 			{
 				IsTypeFaceHidden = value;
-				prefs->IsTypeFaceHidden = IsTypeFaceHidden;
+				preferences->IsTypeFaceHidden = IsTypeFaceHidden;
 				Tile(this,true);
 			}
 			else if(msg->FindBool("Functions",&value) == B_OK)
 			{
 				IsFunctionHidden = value;
-				prefs->IsFunctionHidden = IsFunctionHidden;
+				preferences->IsFunctionHidden = IsFunctionHidden;
 				Tile(this,true);
 			}
-			prefs->Save();
 			AdjustScrollBar();
-		}break;
+		} break;
+		case B_OBSERVER_NOTICE_CHANGE:
+		{
+			if (msg->GetInt32(B_OBSERVE_ORIGINAL_WHAT,0) == PrefsConstants::K_PREFS_UPDATE) 
+			{
+				RefreshColors();
+				//TODO better manage each K_PREFS_ID
+				UpdateHeaders();
+				Tile(this,false);
+			}
+		} break;
 		case B_MOUSE_WHEEL_CHANGED:
-		{	
+		{
 				float delta_y;
 					if(msg->FindFloat("be:wheel_delta_y",&delta_y) == B_OK)
 					{
@@ -1698,18 +1852,18 @@ void TexBar::MessageReceived(BMessage* msg)
 								big *= 10;
 							}
 							float val = bar->Value();
-							
+
 							if(delta_y > 0)       //move wheel down/back
 							{
-								bar->SetValue(val+big);	
+								bar->SetValue(val+big);
 							}
 							else if(delta_y < 0)	//move wheel up/forward
 							{
-								bar->SetValue(val-big);	
+								bar->SetValue(val-big);
 							}
 						}
 					}
-					
+
 		}break;
 		default:
 			BView::MessageReceived(msg);
@@ -1717,5 +1871,59 @@ void TexBar::MessageReceived(BMessage* msg)
 	}
 }
 
+void TexBar::UpdateHeaders() {
+	IsGreekAbsent = preferences->IsGreekAbsent;
+	IsGreekHidden = preferences->IsGreekHidden;
+	IsBigAbsent = preferences->IsBigAbsent;
+	IsBigHidden = preferences->IsBigHidden;
+	IsBinaryAbsent = preferences->IsBinaryAbsent;
+	IsBinaryHidden = preferences->IsBinaryHidden;
+	IsMiscAbsent = preferences->IsMiscAbsent;
+	IsMiscHidden = preferences->IsMiscHidden;
+	IsBinRelAbsent = preferences->IsBinRelAbsent;
+	IsBinRelHidden = preferences->IsBinRelHidden;
+	IsMMAAbsent = preferences->IsMMAAbsent;
+	IsMMAHidden = preferences->IsMMAHidden;
+	IsIntlAbsent = preferences->IsIntlAbsent;
+	IsIntlHidden = preferences->IsIntlHidden;
+	IsTypeFaceAbsent = preferences->IsTypeFaceAbsent;
+	IsTypeFaceHidden = preferences->IsTypeFaceHidden;
+	IsFunctionAbsent = preferences->IsFunctionAbsent;
+	IsFunctionHidden = preferences->IsFunctionHidden;
+}
 
+HeaderItem* TexBar::GetGreekHeader() {
+	return GreekHeader;
+}
 
+HeaderItem* TexBar::GetBigHeader() {
+	return BigHeader;
+}
+
+HeaderItem* TexBar::GetBinaryHeader() {
+	return BinaryHeader;
+}
+
+HeaderItem* TexBar::GetMiscHeader() {
+	return MiscHeader;
+}
+
+HeaderItem* TexBar::GetBinRelHeader() {
+	return BinRelHeader;
+}
+
+HeaderItem* TexBar::GetMMAHeader() {
+	return MMAHeader;
+}
+
+HeaderItem* TexBar::GetIntlHeader() {
+	return IntlHeader;
+}
+
+HeaderItem* TexBar::GetTypeFaceHeader() {
+	return TypeFaceHeader;
+}
+
+HeaderItem* TexBar::GetFunctionHeader() {
+	return FunctionHeader;
+}
