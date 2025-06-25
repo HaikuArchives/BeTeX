@@ -30,7 +30,7 @@ class ColorButton : public BControl
 		virtual status_t	Invoke(BMessage* message = NULL);		
 		void			Render();
 				
-		void                    SetValue(rgb_color color);
+		void			SetValue(rgb_color color);
 		rgb_color		Value();
 		
 	private:
