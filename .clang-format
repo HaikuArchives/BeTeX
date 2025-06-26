@@ -13,6 +13,7 @@ BraceWrapping:
   AfterCaseLabel: true
   AfterEnum: false
   AfterFunction: true
+  SplitEmptyFunction: true
 BreakBeforeBraces: Custom
 AllowShortEnumsOnASingleLine: false
 SeparateDefinitionBlocks: Leave
