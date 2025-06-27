@@ -25,7 +25,8 @@
 
 // Local functions
 
-inline uint8 __Yc(uint8 red, uint8 green, uint8 blue)
+inline uint8
+__Yc(uint8 red, uint8 green, uint8 blue)
 {
 	float R, G, B, Y;
 	R = (float)(red) / 255.0;
@@ -53,10 +54,13 @@ inline uint8 __Yc(uint8 red, uint8 green, uint8 blue)
  *         bitmap. It's up to you to delete the bitmap when you are done with
  *         it.
  */
-BBitmap * BitmapUtils::Grayscale(BBitmap *bitmap)
+BBitmap*
+BitmapUtils::Grayscale(BBitmap* bitmap)
 {
-	if (bitmap == NULL) return NULL;
-	if (!bitmap->IsValid()) return NULL;
+	if (bitmap == NULL)
+		return NULL;
+	if (!bitmap->IsValid())
+		return NULL;
 
 	// To obtain the disabled bitmap, we turn the original bitmap in
 	// grayscale, converting each pixel from RGB to YCbCr and taking only
@@ -64,7 +68,7 @@ BBitmap * BitmapUtils::Grayscale(BBitmap *bitmap)
 
 	int32 x, y, width, height, offset, row_length;
 	unsigned char *i_bits, *o_bits;
-	BBitmap *ret;
+	BBitmap* ret;
 	uint8 Yc;
 
 	ret = new BBitmap(bitmap->Bounds(), bitmap->ColorSpace());
@@ -75,13 +79,13 @@ BBitmap * BitmapUtils::Grayscale(BBitmap *bitmap)
 	row_length = bitmap->BytesPerRow();
 
 	switch (bitmap->ColorSpace()) {
-
 		// B_CMAP8: each pixel (one byte) is the index of a color in the
 		// system's color table. The table can be obtained from a BScreen
 		// object.
-		case B_CMAP8: {
-			const rgb_color *color;
-			const color_map *map;
+		case B_CMAP8:
+		{
+			const rgb_color* color;
+			const color_map* map;
 			BScreen screen;
 			map = screen.ColorMap();
 			for (y = 0; y < height; y++) {
@@ -96,15 +100,14 @@ BBitmap * BitmapUtils::Grayscale(BBitmap *bitmap)
 					}
 				}
 			}
-			} break;
+		} break;
 
 		// B_RGB24 = BGR 8:8:8
 		case B_RGB24:
 			for (y = 0; y < height; y++) {
 				for (x = 0; x < width; x++) {
 					offset = y * row_length + x * 3;
-					Yc = __Yc(i_bits[offset + 2], i_bits[offset + 1],
-						i_bits[offset]);
+					Yc = __Yc(i_bits[offset + 2], i_bits[offset + 1], i_bits[offset]);
 					o_bits[offset + 1] = Yc;
 					o_bits[offset + 2] = Yc;
 					o_bits[offset + 3] = Yc;
@@ -119,8 +122,7 @@ BBitmap * BitmapUtils::Grayscale(BBitmap *bitmap)
 			for (y = 0; y < height; y++) {
 				for (x = 0; x < width; x++) {
 					offset = y * row_length + x * 4;
-					Yc = __Yc(i_bits[offset + 2], i_bits[offset + 1],
-						i_bits[offset]);
+					Yc = __Yc(i_bits[offset + 2], i_bits[offset + 1], i_bits[offset]);
 					o_bits[offset] = Yc;
 					o_bits[offset + 1] = Yc;
 					o_bits[offset + 2] = Yc;
@@ -134,8 +136,7 @@ BBitmap * BitmapUtils::Grayscale(BBitmap *bitmap)
 			for (y = 0; y < height; y++) {
 				for (x = 0; x < width; x++) {
 					offset = y * row_length + x * 3;
-					Yc = __Yc(i_bits[offset], i_bits[offset + 1],
-						i_bits[offset + 2]);
+					Yc = __Yc(i_bits[offset], i_bits[offset + 1], i_bits[offset + 2]);
 					o_bits[offset + 1] = Yc;
 					o_bits[offset + 2] = Yc;
 					o_bits[offset + 3] = Yc;
@@ -150,8 +151,7 @@ BBitmap * BitmapUtils::Grayscale(BBitmap *bitmap)
 			for (y = 0; y < height; y++) {
 				for (x = 0; x < width; x++) {
 					offset = y * row_length + x * 4;
-					Yc = __Yc(i_bits[offset + 1], i_bits[offset + 2],
-						i_bits[offset + 3]);
+					Yc = __Yc(i_bits[offset + 1], i_bits[offset + 2], i_bits[offset + 3]);
 					o_bits[offset] = i_bits[offset];
 					o_bits[offset + 1] = Yc;
 					o_bits[offset + 2] = Yc;
@@ -168,28 +168,37 @@ BBitmap * BitmapUtils::Grayscale(BBitmap *bitmap)
 	return ret;
 }
 
-BBitmap * BitmapUtils::LoadFromResource(const char *name)
+BBitmap*
+BitmapUtils::LoadFromResource(const char* name)
 {
-	if (name == NULL) return NULL;
-	if (name[0] == 0) return NULL;
+	if (name == NULL)
+		return NULL;
+	if (name[0] == 0)
+		return NULL;
 
-	BArchivable *archivable;
+	BArchivable* archivable;
 	BResources resources;
 	BMessage message;
-	const void *data;
-	BBitmap *bitmap;
+	const void* data;
+	BBitmap* bitmap;
 	app_info info;
 	BFile file;
 	size_t len;
 
-	if (be_app->GetAppInfo(&info) != B_OK) return NULL;
-	if (file.SetTo(&(info.ref), B_READ_ONLY) != B_OK) return NULL;
-	if (resources.SetTo(&file, false) != B_OK) return NULL;
+	if (be_app->GetAppInfo(&info) != B_OK)
+		return NULL;
+	if (file.SetTo(&(info.ref), B_READ_ONLY) != B_OK)
+		return NULL;
+	if (resources.SetTo(&file, false) != B_OK)
+		return NULL;
 	data = resources.LoadResource('BBMP', name, &len);
-	if (data == NULL || len <= 0) return NULL;
-	if (message.Unflatten((const char *)data) != B_OK) return NULL;
+	if (data == NULL || len <= 0)
+		return NULL;
+	if (message.Unflatten((const char*)data) != B_OK)
+		return NULL;
 	archivable = BBitmap::Instantiate(&message);
-	if (archivable == NULL) return NULL;
+	if (archivable == NULL)
+		return NULL;
 	bitmap = dynamic_cast<BBitmap*>(archivable);
 	if (bitmap == NULL) {
 		delete archivable;
@@ -198,25 +207,32 @@ BBitmap * BitmapUtils::LoadFromResource(const char *name)
 	return bitmap;
 }
 
-BBitmap * BitmapUtils::LoadFromResource(int32 id)
+BBitmap*
+BitmapUtils::LoadFromResource(int32 id)
 {
-	BArchivable *archivable;
+	BArchivable* archivable;
 	BResources resources;
 	BMessage message;
-	const void *data;
-	BBitmap *bitmap;
+	const void* data;
+	BBitmap* bitmap;
 	app_info info;
 	BFile file;
 	size_t len;
 
-	if (be_app->GetAppInfo(&info) != B_OK) return NULL;
-	if (file.SetTo(&(info.ref), B_READ_ONLY) != B_OK) return NULL;
-	if (resources.SetTo(&file, false) != B_OK) return NULL;
+	if (be_app->GetAppInfo(&info) != B_OK)
+		return NULL;
+	if (file.SetTo(&(info.ref), B_READ_ONLY) != B_OK)
+		return NULL;
+	if (resources.SetTo(&file, false) != B_OK)
+		return NULL;
 	data = resources.LoadResource('BBMP', id, &len);
-	if (data == NULL || len <= 0) return NULL;
-	if (message.Unflatten((const char *)data) != B_OK) return NULL;
+	if (data == NULL || len <= 0)
+		return NULL;
+	if (message.Unflatten((const char*)data) != B_OK)
+		return NULL;
 	archivable = BBitmap::Instantiate(&message);
-	if (archivable == NULL) return NULL;
+	if (archivable == NULL)
+		return NULL;
 	bitmap = dynamic_cast<BBitmap*>(archivable);
 	if (bitmap == NULL) {
 		delete archivable;

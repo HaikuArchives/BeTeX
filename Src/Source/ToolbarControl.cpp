@@ -32,8 +32,8 @@
  */
 
 // libwalter headers
-#include "Toolbar.h"
 #include "ToolbarControl.h"
+#include "Toolbar.h"
 
 // =============================================================================
 // WToolbarControl
@@ -46,16 +46,16 @@
  * the target when the control is invoked (can be NULL).
  * A newly constructed control is enabled by default.
  */
-WToolbarControl::WToolbarControl(const char *name, BMessage *message) :
-	WToolbarItem(name),
-	BInvoker(message, NULL)
+WToolbarControl::WToolbarControl(const char* name, BMessage* message)
+	: WToolbarItem(name),
+	  BInvoker(message, NULL)
 {
 	_init_object();
 }
 
-WToolbarControl::WToolbarControl(BMessage *archive) :
-	WToolbarItem(archive),
-	BInvoker(NULL, NULL)
+WToolbarControl::WToolbarControl(BMessage* archive)
+	: WToolbarItem(archive),
+	  BInvoker(NULL, NULL)
 {
 	bool enabled, visible;
 	BMessage message;
@@ -70,13 +70,12 @@ WToolbarControl::WToolbarControl(BMessage *archive) :
 		SetEnabled(enabled);
 }
 
-WToolbarControl::~WToolbarControl()
-{
-}
+WToolbarControl::~WToolbarControl() {}
 
 // Private
 
-void WToolbarControl::_init_object(void)
+void
+WToolbarControl::_init_object(void)
 {
 	fEnabled = true;
 }
@@ -89,7 +88,8 @@ void WToolbarControl::_init_object(void)
  *  WToolbarControl::message	message
  *  WToolbarControl::enabled	bool
  */
-status_t WToolbarControl::Archive(BMessage *archive, bool deep) const
+status_t
+WToolbarControl::Archive(BMessage* archive, bool deep) const
 {
 	status_t status;
 
@@ -107,10 +107,11 @@ status_t WToolbarControl::Archive(BMessage *archive, bool deep) const
 	return status;
 }
 
-BArchivable * WToolbarControl::Instantiate(BMessage *archive)
+BArchivable*
+WToolbarControl::Instantiate(BMessage* archive)
 {
-	return (validate_instantiation(archive, "WToolbarControl") ?
-		new WToolbarControl(archive) : NULL);
+	return (
+		validate_instantiation(archive, "WToolbarControl") ? new WToolbarControl(archive) : NULL);
 }
 
 // Public
@@ -118,7 +119,8 @@ BArchivable * WToolbarControl::Instantiate(BMessage *archive)
 /* If the control doesn't have a target yet, set the target as the toolbar's
  * target.
  */
-void WToolbarControl::AttachedToToolbar(void)
+void
+WToolbarControl::AttachedToToolbar(void)
 {
 	if (!(Messenger().IsValid()))
 		SetTarget(Toolbar()->Messenger());
@@ -127,7 +129,8 @@ void WToolbarControl::AttachedToToolbar(void)
 
 /* The default implementation does nothing.
  */
-void WToolbarControl::DetachedFromToolbar(void)
+void
+WToolbarControl::DetachedFromToolbar(void)
 {
 	WToolbarItem::DetachedFromToolbar();
 }
@@ -135,13 +138,15 @@ void WToolbarControl::DetachedFromToolbar(void)
 /* Draws the control on the given canvas (the toolbar itself, or an off-screen
  * buffer). The default implementation does nothing.
  */
-void WToolbarControl::Draw(BView *canvas, BRect updateRect)
+void
+WToolbarControl::Draw(BView* canvas, BRect updateRect)
 {
 }
 
 /* Return true if the control is enabled, false otherwise.
  */
-bool WToolbarControl::Enabled(void)
+bool
+WToolbarControl::Enabled(void)
 {
 	return fEnabled;
 }
@@ -150,17 +155,21 @@ bool WToolbarControl::Enabled(void)
  * the values, you can pass NULL.
  * The default implementation returns -1 for both values.
  */
-void WToolbarControl::GetPreferredSize(float *width, float *height)
+void
+WToolbarControl::GetPreferredSize(float* width, float* height)
 {
-	if (width != NULL) *width = -1.0;
-	if (height != NULL) *height = -1.0;
+	if (width != NULL)
+		*width = -1.0;
+	if (height != NULL)
+		*height = -1.0;
 }
 
 /* Just like BView::MouseDown(), this method is called when the user press the
  * primary mouse button when the cursor is over the item (the secondary
  * button is used by the toolbar). The default implementation does nothing.
  */
-void WToolbarControl::MouseDown(BPoint point)
+void
+WToolbarControl::MouseDown(BPoint point)
 {
 	WToolbarItem::MouseDown(point);
 }
@@ -170,8 +179,8 @@ void WToolbarControl::MouseDown(BPoint point)
  * B_ENTERED_VIEW, B_INSIDE_VIEW or B_EXITED_VIEW. message is the actual
  * message that triggered the event. The default implementation does nothing.
  */
-void WToolbarControl::MouseMoved(BPoint point, uint32 transit,
-	const BMessage *message)
+void
+WToolbarControl::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
 	WToolbarItem::MouseMoved(point, transit, message);
 }
@@ -180,7 +189,8 @@ void WToolbarControl::MouseMoved(BPoint point, uint32 transit,
  * left mouse button over the method. The point is in item's coordinates. The
  * default implementation does nothing.
  */
-void WToolbarControl::MouseUp(BPoint point)
+void
+WToolbarControl::MouseUp(BPoint point)
 {
 	WToolbarItem::MouseUp(point);
 }
@@ -188,9 +198,11 @@ void WToolbarControl::MouseUp(BPoint point)
 /* Set if the item is enabled or not. What exactly means to be enabled depends
  * from the actual control. The control is then invalidated.
  */
-void WToolbarControl::SetEnabled(bool enabled)
+void
+WToolbarControl::SetEnabled(bool enabled)
 {
-	if (fEnabled == enabled) return;
+	if (fEnabled == enabled)
+		return;
 	fEnabled = enabled;
 	Invalidate();
 }
@@ -200,7 +212,8 @@ void WToolbarControl::SetEnabled(bool enabled)
  * item just needs to be redrawn, it is safe to call Draw() here.
  * The default implementation does nothing.
  */
-void WToolbarControl::Update(void)
+void
+WToolbarControl::Update(void)
 {
 	WToolbarItem::Update();
 }

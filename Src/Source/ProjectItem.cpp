@@ -11,13 +11,13 @@
 #include <be/interface/Font.h>
 #include "Constants.h"
 
-ProjectItem::ProjectItem(SplitPane* splitPane, BString label, BView *childView) 
-				:	BListItem(),
-					m_splitPane(splitPane),
-					m_childView(childView),
-					m_label(label),
-					m_needToSave(false),
-					m_hasHome(false)
+ProjectItem::ProjectItem(SplitPane* splitPane, BString label, BView* childView)
+	: BListItem(),
+	  m_splitPane(splitPane),
+	  m_childView(childView),
+	  m_label(label),
+	  m_needToSave(false),
+	  m_hasHome(false)
 {
 	m_splitPane->RemoveChild(m_childView);
 	m_splitPane->AddChildTwo(m_childView, false, false);
@@ -30,41 +30,31 @@ ProjectItem::~ProjectItem()
 }
 
 
-//TODO preferences->fontSize
-//TODO preferences->FontFace
-void ProjectItem::DrawItem(BView* owner, BRect frame, bool complete)
+// TODO preferences->fontSize
+// TODO preferences->FontFace
+void
+ProjectItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
 	rgb_color color = owner->ViewColor();
 	float fontSize = 12.0f;
-	if(IsSelected() || complete)
-	{
-		if(IsSelected())
-		{
+	if (IsSelected() || complete) {
+		if (IsSelected()) {
 			BFont font(be_bold_font);
 			font.SetSize(fontSize);
-			if(m_needToSave)
-			{
-
-				font.SetFace(B_ITALIC_FACE|B_BOLD_FACE);
+			if (m_needToSave) {
+				font.SetFace(B_ITALIC_FACE | B_BOLD_FACE);
 				color = ui_color(B_WINDOW_TAB_COLOR);
-			}
-			else
-			{
+			} else {
 				color = ui_color(B_WINDOW_TAB_COLOR);
 			}
 			owner->SetFont(&font);
-		}
-		else
-		{ 
+		} else {
 			BFont font(be_plain_font);
 			font.SetSize(fontSize);
-			if(m_needToSave)
-			{
+			if (m_needToSave) {
 				font.SetFace(B_ITALIC_FACE);
 				color = owner->ViewColor();
-			}
-			else
-			{
+			} else {
 				color = owner->ViewColor();
 			}
 			owner->SetFont(&font);
@@ -72,13 +62,10 @@ void ProjectItem::DrawItem(BView* owner, BRect frame, bool complete)
 		owner->SetHighColor(color);
 		owner->SetLowColor(color);
 		owner->FillRect(frame);
-	}
-	else
-	{
+	} else {
 		BFont font(be_plain_font);
 		font.SetSize(fontSize);
-		if(m_needToSave)
-		{
+		if (m_needToSave) {
 			font.SetFace(B_ITALIC_FACE);
 		}
 		owner->SetFont(&font);
@@ -88,17 +75,13 @@ void ProjectItem::DrawItem(BView* owner, BRect frame, bool complete)
 	}
 	owner->MovePenTo(frame.left + 4.0f, frame.bottom - 2.0f);
 
-	if(IsEnabled())
-	{
-		owner->SetHighColor(0,0,0);
-	}
-	else
-	{
-		owner->SetHighColor(0,0,0);
+	if (IsEnabled()) {
+		owner->SetHighColor(0, 0, 0);
+	} else {
+		owner->SetHighColor(0, 0, 0);
 	}
 
-	if(m_needToSave)
-	{
+	if (m_needToSave) {
 		owner->SetHighColor(ColorConstants::K_UNSAVED_TEXT_COLOR);
 	}
 	owner->SetLowColor(color);
@@ -106,53 +89,63 @@ void ProjectItem::DrawItem(BView* owner, BRect frame, bool complete)
 }
 
 
-void ProjectItem::ShowTextView()
+void
+ProjectItem::ShowTextView()
 {
 	m_splitPane->AddChildTwo(m_childView, true, true);
 }
 
-void ProjectItem::HideTextView()
+void
+ProjectItem::HideTextView()
 {
 	m_splitPane->AddChildTwo(m_childView, true, false);
 }
 
-TexView* ProjectItem::ChildView()
+TexView*
+ProjectItem::ChildView()
 {
-	return ((TexView* )((BScrollView*)m_childView)->Target());
+	return ((TexView*)((BScrollView*)m_childView)->Target());
 }
 
-void ProjectItem::SetSaveNeeded(bool needsSave)
+void
+ProjectItem::SetSaveNeeded(bool needsSave)
 {
 	m_needToSave = needsSave;
 }
 
-bool ProjectItem::IsSaveNeeded()
+bool
+ProjectItem::IsSaveNeeded()
 {
 	return m_needToSave;
 }
 
-void ProjectItem::SetHomely(bool hasHome)
+void
+ProjectItem::SetHomely(bool hasHome)
 {
 	m_hasHome = hasHome;
 }
 
-bool ProjectItem::IsHomely()
+bool
+ProjectItem::IsHomely()
 {
 	return m_hasHome;
 }
 
 
-void ProjectItem::SetLabel(BString str)
+void
+ProjectItem::SetLabel(BString str)
 {
 	m_label = str;
 }
 
-BString ProjectItem::Label()
+BString
+ProjectItem::Label()
 {
 	return m_label;
 }
 
-void ProjectItem::SetRef(entry_ref *ref)
+void
+ProjectItem::SetRef(entry_ref* ref)
 {
 	m_ref = *ref;
 	BPath path(&m_ref);
@@ -161,7 +154,8 @@ void ProjectItem::SetRef(entry_ref *ref)
 	m_hasHome = true;
 }
 
-entry_ref ProjectItem::GetRef() const
+entry_ref
+ProjectItem::GetRef() const
 {
 	return m_ref;
 }

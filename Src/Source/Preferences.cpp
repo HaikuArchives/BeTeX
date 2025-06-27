@@ -6,49 +6,48 @@
 
 BLocker prefsLock;
 
-status_t SavePreferences(BMessage *preferences_archive, const char *path)
+status_t
+SavePreferences(BMessage* preferences_archive, const char* path)
 {
-	if(!path)
+	if (!path)
 		return B_ERROR;
-	
+
 	prefsLock.Lock();
-	
-	BFile file(path,B_READ_WRITE | B_ERASE_FILE | B_CREATE_FILE);
-	
-	status_t status=file.InitCheck();
-	if(status!=B_OK)
-	{
+
+	BFile file(path, B_READ_WRITE | B_ERASE_FILE | B_CREATE_FILE);
+
+	status_t status = file.InitCheck();
+	if (status != B_OK) {
 		prefsLock.Unlock();
 		return status;
 	}
-	
-	status=preferences_archive->Flatten(&file);
-		
+
+	status = preferences_archive->Flatten(&file);
+
 	prefsLock.Unlock();
 	return status;
 }
 
-status_t LoadPreferences(const char *path, BMessage *preferences_archive)
+status_t
+LoadPreferences(const char* path, BMessage* preferences_archive)
 {
-	if(!path)
+	if (!path)
 		return B_ERROR;
-	
+
 	prefsLock.Lock();
-	
-	BFile file(path,B_READ_ONLY);
+
+	BFile file(path, B_READ_ONLY);
 
 	BMessage msg;
-	
-	status_t status=file.InitCheck();
-	if(status!=B_OK)
-	{
+
+	status_t status = file.InitCheck();
+	if (status != B_OK) {
 		prefsLock.Unlock();
 		return status;
 	}
-	
-	status=preferences_archive->Unflatten(&file);
-			
+
+	status = preferences_archive->Unflatten(&file);
+
 	prefsLock.Unlock();
 	return status;
-	
 }

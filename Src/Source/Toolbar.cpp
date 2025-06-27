@@ -58,17 +58,16 @@
  * unmodified; the flags B_FRAME_EVENTS, B_FULL_UPDATE_ON_RESIZE, and
  * B_WILL_DRAW may be added or removed as needed by other methods.
  * The view color will be set to B_TRANSPARENT_32_BIT to avoid flickering.
- * 
+ *
  * Auto size	false
  * Enabled		true
  * Alignment	W_TOOLBAR_HORIZONTAL
- * 
+ *
  */
-WToolbar::WToolbar(BRect frame, const char *name, int style,
-	WToolbarAlignment alignment, bool auto_size, border_style border,
-	uint32 resizing_mode, uint32 flags) :
-	BView(frame, name, resizing_mode,
-		flags | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_WILL_DRAW)
+WToolbar::WToolbar(BRect frame, const char* name, int style, WToolbarAlignment alignment,
+	bool auto_size, border_style border, uint32 resizing_mode, uint32 flags)
+	: BView(frame, name, resizing_mode,
+		  flags | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_WILL_DRAW)
 {
 	_init_object();
 
@@ -81,18 +80,18 @@ WToolbar::WToolbar(BRect frame, const char *name, int style,
 	Update();
 }
 
-WToolbar::WToolbar(BMessage *archive) :
-	BView(archive)
+WToolbar::WToolbar(BMessage* archive)
+	: BView(archive)
 {
 	WToolbarLabelPosition labelPosition;
 	float margin, padding, picSize;
 	WToolbarAlignment alignment;
-	BArchivable *archivable;
+	BArchivable* archivable;
 	bool autoSize, enabled;
 	border_style border;
-	WToolbarItem *item;
+	WToolbarItem* item;
 	BMessage message;
-	BBitmap *backPic;
+	BBitmap* backPic;
 	int32 index;
 	int style;
 
@@ -113,12 +112,10 @@ WToolbar::WToolbar(BMessage *archive) :
 		SetStyle(style);
 	fDisableStyling = false;
 
-	if (archive->FindInt32("WToolbar::alignment",
-	  (int32*)(&alignment)) == B_OK)
+	if (archive->FindInt32("WToolbar::alignment", (int32*)(&alignment)) == B_OK)
 		SetAlignment(alignment);
 
-	if (archive->FindMessage("WToolbar::background_bitmap",
-	  &message) == B_OK) {
+	if (archive->FindMessage("WToolbar::background_bitmap", &message) == B_OK) {
 		archivable = instantiate_object(&message);
 		if (archivable != NULL) {
 			backPic = dynamic_cast<BBitmap*>(archivable);
@@ -127,8 +124,7 @@ WToolbar::WToolbar(BMessage *archive) :
 					SetBackgroundBitmap(backPic);
 				else
 					delete backPic;
-			}
-			else
+			} else
 				delete archivable;
 		}
 	}
@@ -136,8 +132,7 @@ WToolbar::WToolbar(BMessage *archive) :
 	if (archive->FindInt32("WToolbar::border", (int32*)(&border)) == B_OK)
 		SetBorder(border);
 
-	if (archive->FindInt32("WToolbar::label_position",
-	  (int32*)(&labelPosition)) == B_OK)
+	if (archive->FindInt32("WToolbar::label_position", (int32*)(&labelPosition)) == B_OK)
 		SetLabelPosition(labelPosition);
 
 	if (archive->FindFloat("WToolbar::margin", &margin) == B_OK)
@@ -152,16 +147,14 @@ WToolbar::WToolbar(BMessage *archive) :
 	// Items
 
 	index = 0;
-	while (archive->FindMessage("WToolbar::item", index,
-	  &message) == B_OK) {
+	while (archive->FindMessage("WToolbar::item", index, &message) == B_OK) {
 		archivable = instantiate_object(&message);
 		if (archivable != NULL) {
 			item = dynamic_cast<WToolbarItem*>(archivable);
 			if (item != NULL) {
 				if (!AddItem(item, item->fLine))
 					delete item;
-			}
-			else
+			} else
 				delete archivable;
 		}
 		index++;
@@ -187,11 +180,12 @@ WToolbar::~WToolbar()
 
 // Private =====================================================================
 
-void WToolbar::_draw_item(unsigned line, unsigned position, BRect updateRect)
+void
+WToolbar::_draw_item(unsigned line, unsigned position, BRect updateRect)
 {
 	// Beware, this function does not perform any sanity checking!!!
 	// TODO set the clipping region and update rect
-	WToolbarItem *item = (*(fLines[line]))[position];
+	WToolbarItem* item = (*(fLines[line]))[position];
 	BPoint origin = Origin();
 	SetOrigin(item->fFrame.LeftTop());
 	PushState();
@@ -201,7 +195,8 @@ void WToolbar::_draw_item(unsigned line, unsigned position, BRect updateRect)
 	Sync();
 }
 
-void WToolbar::_init_object(void)
+void
+WToolbar::_init_object(void)
 {
 	// Internals
 	fDisableUpdate = true;
@@ -229,10 +224,12 @@ void WToolbar::_init_object(void)
 
 // Protected ===================================================================
 
-void WToolbar::AssertLocked(void)
+void
+WToolbar::AssertLocked(void)
 {
 	// Why BView::check_lock() is private and not protected???
-	if (Looper() == NULL) return;
+	if (Looper() == NULL)
+		return;
 	if (!Looper()->IsLocked())
 		debugger("looper must be locked");
 }
@@ -241,9 +238,10 @@ void WToolbar::AssertLocked(void)
  * DrawBorder(), used only if the border is set to B_FANCY_BORDER. The default
  * implementation returns 2.0. You need to overload this if you overload
  * DrawBorder() and the your border's thickness is different from 2.0 units.
- * Currently, the value will be rounded down. 
+ * Currently, the value will be rounded down.
  */
-float WToolbar::BorderThickness(void)
+float
+WToolbar::BorderThickness(void)
 {
 	return 2.0;
 }
@@ -253,23 +251,23 @@ float WToolbar::BorderThickness(void)
  * area with the low color. Can be overloaded to draw a different background.
  * Border and items are drawn over the background; items can be translucent.
  */
-void WToolbar::DrawBackground(BRect updateRect)
+void
+WToolbar::DrawBackground(BRect updateRect)
 {
 	if (fAppearance.fBackBitmap != NULL) {
 		const float kWidth = fAppearance.fBackBitmap->Bounds().Width(),
-			kHeight = fAppearance.fBackBitmap->Bounds().Height(),
-			kBorder = (fAppearance.fBorder == B_FANCY_BORDER ?
-				ceil(BorderThickness()) :
-				(fAppearance.fBorder == B_PLAIN_BORDER ? 1.0 : 0.0));
+					kHeight = fAppearance.fBackBitmap->Bounds().Height(),
+					kBorder = (fAppearance.fBorder == B_FANCY_BORDER
+								   ? ceil(BorderThickness())
+								   : (fAppearance.fBorder == B_PLAIN_BORDER ? 1.0 : 0.0));
 		float x, y;
-		for (y = floor((updateRect.top - kBorder) / kHeight) * kHeight +
-		  kBorder; y < updateRect.bottom; y += kHeight) {
-			for (x = floor((updateRect.left - kBorder) / kWidth) * kWidth +
-			  kBorder; x <= updateRect.right; x += kWidth)
+		for (y = floor((updateRect.top - kBorder) / kHeight) * kHeight + kBorder;
+			y < updateRect.bottom; y += kHeight) {
+			for (x = floor((updateRect.left - kBorder) / kWidth) * kWidth + kBorder;
+				x <= updateRect.right; x += kWidth)
 				DrawBitmap(fAppearance.fBackBitmap, BPoint(x, y));
 		}
-	}
-	else
+	} else
 		FillRect(updateRect, B_SOLID_LOW);
 }
 
@@ -281,7 +279,8 @@ void WToolbar::DrawBackground(BRect updateRect)
  * that the default DrawBackground() may not cover the border area (it assumes
  * that the border is not translucent).
  */
-void WToolbar::DrawBorder(BRect updateRect)
+void
+WToolbar::DrawBorder(BRect updateRect)
 {
 	WToolbarSupport::Draw3DBorder(this, Bounds());
 }
@@ -304,7 +303,8 @@ void WToolbar::DrawBorder(BRect updateRect)
  * WToolbar::item				message		one for each item
  * Return B_OK if successful, or an error code.
  */
-status_t WToolbar::Archive(BMessage *archive, bool deep) const
+status_t
+WToolbar::Archive(BMessage* archive, bool deep) const
 {
 	status_t status;
 
@@ -322,26 +322,24 @@ status_t WToolbar::Archive(BMessage *archive, bool deep) const
 	// Archive appearance
 
 	if (status == B_OK && fAppearance.fAlignment != W_TOOLBAR_HORIZONTAL)
-		status = archive->AddInt32("WToolbar::alignment",
-			static_cast<int32>(fAppearance.fAlignment));
+		status
+			= archive->AddInt32("WToolbar::alignment", static_cast<int32>(fAppearance.fAlignment));
 
 	if (status == B_OK && fAppearance.fBackBitmap != NULL) {
-		 if (fAppearance.fBackBitmap->IsValid()) {
+		if (fAppearance.fBackBitmap->IsValid()) {
 			BMessage bmp;
 			status = fAppearance.fBackBitmap->Archive(&bmp);
 			if (status == B_OK)
-				status = archive->AddMessage("WToolbar::background_bitmap",
-					&bmp);
+				status = archive->AddMessage("WToolbar::background_bitmap", &bmp);
 		}
 	}
 
 	if (status == B_OK && fAppearance.fBorder != B_FANCY_BORDER)
-		status = archive->AddInt32("WToolbar::border",
-			static_cast<int32>(fAppearance.fBorder));
+		status = archive->AddInt32("WToolbar::border", static_cast<int32>(fAppearance.fBorder));
 
 	if (status == B_OK && fAppearance.fLabelPosition != W_TOOLBAR_LABEL_NONE)
-		status = archive->AddInt32("WToolbar::label_position",
-			static_cast<int32>(fAppearance.fLabelPosition));
+		status = archive->AddInt32(
+			"WToolbar::label_position", static_cast<int32>(fAppearance.fLabelPosition));
 
 	if (status == B_OK && fAppearance.fMargin != 0.0)
 		status = archive->AddFloat("WToolbar::margin", fAppearance.fMargin);
@@ -350,8 +348,7 @@ status_t WToolbar::Archive(BMessage *archive, bool deep) const
 		status = archive->AddFloat("WToolbar::padding", fAppearance.fPadding);
 
 	if (status == B_OK && fAppearance.fPicSize != W_TOOLBAR_PICTURE_XSMALL)
-		status = archive->AddFloat("WToolbar::picture_size",
-			fAppearance.fPicSize);
+		status = archive->AddFloat("WToolbar::picture_size", fAppearance.fPicSize);
 
 	if (status == B_OK && fAppearance.fStyle != W_TOOLBAR_STYLE_FLAT)
 		status = archive->AddInt32("WToolbar::style", fAppearance.fStyle);
@@ -360,7 +357,7 @@ status_t WToolbar::Archive(BMessage *archive, bool deep) const
 
 	if (deep) {
 		for (unsigned l = 0; l < fLines.size() && status == B_OK; l++) {
-			WToolbarLine *line = fLines[l];
+			WToolbarLine* line = fLines[l];
 			const unsigned kItems = line->size();
 			for (unsigned i = 0; i < kItems && status == B_OK; i++) {
 				BMessage item;
@@ -374,10 +371,10 @@ status_t WToolbar::Archive(BMessage *archive, bool deep) const
 	return status;
 }
 
-BArchivable * WToolbar::Instantiate(BMessage *archive)
+BArchivable*
+WToolbar::Instantiate(BMessage* archive)
 {
-	return (validate_instantiation(archive, "WToolbar") ?
-		new WToolbar(archive) : NULL);
+	return (validate_instantiation(archive, "WToolbar") ? new WToolbar(archive) : NULL);
 }
 
 // BHandler hooks ==============================================================
@@ -390,9 +387,10 @@ BArchivable * WToolbar::Instantiate(BMessage *archive)
 	return BView::GetSupportedSuites(message);
 }*/
 
-void WToolbar::MessageReceived(BMessage *message)
+void
+WToolbar::MessageReceived(BMessage* message)
 {
-	BMessage *reply = NULL;
+	BMessage* reply = NULL;
 	bool handled = false;
 
 	/*switch (message->what) {
@@ -428,8 +426,7 @@ void WToolbar::MessageReceived(BMessage *message)
 			message->SendReply(reply);
 			delete reply;
 		}
-	}
-	else
+	} else
 		BView::MessageReceived(message);
 }
 
@@ -450,14 +447,15 @@ void WToolbar::MessageReceived(BMessage *message)
  * not become the new target (this is a wanted feature). To change to target for
  * all the controls, use SetControlsTarget().
  */
-void WToolbar::AttachedToWindow(void)
+void
+WToolbar::AttachedToWindow(void)
 {
 	BView::AttachedToWindow();
 	if (!fTarget.IsValid()) {
 		for (unsigned l = 0; l < fLines.size(); l++) {
-			WToolbarLine *line = fLines[l];
+			WToolbarLine* line = fLines[l];
 			const unsigned kItems = line->size();
-			WToolbarControl *control;
+			WToolbarControl* control;
 			unsigned i;
 			SetTarget(Window());
 			for (i = 0; i < kItems; i++) {
@@ -469,12 +467,14 @@ void WToolbar::AttachedToWindow(void)
 	}
 }
 
-void WToolbar::DetachedFromWindow(void)
+void
+WToolbar::DetachedFromWindow(void)
 {
 	BView::DetachedFromWindow();
 }
 
-void WToolbar::Draw(BRect updateRect)
+void
+WToolbar::Draw(BRect updateRect)
 {
 	// Background
 	PushState();
@@ -492,14 +492,14 @@ void WToolbar::Draw(BRect updateRect)
 			StrokeRect(Bounds(), B_SOLID_HIGH);
 		default:
 			break;
-	}		
+	}
 
 	// Items
 	for (unsigned l = 0; l < fLines.size(); l++) {
-		WToolbarLine *line = fLines[l];
+		WToolbarLine* line = fLines[l];
 		const unsigned kItems = line->size();
 		for (unsigned i = 0; i < kItems; i++) {
-			WToolbarItem *item = (*line)[i];
+			WToolbarItem* item = (*line)[i];
 			if (item->fFrame.Intersects(updateRect) && item->fVisible)
 				_draw_item(l, i, updateRect);
 		}
@@ -510,16 +510,19 @@ void WToolbar::Draw(BRect updateRect)
  * padding, and border. It works only if the toolbar is attached to a window.
  * If you don't need one of the values, it can be NULL.
  */
-void WToolbar::GetPreferredSize(float *width, float *height)
+void
+WToolbar::GetPreferredSize(float* width, float* height)
 {
 	float w = 0.0, h = 0.0, total = 0.0, max = 0.0;
 	unsigned l, i, visible_lines = 0;
-	WToolbarLine *line;
-	WToolbarItem *item;
+	WToolbarLine* line;
+	WToolbarItem* item;
 
 	if (Window() == NULL) {
-		if (width != NULL) *width = -1.0;
-		if (height != NULL) *height = -1.0;
+		if (width != NULL)
+			*width = -1.0;
+		if (height != NULL)
+			*height = -1.0;
 	}
 
 	// Items
@@ -542,16 +545,15 @@ void WToolbar::GetPreferredSize(float *width, float *height)
 						h += item->fFrame.Height() + 1.0 + fAppearance.fMargin;
 					}
 				}
-				total += w + fAppearance.fMargin * 2.0;	// width
-				max = (h > max ? h : max);				// height
+				total += w + fAppearance.fMargin * 2.0;	 // width
+				max = (h > max ? h : max);				 // height
 			}
 		}
 		if (visible_lines > 0) {
 			w = total;
 			h = max + fAppearance.fMargin;
 		}
-	}
-	else { // W_TOOLBAR_HORIZONTAL
+	} else {  // W_TOOLBAR_HORIZONTAL
 		// Toolbar width is the width of the widest line; the width of each line
 		// is the sum of the widths of its visible items
 		// Toolbar height is the sum of the heights of the visible lines; the
@@ -570,8 +572,8 @@ void WToolbar::GetPreferredSize(float *width, float *height)
 						h = item->fFrame.Height() + 1.0;
 					}
 				}
-				max = (w > max ? w : max);				// width
-				total += h + fAppearance.fMargin * 2.0;	// height
+				max = (w > max ? w : max);				 // width
+				total += h + fAppearance.fMargin * 2.0;	 // height
 			}
 		}
 		if (visible_lines > 0) {
@@ -596,28 +598,32 @@ void WToolbar::GetPreferredSize(float *width, float *height)
 
 	// Padding
 	h += fAppearance.fPadding * 2.0;
-	w += fAppearance.fPadding * 2.0;			
+	w += fAppearance.fPadding * 2.0;
 
-	if (height != NULL) *height = h - 1.0;
-	if (width != NULL) *width = w - 1.0;
+	if (height != NULL)
+		*height = h - 1.0;
+	if (width != NULL)
+		*width = w - 1.0;
 }
 
-void WToolbar::FrameResized(float width, float height)
+void
+WToolbar::FrameResized(float width, float height)
 {
 	if (!fAutoSize)
 		Update();
 	BView::FrameResized(width, height);
 }
 
-void WToolbar::MouseDown(BPoint point)
+void
+WToolbar::MouseDown(BPoint point)
 {
-	if (Looper() == NULL) return;
+	if (Looper() == NULL)
+		return;
 
-	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS |
-		B_SUSPEND_VIEW_FOCUS);
+	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS | B_SUSPEND_VIEW_FOCUS);
 
 	int32 button = B_PRIMARY_MOUSE_BUTTON;
-	BMessage *msg;
+	BMessage* msg;
 
 	// Find the mouse button
 	msg = Looper()->CurrentMessage();
@@ -626,7 +632,6 @@ void WToolbar::MouseDown(BPoint point)
 
 	// Left button
 	if (button == B_PRIMARY_MOUSE_BUTTON) {
-
 		// If the mouse is over a item, tell the item about this
 		if (fMouseOverItem != NULL && fEnabled) {
 			fMouseOverItem->MouseDown(point - fMouseOverItem->fFrame.LeftTop());
@@ -635,18 +640,18 @@ void WToolbar::MouseDown(BPoint point)
 	}
 }
 
-void WToolbar::MouseMoved(BPoint point, uint32 transit,
-	const BMessage *message)
+void
+WToolbar::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
-	if (Looper() == NULL) return;
+	if (Looper() == NULL)
+		return;
 
 	bool disableUpdate = fDisableUpdate;
 	fDisableUpdate = true;
 
 	if (fMouseDownItem == NULL) {
-
 		int32 buttons = 0;
-		BMessage *msg;
+		BMessage* msg;
 
 		// Pressed mouse buttons
 		msg = Looper()->CurrentMessage();
@@ -655,33 +660,28 @@ void WToolbar::MouseMoved(BPoint point, uint32 transit,
 
 		if (buttons == 0) {
 			if (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW) {
-				WToolbarItem *old_over = fMouseOverItem;
+				WToolbarItem* old_over = fMouseOverItem;
 				fMouseOverItem = ItemAt(point);
 				if (fMouseOverItem != old_over) {
 					// Remove mouse over from previous item
 					if (old_over != NULL)
-						old_over->MouseMoved(point - old_over->fFrame.LeftTop(),
-							B_EXITED_VIEW, message);
+						old_over->MouseMoved(
+							point - old_over->fFrame.LeftTop(), B_EXITED_VIEW, message);
 					// Assign mouse over to new item
 					if (fMouseOverItem != NULL)
 						fMouseOverItem->MouseMoved(
-							point - fMouseOverItem->fFrame.LeftTop(),
-							B_ENTERED_VIEW, message);
-				}
-				else {
+							point - fMouseOverItem->fFrame.LeftTop(), B_ENTERED_VIEW, message);
+				} else {
 					// Tell the item that the mouse has moved
 					if (fMouseOverItem != NULL)
 						fMouseOverItem->MouseMoved(
-							point - fMouseOverItem->fFrame.LeftTop(),
-							B_INSIDE_VIEW, message);
+							point - fMouseOverItem->fFrame.LeftTop(), B_INSIDE_VIEW, message);
 				}
-			}
-			else {
+			} else {
 				// B_EXITED_VIEW or B_OUTSIDE_VIEW, remove focus
 				if (fMouseOverItem != NULL) {
 					fMouseOverItem->MouseMoved(
-						point - fMouseOverItem->fFrame.LeftTop(),
-						B_EXITED_VIEW, message);
+						point - fMouseOverItem->fFrame.LeftTop(), B_EXITED_VIEW, message);
 					fMouseOverItem = NULL;
 				}
 			}
@@ -692,34 +692,34 @@ void WToolbar::MouseMoved(BPoint point, uint32 transit,
 	// pressed item, but not assign it to a new one.
 	else {
 		if (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW) {
-			WToolbarItem *new_over = ItemAt(point);
+			WToolbarItem* new_over = ItemAt(point);
 			if (new_over != fMouseDownItem) {
 				// Remove mouse over from pressed item
-				fMouseDownItem->MouseMoved(point -
-					fMouseDownItem->fFrame.LeftTop(), B_EXITED_VIEW, message);
-			}
-			else {
+				fMouseDownItem->MouseMoved(
+					point - fMouseDownItem->fFrame.LeftTop(), B_EXITED_VIEW, message);
+			} else {
 				// Tell the item that the mouse has moved
-				fMouseDownItem->MouseMoved(point -
-					fMouseDownItem->fFrame.LeftTop(), B_INSIDE_VIEW, message);
+				fMouseDownItem->MouseMoved(
+					point - fMouseDownItem->fFrame.LeftTop(), B_INSIDE_VIEW, message);
 			}
-		}
-		else {
+		} else {
 			// B_EXITED_VIEW or B_OUTSIDE_VIEW, remove focus
-			fMouseDownItem->MouseMoved(point - fMouseDownItem->fFrame.LeftTop(),
-				B_EXITED_VIEW, message);
+			fMouseDownItem->MouseMoved(
+				point - fMouseDownItem->fFrame.LeftTop(), B_EXITED_VIEW, message);
 		}
 	}
 
 	fDisableUpdate = disableUpdate;
 }
 
-void WToolbar::MouseUp(BPoint point)
+void
+WToolbar::MouseUp(BPoint point)
 {
-	if (Looper() == NULL) return;
+	if (Looper() == NULL)
+		return;
 
-	WToolbarItem *new_over;
-	BMessage *msg;
+	WToolbarItem* new_over;
+	BMessage* msg;
 
 	msg = Looper()->CurrentMessage();
 
@@ -733,17 +733,15 @@ void WToolbar::MouseUp(BPoint point)
 	new_over = ItemAt(point);
 	if (new_over != fMouseOverItem) {
 		if (fMouseOverItem != NULL)
-			fMouseOverItem->MouseMoved(point - fMouseOverItem->fFrame.LeftTop(),
-				B_EXITED_VIEW, msg);
+			fMouseOverItem->MouseMoved(
+				point - fMouseOverItem->fFrame.LeftTop(), B_EXITED_VIEW, msg);
 		if (new_over != NULL)
-			new_over->MouseMoved(point - new_over->fFrame.LeftTop(),
-				B_ENTERED_VIEW, msg);
+			new_over->MouseMoved(point - new_over->fFrame.LeftTop(), B_ENTERED_VIEW, msg);
 		fMouseOverItem = new_over;
-	}
-	else {
+	} else {
 		if (fMouseOverItem != NULL)
-			fMouseOverItem->MouseMoved(point - fMouseOverItem->fFrame.LeftTop(),
-				B_INSIDE_VIEW, msg);
+			fMouseOverItem->MouseMoved(
+				point - fMouseOverItem->fFrame.LeftTop(), B_INSIDE_VIEW, msg);
 	}
 }
 
@@ -768,17 +766,19 @@ void WToolbar::MouseUp(BPoint point)
  * Note: the line number stored in the item will be ignored and the correct
  * value will be assigned to it.
  */
-bool WToolbar::AddItem(WToolbarItem *item, int line, int position)
+bool
+WToolbar::AddItem(WToolbarItem* item, int line, int position)
 {
 	AssertLocked();
-	if (item == NULL) return false;
+	if (item == NULL)
+		return false;
 	if (item->Toolbar() != NULL)
 		return (item->Toolbar() == this);
 
 	bool disableUpdate = fDisableUpdate;
 	const unsigned kLines = fLines.size();
 	fDisableUpdate = true;
-	
+
 	// There are no lines, or user asked for a new line after the last one;
 	// create a new line, add the item at the beginning of it, and add the line
 	// below all the other lines
@@ -787,41 +787,33 @@ bool WToolbar::AddItem(WToolbarItem *item, int line, int position)
 			fDisableUpdate = disableUpdate;
 			return false;
 		}
-		WToolbarLine *newLine = new WToolbarLine;
+		WToolbarLine* newLine = new WToolbarLine;
 		item->fLine = kLines;
 		newLine->push_back(item);
 		fLines.push_back(newLine);
-	}
-	else 
-	{
-		//User asked to insert the item into an existing line, or to create a line
-		//in the middle
-		if (position >= 0) 
-		{
+	} else {
+		// User asked to insert the item into an existing line, or to create a line
+		// in the middle
+		if (position >= 0) {
 			// Insert the item at the asked line and position if possible
-			unsigned lineIndex = ((unsigned)line < fLines.size() ?
-				(unsigned)line : fLines.size());
-			WToolbarLine *_line = fLines[lineIndex];
+			unsigned lineIndex = ((unsigned)line < fLines.size() ? (unsigned)line : fLines.size());
+			WToolbarLine* _line = fLines[lineIndex];
 			if (_line->size() >= W_TOOLBAR_MAX_ITEMS_PER_LINE) {
 				fDisableUpdate = disableUpdate;
 				return false;
 			}
 			item->fLine = lineIndex;
 			if ((unsigned)position < _line->size())
-				_line->insert(_line->begin() + (position > 0 ? position : 0),
-					item);
+				_line->insert(_line->begin() + (position > 0 ? position : 0), item);
 			else
 				_line->push_back(item);
-		}
-		else 
-		{ // position < 0
+		} else {  // position < 0
 			// Create a new line
-			if (fLines.size() > W_TOOLBAR_MAX_LINES) 
-			{
+			if (fLines.size() > W_TOOLBAR_MAX_LINES) {
 				fDisableUpdate = disableUpdate;
 				return false;
 			}
-			WToolbarLine *_line = new WToolbarLine;
+			WToolbarLine* _line = new WToolbarLine;
 			item->fLine = line;
 			_line->push_back(item);
 			fLines.insert(fLines.begin() + line, _line);
@@ -846,7 +838,8 @@ bool WToolbar::AddItem(WToolbarItem *item, int line, int position)
 /* Return the total number of items in the toolbar. If visibleOnly is true,
  * return the total number of visible items.
  */
-unsigned WToolbar::CountItems(bool visibleOnly)
+unsigned
+WToolbar::CountItems(bool visibleOnly)
 {
 	unsigned items = 0;
 	for (unsigned l = 0; l < fLines.size(); l++)
@@ -859,13 +852,14 @@ unsigned WToolbar::CountItems(bool visibleOnly)
  * If there is no a line with the given index, return 0. Line index starts
  * from 0.
  */
-unsigned WToolbar::CountItemsInLine(unsigned line, bool visibleOnly)
+unsigned
+WToolbar::CountItemsInLine(unsigned line, bool visibleOnly)
 {
 	if (line >= fLines.size())
 		return 0;
 	if (!visibleOnly)
 		return fLines[line]->size();
-	WToolbarLine *_line = fLines[line];
+	WToolbarLine* _line = fLines[line];
 	const unsigned kItems = _line->size();
 	unsigned i, items = 0;
 	for (i = 0; i < kItems; i++) {
@@ -878,7 +872,8 @@ unsigned WToolbar::CountItemsInLine(unsigned line, bool visibleOnly)
 /* Return the number of lines of items. If visibleOnly is true, return the
  * number of lines with at least one visible item.
  */
-unsigned WToolbar::CountLines(bool visibleOnly)
+unsigned
+WToolbar::CountLines(bool visibleOnly)
 {
 	if (!visibleOnly)
 		return fLines.size();
@@ -892,13 +887,15 @@ unsigned WToolbar::CountLines(bool visibleOnly)
 
 /* Remove the line, freeing all the items on it. Line index starts from 0.
  */
-void WToolbar::DeleteLine(unsigned line)
+void
+WToolbar::DeleteLine(unsigned line)
 {
-	if (line >= fLines.size()) return;
+	if (line >= fLines.size())
+		return;
 
-	WToolbarLine *_line = fLines[line];
+	WToolbarLine* _line = fLines[line];
 	bool disableUpdate;
-	WToolbarItem *item;
+	WToolbarItem* item;
 	unsigned i = 0;
 
 	// We have to buffer the number of items because the while loop below use
@@ -925,12 +922,16 @@ void WToolbar::DeleteLine(unsigned line)
 /* Force the redraw of the item, if it belongs to this toolbar and the toolbar
  * is attached to a window.
  */
-void WToolbar::DrawItem(WToolbarItem *item)
+void
+WToolbar::DrawItem(WToolbarItem* item)
 {
 	AssertLocked();
-	if (item == NULL) return;
-	if (item->fToolbar != this) return;
-	if (Window() == NULL) return;
+	if (item == NULL)
+		return;
+	if (item->fToolbar != this)
+		return;
+	if (Window() == NULL)
+		return;
 	Invalidate(item->Frame());
 }
 
@@ -944,14 +945,16 @@ void WToolbar::DrawItem(WToolbarItem *item)
  * If the toolbar has a single line and is set to auto resize, this property
  * will have no effect.
  */
-WToolbarItem * WToolbar::FindFlexibleItem(unsigned line)
+WToolbarItem*
+WToolbar::FindFlexibleItem(unsigned line)
 {
-	if (line >= fLines.size()) return NULL;
-	WToolbarLine *_line = fLines[line];
+	if (line >= fLines.size())
+		return NULL;
+	WToolbarLine* _line = fLines[line];
 	const unsigned kItems = _line->size();
 	unsigned i = 0;
 	while (i < kItems) {
-		WToolbarItem *item = (*_line)[i];
+		WToolbarItem* item = (*_line)[i];
 		if (item->Flexible())
 			return item;
 		i++;
@@ -961,21 +964,21 @@ WToolbarItem * WToolbar::FindFlexibleItem(unsigned line)
 
 /* Return the first item with a matching name, or NULL. Name can be NULL.
  */
-WToolbarItem * WToolbar::FindItem(const char *name)
+WToolbarItem*
+WToolbar::FindItem(const char* name)
 {
-	WToolbarLine *line;
+	WToolbarLine* line;
 	unsigned l = 0, i;
 	while (l < fLines.size()) {
 		line = fLines[l];
 		const unsigned kItems = line->size();
 		i = 0;
 		while (i < kItems) {
-			WToolbarItem *item = (*line)[i];
+			WToolbarItem* item = (*line)[i];
 			if (name == NULL) {
 				if (item->Name() == NULL)
 					return item;
-			}
-			else {
+			} else {
 				if (strcmp(name, item->Name()) == 0)
 					return item;
 			}
@@ -988,11 +991,14 @@ WToolbarItem * WToolbar::FindItem(const char *name)
 /* Return the absolute index of the item, or -1 if it doesn't belong to this
  * toolbar.
  */
-int WToolbar::IndexOf(WToolbarItem *item)
+int
+WToolbar::IndexOf(WToolbarItem* item)
 {
-	if (item == NULL) return -1;
-	if (item->Toolbar() != this) return -1;
-	WToolbarLine *line;
+	if (item == NULL)
+		return -1;
+	if (item->Toolbar() != this)
+		return -1;
+	WToolbarLine* line;
 	int index = 0, i;
 	for (i = 0; i < item->fLine; i++)
 		index += fLines[i]->size();
@@ -1003,16 +1009,18 @@ int WToolbar::IndexOf(WToolbarItem *item)
 		if ((*line)[i] == item)
 			return index + i;
 	}
-	return -1; // Should never happen
+	return -1;	// Should never happen
 }
 
 /* Return the item at the given view's coordinates, or NULL.
  */
-WToolbarItem * WToolbar::ItemAt(BPoint point)
+WToolbarItem*
+WToolbar::ItemAt(BPoint point)
 {
-	if (fLines.size() == 0) return NULL;
-	WToolbarLine *line;
-	WToolbarItem *item;
+	if (fLines.size() == 0)
+		return NULL;
+	WToolbarLine* line;
+	WToolbarItem* item;
 	unsigned l = 0, i;
 	while (l < fLines.size()) {
 		line = fLines[l];
@@ -1031,9 +1039,11 @@ WToolbarItem * WToolbar::ItemAt(BPoint point)
 
 /* Return the item at the given absolute index, or NULL. Index starts from 0.
  */
-WToolbarItem * WToolbar::ItemAt(int index)
+WToolbarItem*
+WToolbar::ItemAt(int index)
 {
-	if (index < 0 || fLines.size() == 0) return NULL;
+	if (index < 0 || fLines.size() == 0)
+		return NULL;
 	unsigned base = 0, line = 0;
 	while (line < fLines.size() - 1 && base < (unsigned)index) {
 		base += fLines[line]->size();
@@ -1041,14 +1051,14 @@ WToolbarItem * WToolbar::ItemAt(int index)
 	}
 	/*if (base == index) // item is the first of the line
 		return (*fLines[line])[0];*/
-	if (base > (unsigned)index) { // item is in previous line
+	if (base > (unsigned)index) {  // item is in previous line
 		base -= fLines[line]->size();
 		line--;
-		//return (*fLines[line])[index - base];
+		// return (*fLines[line])[index - base];
 	}
 	// base < index (item is in the last line, or index out of range)
-	return ((unsigned)index > base + fLines[line]->size() - 1 ? NULL :
-		(*fLines[line])[index - base]);
+	return (
+		(unsigned)index > base + fLines[line]->size() - 1 ? NULL : (*fLines[line])[index - base]);
 }
 
 /* Return the item at the given line and position, or NULL if line index or
@@ -1057,15 +1067,15 @@ WToolbarItem * WToolbar::ItemAt(int index)
  * visible); this is useful for user interaction. Line index and position start
  * from 0.
  */
-WToolbarItem * WToolbar::ItemAt(unsigned line, unsigned position,
-	bool visibleOnly)
+WToolbarItem*
+WToolbar::ItemAt(unsigned line, unsigned position, bool visibleOnly)
 {
 	const unsigned kLines = fLines.size();
 
 	if (kLines == 0 || line >= kLines)
 		return NULL;
 
-	WToolbarLine *_line;
+	WToolbarLine* _line;
 	unsigned index;
 	int visible;
 
@@ -1092,8 +1102,7 @@ WToolbarItem * WToolbar::ItemAt(unsigned line, unsigned position,
 		if (position >= kItems)
 			return NULL;
 		index = position;
-	}
-	else {
+	} else {
 		visible = -1;
 		index = 0;
 		while (visible < (int)position && index < kItems) {
@@ -1111,14 +1120,16 @@ WToolbarItem * WToolbar::ItemAt(unsigned line, unsigned position,
 /* Return true if the line is enabled, false otherwise. A line is enabled if at
  * least one of its controls (not items) is enabled.
  */
-bool WToolbar::LineEnabled(unsigned line)
+bool
+WToolbar::LineEnabled(unsigned line)
 {
-	if (line >= fLines.size()) return false;
-	WToolbarLine *_line = fLines[line];
+	if (line >= fLines.size())
+		return false;
+	WToolbarLine* _line = fLines[line];
 	const unsigned kItems = _line->size();
 	bool enabled = false;
 	for (unsigned i = 0; i < kItems && !enabled; i++) {
-		WToolbarControl *control = dynamic_cast<WToolbarControl*>((*_line)[i]);
+		WToolbarControl* control = dynamic_cast<WToolbarControl*>((*_line)[i]);
 		if (control != NULL) {
 			if (control->fEnabled)
 				enabled = true;
@@ -1131,7 +1142,8 @@ bool WToolbar::LineEnabled(unsigned line)
  * least one of its items is visible. It is a shortcut to
  * CountItems(line, true).
  */
-bool WToolbar::LineVisible(unsigned line)
+bool
+WToolbar::LineVisible(unsigned line)
 {
 	return (CountItemsInLine(line, true) > 0);
 }
@@ -1146,10 +1158,13 @@ bool WToolbar::LineVisible(unsigned line)
  * not a valid combination (in this case, the item will be removed from the
  * toolbar).
  */
-bool WToolbar::MoveItem(WToolbarItem *item, int line, int position)
+bool
+WToolbar::MoveItem(WToolbarItem* item, int line, int position)
 {
-	if (item == NULL) return false;
-	if (item->Toolbar() != this) return false;
+	if (item == NULL)
+		return false;
+	if (item->Toolbar() != this)
+		return false;
 	bool disableUpdate = fDisableUpdate, ret;
 	fDisableUpdate = true;
 	ret = RemoveItem(item);
@@ -1164,11 +1179,14 @@ bool WToolbar::MoveItem(WToolbarItem *item, int line, int position)
  * doesn't belong to this toolbar. To get the item's line index, use
  * item->Line().
  */
-int WToolbar::PositionOf(WToolbarItem *item)
+int
+WToolbar::PositionOf(WToolbarItem* item)
 {
-	if (item == NULL) return -1;
-	if (item->Toolbar() != this) return -1;
-	WToolbarLine *line = fLines[item->fLine];
+	if (item == NULL)
+		return -1;
+	if (item->Toolbar() != this)
+		return -1;
+	WToolbarLine* line = fLines[item->fLine];
 	const unsigned kItems = line->size();
 	unsigned i = 0;
 	while (i < kItems) {
@@ -1184,10 +1202,13 @@ int WToolbar::PositionOf(WToolbarItem *item)
  * be deleted and the items in the lines below will have their line index
  * decreased. The item will not be deleted.
  */
-bool WToolbar::RemoveItem(WToolbarItem *item)
+bool
+WToolbar::RemoveItem(WToolbarItem* item)
 {
-	if (item == NULL) return false;
-	if (item->fToolbar != this) return false;
+	if (item == NULL)
+		return false;
+	if (item->fToolbar != this)
+		return false;
 
 	AssertLocked();
 
@@ -1213,7 +1234,7 @@ bool WToolbar::RemoveItem(WToolbarItem *item)
 	if (fLines[line]->size() == 0) {
 		fLines.erase(fLines.begin() + line);
 		for (unsigned l = line; l < fLines.size(); l++) {
-			WToolbarLine *_line = fLines[l];
+			WToolbarLine* _line = fLines[l];
 			const unsigned kItems = _line->size();
 			for (unsigned i = 0; i < kItems; i++)
 				(*_line)[i]->fLine--;
@@ -1227,13 +1248,15 @@ bool WToolbar::RemoveItem(WToolbarItem *item)
 
 /* Enable or disable all the controls (not items) of a line.
  */
-void WToolbar::SetLineEnabled(unsigned line, bool enabled)
+void
+WToolbar::SetLineEnabled(unsigned line, bool enabled)
 {
-	if (line >= fLines.size()) return;
-	WToolbarLine *_line = fLines[line];
+	if (line >= fLines.size())
+		return;
+	WToolbarLine* _line = fLines[line];
 	const unsigned kItems = _line->size();
 	for (unsigned i = 0; i < kItems; i++) {
-		WToolbarControl *control = dynamic_cast<WToolbarControl*>((*_line)[i]);
+		WToolbarControl* control = dynamic_cast<WToolbarControl*>((*_line)[i]);
 		if (control != NULL)
 			control->fEnabled = enabled;
 	}
@@ -1243,10 +1266,12 @@ void WToolbar::SetLineEnabled(unsigned line, bool enabled)
 
 /* Show or hide all the items of a line.
  */
-void WToolbar::SetLineVisible(unsigned line, bool visible)
+void
+WToolbar::SetLineVisible(unsigned line, bool visible)
 {
-	if (line >= fLines.size()) return;
-	WToolbarLine *_line = fLines[line];
+	if (line >= fLines.size())
+		return;
+	WToolbarLine* _line = fLines[line];
 	const unsigned kItems = _line->size();
 	for (unsigned i = 0; i < kItems; i++)
 		(*_line)[i]->fVisible = visible;
@@ -1257,7 +1282,8 @@ void WToolbar::SetLineVisible(unsigned line, bool visible)
 
 /* Return true if the toolbar will auto resize to fit the items.
  */
-bool WToolbar::AutoSize(void)
+bool
+WToolbar::AutoSize(void)
 {
 	return fAutoSize;
 }
@@ -1266,7 +1292,8 @@ bool WToolbar::AutoSize(void)
  * property is not related to this; to function, both the item and the toolbar
  * must be enabled.
  */
-bool WToolbar::Enabled(void)
+bool
+WToolbar::Enabled(void)
 {
 	return fEnabled;
 }
@@ -1274,10 +1301,12 @@ bool WToolbar::Enabled(void)
 /* Set the auto-sizing of the toolbar. If set on, the toolbar will auto resize
  * to fit its content.
  */
-void WToolbar::SetAutoSize(bool auto_size)
+void
+WToolbar::SetAutoSize(bool auto_size)
 {
 	AssertLocked();
-	if (auto_size == fAutoSize) return;
+	if (auto_size == fAutoSize)
+		return;
 	fAutoSize = auto_size;
 	Update();
 }
@@ -1285,10 +1314,12 @@ void WToolbar::SetAutoSize(bool auto_size)
 /* Enable or disable the toolbar. This does not affect the enabled property of
  * items; to function, both the item and the toolbar must be enabled.
  */
-void WToolbar::SetEnabled(bool enabled)
+void
+WToolbar::SetEnabled(bool enabled)
 {
 	AssertLocked();
-	if (enabled == fEnabled) return;
+	if (enabled == fEnabled)
+		return;
 	fEnabled = enabled;
 	Update();
 	Invalidate();
@@ -1299,14 +1330,16 @@ void WToolbar::SetEnabled(bool enabled)
 /* Return the alignment of the toolbar, W_TOOLBAR_HORIZONTAL or
  * W_TOOLBAR_VERTICAL.
  */
-WToolbarAlignment WToolbar::Alignment(void)
+WToolbarAlignment
+WToolbar::Alignment(void)
 {
 	return fAppearance.fAlignment;
 }
 
 /* Return the background bitmap of the toolbar, or NULL if there is no bitmap.
  */
-BBitmap * WToolbar::BackgroundBitmap(void)
+BBitmap*
+WToolbar::BackgroundBitmap(void)
 {
 	return fAppearance.fBackBitmap;
 }
@@ -1314,7 +1347,8 @@ BBitmap * WToolbar::BackgroundBitmap(void)
 /* Return the border type of the toolbar, one of B_FANCY_BORDER,
  * B_PLAIN_BORDER, or B_NO_BORDER.
  */
-border_style WToolbar::Border(void)
+border_style
+WToolbar::Border(void)
 {
 	return fAppearance.fBorder;
 }
@@ -1322,14 +1356,16 @@ border_style WToolbar::Border(void)
 /* Return the position of the labels in the toolbar buttons:
  * W_TOOLBAR_LABEL_NONE, W_TOOLBAR_LABEL_BOTTOM or B_TOOLBAR_LABEL_SIDE.
  */
-WToolbarLabelPosition WToolbar::LabelPosition(void)
+WToolbarLabelPosition
+WToolbar::LabelPosition(void)
 {
 	return fAppearance.fLabelPosition;
 }
 
 /* Return the margin, in view's units, that is left around each item.
  */
-float WToolbar::Margin(void)
+float
+WToolbar::Margin(void)
 {
 	return fAppearance.fMargin;
 }
@@ -1337,7 +1373,8 @@ float WToolbar::Margin(void)
 /* Return the padding, the space left between the border and the items (not
  * including margin), in view's units.
  */
-float WToolbar::Padding(void)
+float
+WToolbar::Padding(void)
 {
 	return fAppearance.fPadding;
 }
@@ -1345,7 +1382,8 @@ float WToolbar::Padding(void)
 /* Return the buttons picture size, in view's units. If pictures are not shown,
  * returns 0.
  */
-float WToolbar::PictureSize(void)
+float
+WToolbar::PictureSize(void)
 {
 	return fAppearance.fPicSize;
 }
@@ -1356,13 +1394,14 @@ float WToolbar::PictureSize(void)
  * same height, and the lines will be stacked vertically, from top to bottom; if
  * vertical, the items will be stacked to the top, all the items in the same
  * line will have the same width, and the lines will be aligned horizontally
- * from left to right. 
+ * from left to right.
  */
-void WToolbar::SetAlignment(WToolbarAlignment alignment)
+void
+WToolbar::SetAlignment(WToolbarAlignment alignment)
 {
 	AssertLocked();
-	if (alignment == fAppearance.fAlignment ||
-	  (alignment != W_TOOLBAR_HORIZONTAL && alignment != W_TOOLBAR_VERTICAL))
+	if (alignment == fAppearance.fAlignment
+		|| (alignment != W_TOOLBAR_HORIZONTAL && alignment != W_TOOLBAR_VERTICAL))
 		return;
 	fAppearance.fAlignment = alignment;
 	Update();
@@ -1374,10 +1413,12 @@ void WToolbar::SetAlignment(WToolbarAlignment alignment)
  * Note: descendants of WToolbar may not use the background bitmap and draw a
  * custom background.
  */
-void WToolbar::SetBackgroundBitmap(BBitmap *bitmap)
+void
+WToolbar::SetBackgroundBitmap(BBitmap* bitmap)
 {
 	AssertLocked();
-	if (bitmap == fAppearance.fBackBitmap) return;
+	if (bitmap == fAppearance.fBackBitmap)
+		return;
 	if (fAppearance.fBackBitmap != NULL) {
 		delete fAppearance.fBackBitmap;
 		fAppearance.fBackBitmap = NULL;
@@ -1396,11 +1437,12 @@ void WToolbar::SetBackgroundBitmap(BBitmap *bitmap)
  * default black), or B_NO_BORDER. A descendant of WToolbar may draw a custom
  * fancy border.
  */
-void WToolbar::SetBorder(border_style border)
+void
+WToolbar::SetBorder(border_style border)
 {
 	AssertLocked();
-	if (border == fAppearance.fBorder || (border != B_FANCY_BORDER &&
-	  border != B_PLAIN_BORDER && border != B_NO_BORDER))
+	if (border == fAppearance.fBorder
+		|| (border != B_FANCY_BORDER && border != B_PLAIN_BORDER && border != B_NO_BORDER))
 		return;
 	fAppearance.fBorder = border;
 	Update();
@@ -1413,13 +1455,13 @@ void WToolbar::SetBorder(border_style border)
  * drawn in the center, regardeless of this setting.
  * Items other than buttons may behave differently.
  */
-void WToolbar::SetLabelPosition(WToolbarLabelPosition label_position)
+void
+WToolbar::SetLabelPosition(WToolbarLabelPosition label_position)
 {
 	AssertLocked();
-	if (label_position == fAppearance.fLabelPosition ||
-	  (label_position != W_TOOLBAR_LABEL_BOTTOM &&
-	  label_position != W_TOOLBAR_LABEL_SIDE &
-	  label_position != W_TOOLBAR_LABEL_NONE))
+	if (label_position == fAppearance.fLabelPosition
+		|| (label_position != W_TOOLBAR_LABEL_BOTTOM
+			&& label_position != W_TOOLBAR_LABEL_SIDE & label_position != W_TOOLBAR_LABEL_NONE))
 		return;
 	fAppearance.fLabelPosition = label_position;
 	Update();
@@ -1429,24 +1471,28 @@ void WToolbar::SetLabelPosition(WToolbarLabelPosition label_position)
  * Currently, the value will be rounded down. Default value is 0.0 for all
  * styles.
  */
-void WToolbar::SetMargin(float margin)
+void
+WToolbar::SetMargin(float margin)
 {
 	AssertLocked();
-	if (margin == fAppearance.fMargin || floor(margin) < 0.0) return;
+	if (margin == fAppearance.fMargin || floor(margin) < 0.0)
+		return;
 	fAppearance.fMargin = floor(margin);
 	Update();
 }
 
-/* Set the padding, the spaace between the border and the items (not including 
+/* Set the padding, the spaace between the border and the items (not including
  * the margin), in view's units. It must be positive or 0. Currently, the value
  * will be rounded down. Default value is 2.0 if the style is
  * W_TOOLBAR_STYLE_FLAT or W_TOOLBAR_STYLE_3D, or 0.0 is style is
  * W_TOOLBAR_STYLE_MENU.
  */
-void WToolbar::SetPadding(float padding)
+void
+WToolbar::SetPadding(float padding)
 {
 	AssertLocked();
-	if (padding == fAppearance.fPadding || floor(padding) < 0.0) return;
+	if (padding == fAppearance.fPadding || floor(padding) < 0.0)
+		return;
 	fAppearance.fPadding = floor(padding);
 	Update();
 }
@@ -1471,12 +1517,13 @@ void WToolbar::SetPadding(float padding)
  * W_TOOLBAR_PICTURE_XSMALL for all styles.
  * Items other than buttons may behave differently.
  */
-void WToolbar::SetPictureSize(float picture_size)
+void
+WToolbar::SetPictureSize(float picture_size)
 {
 	AssertLocked();
-	if (picture_size == fAppearance.fPicSize || picture_size < 0.0 ||
-	  picture_size > static_cast<float>(W_TOOLBAR_PICTURE_MAX))
-	  	return;
+	if (picture_size == fAppearance.fPicSize || picture_size < 0.0
+		|| picture_size > static_cast<float>(W_TOOLBAR_PICTURE_MAX))
+		return;
 	fAppearance.fPicSize = picture_size;
 	Update();
 }
@@ -1496,7 +1543,8 @@ void WToolbar::SetPictureSize(float picture_size)
  * toolbar and the libwalter's item classes will treat them like the default
  * value; descendant of WToolbar and item classes may use them.
  */
-void WToolbar::SetStyle(int style)
+void
+WToolbar::SetStyle(int style)
 {
 	AssertLocked();
 	fAppearance.fStyle = style;
@@ -1504,39 +1552,40 @@ void WToolbar::SetStyle(int style)
 	switch (style) {
 		case W_TOOLBAR_STYLE_FLAT:
 			fAppearance.fStyle = W_TOOLBAR_STYLE_FLAT;
-			if (fDisableStyling) break;
+			if (fDisableStyling)
+				break;
 			fAppearance.fLabelPosition = W_TOOLBAR_LABEL_NONE;
 			fAppearance.fMargin = 0.0;
 			fAppearance.fPadding = 2.0;
-			fAppearance.fPicSize =
-				static_cast<float>(W_TOOLBAR_PICTURE_XSMALL);
+			fAppearance.fPicSize = static_cast<float>(W_TOOLBAR_PICTURE_XSMALL);
 			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			SetFont(be_plain_font);
 			SetHighColor(0, 0, 0);
 			break;
 		case W_TOOLBAR_STYLE_3D:
 			fAppearance.fStyle = W_TOOLBAR_STYLE_3D;
-			if (fDisableStyling) break;
+			if (fDisableStyling)
+				break;
 			fAppearance.fLabelPosition = W_TOOLBAR_LABEL_NONE;
 			fAppearance.fMargin = 0.0;
 			fAppearance.fPadding = 2.0;
-			fAppearance.fPicSize =
-				static_cast<float>(W_TOOLBAR_PICTURE_XSMALL);
+			fAppearance.fPicSize = static_cast<float>(W_TOOLBAR_PICTURE_XSMALL);
 			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			SetFont(be_plain_font);
 			SetHighColor(0, 0, 0);
 			break;
-		case W_TOOLBAR_STYLE_MENU: {
+		case W_TOOLBAR_STYLE_MENU:
+		{
 			fAppearance.fStyle = W_TOOLBAR_STYLE_MENU;
-			if (fDisableStyling) break;
+			if (fDisableStyling)
+				break;
 			menu_info mi;
 			BFont font;
 			get_menu_info(&mi);
 			fAppearance.fLabelPosition = W_TOOLBAR_LABEL_SIDE;
 			fAppearance.fMargin = 0.0;
 			fAppearance.fPadding = 0.0;
-			fAppearance.fPicSize =
-				static_cast<float>(W_TOOLBAR_PICTURE_XSMALL);
+			fAppearance.fPicSize = static_cast<float>(W_TOOLBAR_PICTURE_XSMALL);
 			SetLowColor(mi.background_color);
 			// BeBook says that menu_info has a property called "font",
 			// but that's wrong; it has "f_family" and "f_style" instead.
@@ -1545,7 +1594,7 @@ void WToolbar::SetStyle(int style)
 			font.SetSize(mi.font_size);
 			SetFont(&font);
 			SetHighColor(0, 0, 0);
-			} break;
+		} break;
 		default:
 			return;
 	}
@@ -1556,19 +1605,22 @@ void WToolbar::SetStyle(int style)
 /* Return the style of the toolbar; it can be W_TOOLBAR_STYLE_FLAT,
  * W_TOOLBAR_STYLE_3D, W_TOOLBAR_STYLE_MENU or a custom value.
  */
-int WToolbar::Style(void)
+int
+WToolbar::Style(void)
 {
 	return fAppearance.fStyle;
 }
 
 // Target - mimic BInvoker =====================================================
 
-bool WToolbar::IsTargetLocal(void) const
+bool
+WToolbar::IsTargetLocal(void) const
 {
 	return fTarget.IsTargetLocal();
 }
 
-BMessenger WToolbar::Messenger(void) const
+BMessenger
+WToolbar::Messenger(void) const
 {
 	return fTarget;
 }
@@ -1576,11 +1628,12 @@ BMessenger WToolbar::Messenger(void) const
 /* Set the target for all the controls. Target cna be set individually for each
  * control.
  */
-status_t WToolbar::SetControlsTarget(BMessenger messenger)
+status_t
+WToolbar::SetControlsTarget(BMessenger messenger)
 {
 	AssertLocked();
-	WToolbarControl *control;
-	WToolbarLine *line;
+	WToolbarControl* control;
+	WToolbarLine* line;
 	for (unsigned l = 0; l < fLines.size(); l++) {
 		line = fLines[l];
 		const unsigned kItems = line->size();
@@ -1593,12 +1646,12 @@ status_t WToolbar::SetControlsTarget(BMessenger messenger)
 	return B_OK;
 }
 
-status_t WToolbar::SetControlsTarget(const BHandler *handler,
-	const BLooper *looper)
+status_t
+WToolbar::SetControlsTarget(const BHandler* handler, const BLooper* looper)
 {
 	AssertLocked();
-	WToolbarControl *control;
-	WToolbarLine *line;
+	WToolbarControl* control;
+	WToolbarLine* line;
 	if (handler == NULL && looper == NULL)
 		return B_BAD_VALUE;
 	if (handler != NULL) {
@@ -1623,14 +1676,16 @@ status_t WToolbar::SetControlsTarget(const BHandler *handler,
  * really needs a target; it is used only when the toolbar is attached to a
  * window, when the target will be given to each of its control.
  */
-status_t WToolbar::SetTarget(BMessenger messenger)
+status_t
+WToolbar::SetTarget(BMessenger messenger)
 {
 	AssertLocked();
 	fTarget = messenger;
 	return B_OK;
 }
 
-status_t WToolbar::SetTarget(const BHandler *handler, const BLooper *looper)
+status_t
+WToolbar::SetTarget(const BHandler* handler, const BLooper* looper)
 {
 	AssertLocked();
 	if (handler == NULL && looper == NULL)
@@ -1645,7 +1700,8 @@ status_t WToolbar::SetTarget(const BHandler *handler, const BLooper *looper)
 	return B_OK;
 }
 
-BHandler * WToolbar::Target(BLooper **looper) const
+BHandler*
+WToolbar::Target(BLooper** looper) const
 {
 	return fTarget.Target(looper);
 }
@@ -1656,9 +1712,11 @@ BHandler * WToolbar::Target(BLooper **looper) const
  * auto resize itself if required. See SetAlignment(), FindFlexibleItem(),
  * and SetAutoSize() for more info.
  */
-void WToolbar::Update(void)
+void
+WToolbar::Update(void)
 {
-	if (fDisableUpdate) return;
+	if (fDisableUpdate)
+		return;
 	AssertLocked();
 
 	const unsigned kLines = fLines.size();
@@ -1666,8 +1724,8 @@ void WToolbar::Update(void)
 	float border, left, top, right, bottom, max, total, width, height, start;
 	vector<float> maxs, totals, sizes;
 	unsigned i, l, sizeIndex = 0;
-	WToolbarLine *line;
-	WToolbarItem *item;
+	WToolbarLine* line;
+	WToolbarItem* item;
 	bool flexible;
 	BRect r;
 
@@ -1693,11 +1751,12 @@ void WToolbar::Update(void)
 				width++;
 				height++;
 				if (fAppearance.fAlignment == W_TOOLBAR_VERTICAL) {
-					if (width > max) max = width;
+					if (width > max)
+						max = width;
 					total += height + fAppearance.fMargin;
-				}
-				else {
-					if (height > max) max = height;
+				} else {
+					if (height > max)
+						max = height;
 					total += width + fAppearance.fMargin;
 				}
 			}
@@ -1723,9 +1782,10 @@ void WToolbar::Update(void)
 
 	// Find the widest (or tallest) line. Used to calculate the size of the
 	// flexible items.
-	max = (fAutoSize ? 0.0 : (fAppearance.fAlignment == W_TOOLBAR_VERTICAL ?
-		Frame().Height() : Frame().Width()) + 1.0 - (border +
-		fAppearance.fPadding) * 2.0);
+	max = (fAutoSize
+			   ? 0.0
+			   : (fAppearance.fAlignment == W_TOOLBAR_VERTICAL ? Frame().Height() : Frame().Width())
+					 + 1.0 - (border + fAppearance.fPadding) * 2.0);
 	for (l = 0; l < kLines; l++) {
 		if (totals[l] > max)
 			max = totals[l];
@@ -1744,8 +1804,7 @@ void WToolbar::Update(void)
 		if (fAppearance.fAlignment == W_TOOLBAR_VERTICAL) {
 			top = start;
 			right = left + maxs[l] - 1.0;
-		}
-		else {
+		} else {
 			left = start;
 			bottom = top + maxs[l] - 1.0;
 		}
@@ -1765,8 +1824,7 @@ void WToolbar::Update(void)
 						flexible = true;
 					}
 					top = r.bottom + fAppearance.fMargin + 1.0;
-				}
-				else {
+				} else {
 					r.right = left + width - 1.0;
 					r.bottom = bottom;
 					if (item->fFlexible && !flexible) {
@@ -1795,8 +1853,7 @@ void WToolbar::Update(void)
 			if (Window() != NULL)
 				Invalidate();
 		}
-	}
-	else {
+	} else {
 		if (Window() != NULL)
 			Invalidate();
 	}
@@ -1804,7 +1861,7 @@ void WToolbar::Update(void)
 	// If the rects have changed the mouse may be over a different
 	// item than before, so we have to simulate a MouseOver() event
 	if (Window() != NULL) {
-		WToolbarItem *new_over;
+		WToolbarItem* new_over;
 		uint32 buttons;
 		BPoint point;
 		GetMouse(&point, &buttons, false);
@@ -1813,32 +1870,25 @@ void WToolbar::Update(void)
 			if (new_over != fMouseOverItem) {
 				if (fMouseOverItem != NULL) {
 					fMouseOverItem->MouseMoved(
-						point - fMouseOverItem->fFrame.LeftTop(),
-						B_EXITED_VIEW, NULL);
+						point - fMouseOverItem->fFrame.LeftTop(), B_EXITED_VIEW, NULL);
 				}
 				if (new_over != NULL) {
-					new_over->MouseMoved(point - new_over->fFrame.LeftTop(),
-						B_ENTERED_VIEW, NULL);
+					new_over->MouseMoved(point - new_over->fFrame.LeftTop(), B_ENTERED_VIEW, NULL);
 				}
 				fMouseOverItem = new_over;
-			}
-			else {
+			} else {
 				if (fMouseOverItem != NULL) {
 					fMouseOverItem->MouseMoved(
-						point - fMouseOverItem->fFrame.LeftTop(),
-						B_INSIDE_VIEW, NULL);
+						point - fMouseOverItem->fFrame.LeftTop(), B_INSIDE_VIEW, NULL);
 				}
 			}
-		}
-		else {
+		} else {
 			if (new_over != fMouseDownItem)
 				fMouseDownItem->MouseMoved(
-					point - fMouseDownItem->fFrame.LeftTop(), B_EXITED_VIEW,
-					NULL);
+					point - fMouseDownItem->fFrame.LeftTop(), B_EXITED_VIEW, NULL);
 			else
 				fMouseDownItem->MouseMoved(
-					point - fMouseDownItem->fFrame.LeftTop(), B_INSIDE_VIEW,
-					NULL);
+					point - fMouseDownItem->fFrame.LeftTop(), B_INSIDE_VIEW, NULL);
 		}
 	}
 }

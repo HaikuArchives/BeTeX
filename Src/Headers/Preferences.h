@@ -11,7 +11,7 @@
 
 extern BLocker prefsLock;
 
-status_t SavePreferences(BMessage *preferences_archive, const char *path);
-status_t LoadPreferences(const char *path, BMessage *preferences_archive);
+status_t SavePreferences(BMessage* preferences_archive, const char* path);
+status_t LoadPreferences(const char* path, BMessage* preferences_archive);
 
 #endif

@@ -51,8 +51,8 @@
  * use as a disabled picture. The picture will become property of the button's
  * decorator; do not delete it.
  */
-WToolbarButton::WToolbarButton(const char *name, const char *label,
-	BBitmap *picture, BMessage *message, bool switchMode)
+WToolbarButton::WToolbarButton(
+	const char* name, const char* label, BBitmap* picture, BMessage* message, bool switchMode)
 	: WToolbarControl(name, message)
 {
 	_InitObject();
@@ -61,7 +61,7 @@ WToolbarButton::WToolbarButton(const char *name, const char *label,
 	SetSwitchMode(switchMode);
 
 	if (picture != NULL) {
-		BBitmap *bitmaps[8];
+		BBitmap* bitmaps[8];
 		bitmaps[0] = picture;
 		bitmaps[1] = BitmapUtils::Grayscale(picture);
 		for (int i = 2; i < 8; i++)
@@ -70,7 +70,7 @@ WToolbarButton::WToolbarButton(const char *name, const char *label,
 	}
 }
 
-WToolbarButton::WToolbarButton(BMessage *archive)
+WToolbarButton::WToolbarButton(BMessage* archive)
 	: WToolbarControl(archive)
 {
 	BMessage decArchive;
@@ -79,18 +79,15 @@ WToolbarButton::WToolbarButton(BMessage *archive)
 
 	_InitObject();
 
-	if (archive->FindMessage("WToolbarButton::decorator",
-	  &decArchive) == B_OK) {
-		BArchivable *archivable;
+	if (archive->FindMessage("WToolbarButton::decorator", &decArchive) == B_OK) {
+		BArchivable* archivable;
 		archivable = ButtonDecorator::Instantiate(&decArchive);
 		if (archivable != NULL) {
-			ButtonDecorator *decorator =
-				static_cast<ButtonDecorator*>(archivable);
+			ButtonDecorator* decorator = static_cast<ButtonDecorator*>(archivable);
 			if (decorator != NULL) {
 				delete fDecorator;
 				fDecorator = decorator;
-			}
-			else
+			} else
 				delete archivable;
 		}
 	}
@@ -100,7 +97,7 @@ WToolbarButton::WToolbarButton(BMessage *archive)
 
 	if (archive->FindInt32("WToolbarButton::value", (int32*)(&value)) == B_OK)
 		SetValue(value);
-}	
+}
 
 WToolbarButton::~WToolbarButton()
 {
@@ -139,7 +136,7 @@ WToolbarButton::BorderThickness(void)
  * be rounded down.
  */
 void
-WToolbarButton::ContentSize(float *width, float *height)
+WToolbarButton::ContentSize(float* width, float* height)
 {
 	float w, h;
 	fDecorator->GetPreferredSize(fCanvas, &w, &h);
@@ -161,8 +158,7 @@ void
 WToolbarButton::DrawBackground(BRect updateRect)
 {
 	// Draw the menu selection background
-	if (Enabled() && Toolbar()->Enabled() && fMouseOver &&
-	 	fStyle == W_TOOLBAR_STYLE_MENU) {
+	if (Enabled() && Toolbar()->Enabled() && fMouseOver && fStyle == W_TOOLBAR_STYLE_MENU) {
 		fCanvas->SetLowColor(ui_color(B_MENU_SELECTION_BACKGROUND_COLOR));
 		fCanvas->FillRect(Bounds(), B_SOLID_LOW);
 	}
@@ -189,8 +185,7 @@ WToolbarButton::DrawBorder(BRect updateRect)
 
 	if (fStyle == W_TOOLBAR_STYLE_FLAT) {
 		// Flat toolbar: draw only if the mouse is over us or value is on
-		if ((fMouseOver && Enabled() && Toolbar()->Enabled()) ||
-		 	fValue == B_CONTROL_ON) {
+		if ((fMouseOver && Enabled() && Toolbar()->Enabled()) || fValue == B_CONTROL_ON) {
 			doDraw = true;
 			pushed = (fMouseDown || fValue == B_CONTROL_ON);
 		}
@@ -229,7 +224,7 @@ WToolbarButton::DrawContent(BPoint position, BRect updateRect)
 
 	// Calculate the contect rectangle
 	fDecorator->GetPreferredSize(fCanvas, &w, &h);
-	r =  BRect(position, BPoint(position.x + w, position.y + h));
+	r = BRect(position, BPoint(position.x + w, position.y + h));
 	if (fMouseDown || fValue == B_CONTROL_ON)
 		r.OffsetBy(1.0, 1.0);
 
@@ -258,7 +253,7 @@ WToolbarButton::Padding(void)
  * archives all the pictures and the label.
  */
 status_t
-WToolbarButton::Archive(BMessage *archive, bool deep) const
+WToolbarButton::Archive(BMessage* archive, bool deep) const
 {
 	status_t status;
 
@@ -268,8 +263,7 @@ WToolbarButton::Archive(BMessage *archive, bool deep) const
 		BMessage decorator;
 		status = fDecorator->Archive(&decorator);
 		if (status == B_OK)
-			status = archive->AddMessage("WToolbarButton::decorator",
-				&decorator);
+			status = archive->AddMessage("WToolbarButton::decorator", &decorator);
 	}
 
 	if (status == B_OK && fSwitchMode == false)
@@ -281,11 +275,10 @@ WToolbarButton::Archive(BMessage *archive, bool deep) const
 	return status;
 }
 
-BArchivable *
-WToolbarButton::Instantiate(BMessage *archive)
+BArchivable*
+WToolbarButton::Instantiate(BMessage* archive)
 {
-	return (validate_instantiation(archive, "WToolbarButton") ?
-		new WToolbarButton(archive) : NULL);
+	return (validate_instantiation(archive, "WToolbarButton") ? new WToolbarButton(archive) : NULL);
 }
 
 // WToolbarItem hooks
@@ -308,7 +301,7 @@ WToolbarButton::DetachedFromToolbar(void)
  * buffer).
  */
 void
-WToolbarButton::Draw(BView *canvas, BRect updateRect)
+WToolbarButton::Draw(BView* canvas, BRect updateRect)
 {
 	if (Toolbar() == NULL || canvas == NULL)
 		return;
@@ -356,12 +349,14 @@ WToolbarButton::Draw(BView *canvas, BRect updateRect)
  * will be -1. If you aren't interested in one of the values, you can pass NULL.
  */
 void
-WToolbarButton::GetPreferredSize(float *width, float *height)
+WToolbarButton::GetPreferredSize(float* width, float* height)
 {
 	// We must be attached to a toolbar
 	if (Toolbar() == NULL) {
-		if (width != NULL) *width = -1.0;
-		if (height != NULL) *height = -1.0;
+		if (width != NULL)
+			*width = -1.0;
+		if (height != NULL)
+			*height = -1.0;
 		return;
 	}
 
@@ -378,8 +373,10 @@ WToolbarButton::GetPreferredSize(float *width, float *height)
 	w = floor(w) + border * 2.0 + padding * 2.0;
 	h = floor(h) + border * 2.0 + padding * 2.0;
 
-	if (width != NULL) *width = w - 1.0;
-	if (height != NULL) *height = h - 1.0;
+	if (width != NULL)
+		*width = w - 1.0;
+	if (height != NULL)
+		*height = h - 1.0;
 }
 
 void
@@ -394,10 +391,10 @@ WToolbarButton::MouseDown(BPoint point)
 }
 
 void
-WToolbarButton::MouseMoved(BPoint point, uint32 transit,
-	const BMessage *message)
+WToolbarButton::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
-	if (Toolbar() == NULL) return;
+	if (Toolbar() == NULL)
+		return;
 	bool oldMouseOver = fMouseOver;
 	fMouseOver = (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW);
 	if (fMouseOver != oldMouseOver)
@@ -419,7 +416,8 @@ WToolbarButton::MouseUp(BPoint point)
 void
 WToolbarButton::Update(void)
 {
-	if (Toolbar() == NULL) return;
+	if (Toolbar() == NULL)
+		return;
 
 	float picsize = Toolbar()->PictureSize();
 
@@ -430,13 +428,11 @@ WToolbarButton::Update(void)
 			break;
 		case W_TOOLBAR_LABEL_BOTTOM:
 			fDecorator->SetPosition(BD_POSITION_ABOVE);
-			fDecorator->SetVisible(picsize == 0.0 ?
-				BD_VISIBLE_LABEL : BD_VISIBLE_BOTH);
+			fDecorator->SetVisible(picsize == 0.0 ? BD_VISIBLE_LABEL : BD_VISIBLE_BOTH);
 			break;
 		case W_TOOLBAR_LABEL_SIDE:
 			fDecorator->SetPosition(BD_POSITION_LEFT);
-			fDecorator->SetVisible(picsize == 0.0 ?
-				BD_VISIBLE_LABEL : BD_VISIBLE_BOTH);
+			fDecorator->SetVisible(picsize == 0.0 ? BD_VISIBLE_LABEL : BD_VISIBLE_BOTH);
 			break;
 	}
 
@@ -467,12 +463,13 @@ WToolbarButton::DeleteBitmapSetAt(unsigned index)
 	return fDecorator->DeleteBitmapSetAt(index);
 }
 
-void WToolbarButton::DeletePicture(void)
+void
+WToolbarButton::DeletePicture(void)
 {
 	fDecorator->DeletePicture();
 }
 
-BDBitmapSet *
+BDBitmapSet*
 WToolbarButton::GetBitmapSet(unsigned size)
 {
 	if (size == 0)
@@ -480,15 +477,16 @@ WToolbarButton::GetBitmapSet(unsigned size)
 	return fDecorator->GetBitmapSet(size);
 }
 
-BDBitmapSet *
+BDBitmapSet*
 WToolbarButton::GetBitmapSetAt(unsigned index)
 {
 	return fDecorator->GetBitmapSetAt(index);
 }
 
-BBitmap * WToolbarButton::GetMenuCheckMark(void)
+BBitmap*
+WToolbarButton::GetMenuCheckMark(void)
 {
-// clang-format off
+	// clang-format off
 	static const unsigned char kCheckMarkBitmapData[] = {
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0C, 0x0C, 0xFF, 0xFF,
@@ -503,14 +501,14 @@ BBitmap * WToolbarButton::GetMenuCheckMark(void)
 		0xFF, 0xFF, 0xFF, 0x0C, 0x0C, 0x0C, 0x17, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 		0xFF, 0xFF, 0xFF, 0xFF, 0x0C, 0x17, 0x17, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 	};
-// clang-format on
-	BBitmap *ret = new BBitmap(BRect(0.0, 0.0, 11.0, 11.0), B_CMAP8);
+	// clang-format on
+	BBitmap* ret = new BBitmap(BRect(0.0, 0.0, 11.0, 11.0), B_CMAP8);
 	memcpy(ret->Bits(), kCheckMarkBitmapData, 144);
 	return ret;
 }
 
 void
-WToolbarButton::GetPicture(BBitmap *picture[8])
+WToolbarButton::GetPicture(BBitmap* picture[8])
 {
 	if (picture == NULL)
 		return;
@@ -518,27 +516,27 @@ WToolbarButton::GetPicture(BBitmap *picture[8])
 }
 
 int
-WToolbarButton::IndexOfBitmapSet(BDBitmapSet *set)
+WToolbarButton::IndexOfBitmapSet(BDBitmapSet* set)
 {
 	if (set == NULL)
 		return -1;
 	return fDecorator->IndexOfBitmapSet(set);
 }
 
-const char *
+const char*
 WToolbarButton::Label(void)
 {
 	return fDecorator->Label();
 }
 
 void
-WToolbarButton::SetLabel(const char *label)
+WToolbarButton::SetLabel(const char* label)
 {
 	fDecorator->SetLabel(label);
 }
 
 bool
-WToolbarButton::SetPicture(BBitmap *picture[8])
+WToolbarButton::SetPicture(BBitmap* picture[8])
 {
 	if (picture == NULL)
 		return false;
@@ -550,7 +548,8 @@ WToolbarButton::SetPicture(BBitmap *picture[8])
 void
 WToolbarButton::SetSwitchMode(bool switchMode)
 {
-	if (fSwitchMode == switchMode) return;
+	if (fSwitchMode == switchMode)
+		return;
 	fSwitchMode = switchMode;
 	Invalidate();
 }

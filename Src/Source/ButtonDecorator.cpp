@@ -27,54 +27,41 @@
 // Currently supported color spaces
 #define COLORSPACES_COUNT 9
 const color_space kColorSpaces[COLORSPACES_COUNT] = {
-	B_CMAP8,
-	B_RGB24,
-	B_RGB32,
-	B_RGBA32,
-	B_RGB24_BIG,
-	B_RGB32_BIG,
-	B_RGBA32_BIG,
-	B_GRAY8,
-	B_GRAY1
-};
+	B_CMAP8, B_RGB24, B_RGB32, B_RGBA32, B_RGB24_BIG, B_RGB32_BIG, B_RGBA32_BIG, B_GRAY8, B_GRAY1};
 
 // Local functions
 
-void __h_align(BDAlignment align, float ps, float lw, float *po,
-	float *lo)
+void
+__h_align(BDAlignment align, float ps, float lw, float* po, float* lo)
 {
 	if (align != BD_ALIGN_LEFT) {
 		if (ps > lw) {
-			*lo = (align == BD_ALIGN_RIGHT ? ps - lw :
-				ceil((ps - lw) / 2.0));
-		}
-		else {
-			*po = (align == BD_ALIGN_RIGHT ? lw - ps:
-				ceil((lw - ps) / 2.0));
+			*lo = (align == BD_ALIGN_RIGHT ? ps - lw : ceil((ps - lw) / 2.0));
+		} else {
+			*po = (align == BD_ALIGN_RIGHT ? lw - ps : ceil((lw - ps) / 2.0));
 		}
 	}
 }
 
-void __v_align(BDAlignment align, float ps, float lh, float *po,
-	float *lo)
+void
+__v_align(BDAlignment align, float ps, float lh, float* po, float* lo)
 {
 	if (align != BD_ALIGN_TOP) {
 		if (ps > lh) {
-			*lo = (align == BD_ALIGN_BOTTOM ? ps - lh :
-				ceil((ps - lh) / 2.0));
-		}
-		else {
-			*po = (align == BD_ALIGN_BOTTOM ? lh - ps:
-				ceil((lh - ps) / 2.0));
+			*lo = (align == BD_ALIGN_BOTTOM ? ps - lh : ceil((ps - lh) / 2.0));
+		} else {
+			*po = (align == BD_ALIGN_BOTTOM ? lh - ps : ceil((lh - ps) / 2.0));
 		}
 	}
 }
 
-bool _check_color_space(color_space space)
+bool
+_check_color_space(color_space space)
 {
 	int i = 0;
 	do {
-		if (space == kColorSpaces[i]) return true;
+		if (space == kColorSpaces[i])
+			return true;
 	} while (++i < COLORSPACES_COUNT);
 	return false;
 }
@@ -83,7 +70,8 @@ bool _check_color_space(color_space space)
 // Private
 // ============================================================================
 
-void ButtonDecorator::_calc_rects(BView *view, BRect **picture, BRect **label)
+void
+ButtonDecorator::_calc_rects(BView* view, BRect** picture, BRect** label)
 {
 	float ps = 0.0, lw = 0.0, lh = 0.0;
 	BRect *p = NULL, *l = NULL;
@@ -112,7 +100,7 @@ void ButtonDecorator::_calc_rects(BView *view, BRect **picture, BRect **label)
 	// least a label to show
 	if (fVisible == BD_VISIBLE_LABEL && lw > 0.0)
 		ps = 0.0;
-			
+
 
 	// If label is hidden don't report its rectangle, but only if we have at
 	// least a picture to show
@@ -171,14 +159,18 @@ void ButtonDecorator::_calc_rects(BView *view, BRect **picture, BRect **label)
 	}
 
 	// Report the rectangles
-	if (picture != NULL) *picture = p;
-	if (label != NULL) *label = l;
+	if (picture != NULL)
+		*picture = p;
+	if (label != NULL)
+		*label = l;
 }
 
-void ButtonDecorator::_delete_bitmap_set(int num)
+void
+ButtonDecorator::_delete_bitmap_set(int num)
 {
-	BDBitmapSet *set = fBitmaps[num];
-	if (set == NULL) return;
+	BDBitmapSet* set = fBitmaps[num];
+	if (set == NULL)
+		return;
 	for (int i = 0; i < 8; i++) {
 		if (set->bitmap[i] != NULL)
 			delete set->bitmap[i];
@@ -187,21 +179,24 @@ void ButtonDecorator::_delete_bitmap_set(int num)
 	fBitmaps.erase(fBitmaps.begin() + num);
 }
 
-int ButtonDecorator::_get_real_pic_index(int status)
+int
+ButtonDecorator::_get_real_pic_index(int status)
 {
 	if (fPictureType == BD_PICTURE_BITMAP && fCurrentSet != NULL) {
 		int s = (status & BD_STATUS_DISABLED ? status - 1 : status);
-		while (fCurrentSet->bitmap[s] == NULL) s -= 2;
-		if (status & BD_STATUS_DISABLED) s++;
+		while (fCurrentSet->bitmap[s] == NULL)
+			s -= 2;
+		if (status & BD_STATUS_DISABLED)
+			s++;
 		return s;
-	}
-	else if (fPictureType == BD_PICTURE_SVG) {
+	} else if (fPictureType == BD_PICTURE_SVG) {
 		// TODO
 	}
 	return -1;
 }
 
-void ButtonDecorator::_init(void)
+void
+ButtonDecorator::_init(void)
 {
 	// TODO initialize SVG here if needed
 	fCurrentSet = NULL;
@@ -219,7 +214,8 @@ void ButtonDecorator::_init(void)
 	fNeedsUpdate = true;
 }
 
-void ButtonDecorator::_select_current_set(void)
+void
+ButtonDecorator::_select_current_set(void)
 {
 	fCurrentSet = GetBitmapSet(floor(fPictureSize));
 }
@@ -228,7 +224,8 @@ void ButtonDecorator::_select_current_set(void)
 // Protected
 // ============================================================================
 
-void ButtonDecorator::DrawLabel(BView *view, BRect rect, int status)
+void
+ButtonDecorator::DrawLabel(BView* view, BRect rect, int status)
 {
 	BPoint realPos(rect.LeftTop());
 	font_height fe;
@@ -252,17 +249,20 @@ void ButtonDecorator::DrawLabel(BView *view, BRect rect, int status)
 	view->DrawString(fLabel, realPos);
 }
 
-void ButtonDecorator::DrawPicture(BView *view, BRect rect, int status)
+void
+ButtonDecorator::DrawPicture(BView* view, BRect rect, int status)
 {
 	// TODO SVG
 
-	if (fCurrentSet == NULL) return;
+	if (fCurrentSet == NULL)
+		return;
 
 	int index = _get_real_pic_index(status);
 
-	if (index == -1) return;
+	if (index == -1)
+		return;
 
-	BBitmap *bitmap = fCurrentSet->bitmap[index];
+	BBitmap* bitmap = fCurrentSet->bitmap[index];
 	BPoint realPos(rect.LeftTop());
 
 	// Fancy alpha blending!
@@ -271,8 +271,7 @@ void ButtonDecorator::DrawPicture(BView *view, BRect rect, int status)
 	// Center the bitmap
 	// TODO resize the bitmap
 	if (fCurrentSet->size < floor(fPictureSize)) {
-		float offset = floor((floor(fPictureSize) - fCurrentSet->size) /
-			2.0);
+		float offset = floor((floor(fPictureSize) - fCurrentSet->size) / 2.0);
 		realPos.x += offset;
 		realPos.y += offset;
 	}
@@ -285,10 +284,9 @@ void ButtonDecorator::DrawPicture(BView *view, BRect rect, int status)
 // Constructors and destructor
 // ============================================================================
 
-ButtonDecorator::ButtonDecorator(const char *label, BBitmap *picture,
-	BDPosition position)
+ButtonDecorator::ButtonDecorator(const char* label, BBitmap* picture, BDPosition position)
 {
-	BDBitmapSet *set;
+	BDBitmapSet* set;
 	BRect r;
 	int i;
 
@@ -296,11 +294,15 @@ ButtonDecorator::ButtonDecorator(const char *label, BBitmap *picture,
 	SetLabel(label);
 	SetPosition(position);
 
-	if (picture == NULL) return;
-	if (!picture->IsValid()) return;
+	if (picture == NULL)
+		return;
+	if (!picture->IsValid())
+		return;
 	r = picture->Bounds();
-	if (r.IntegerWidth() != r.IntegerHeight()) return;
-	if (!_check_color_space(picture->ColorSpace())) return;
+	if (r.IntegerWidth() != r.IntegerHeight())
+		return;
+	if (!_check_color_space(picture->ColorSpace()))
+		return;
 
 	set = new BDBitmapSet;
 	set->size = r.IntegerWidth() + 1;
@@ -315,22 +317,22 @@ ButtonDecorator::ButtonDecorator(const char *label, BBitmap *picture,
 	fPictureSize = set->size;
 }
 
-ButtonDecorator::ButtonDecorator(BMessage *archive) :
-	BArchivable(archive)
+ButtonDecorator::ButtonDecorator(BMessage* archive)
+	: BArchivable(archive)
 {
 	float aFloat, aFloat2, aFloat3, aFloat4;
-	const char *aString;
+	const char* aString;
 	int32 anInt32;
 
 	_init();
-	if (archive == NULL) return; // I feel better
+	if (archive == NULL)
+		return;	 // I feel better
 
 	// Bitmap
-	if (archive->FindInt32("ButtonDecorator::bitmap_sets_count",
-	  &anInt32) == B_OK) {
-	  	BArchivable *archivable;
-	  	BBitmap *bitmaps[8];
-	  	BMessage *message;
+	if (archive->FindInt32("ButtonDecorator::bitmap_sets_count", &anInt32) == B_OK) {
+		BArchivable* archivable;
+		BBitmap* bitmaps[8];
+		BMessage* message;
 		char name[64];
 		int32 i, j;
 		for (i = 0; i < anInt32; i++) {
@@ -358,7 +360,7 @@ ButtonDecorator::ButtonDecorator(BMessage *archive) :
 	if (fPictureType == BD_PICTURE_NONE) {
 		// TODO
 	}
-	
+
 	// Label
 	if (archive->FindString("ButtonDecorator::label", &aString) == B_OK)
 		SetLabel(aString);
@@ -384,10 +386,10 @@ ButtonDecorator::ButtonDecorator(BMessage *archive) :
 		SetSpacing(aFloat);
 
 	// Margins
-	if (archive->FindFloat("ButtonDecorator::left_margin", &aFloat) == B_OK &&
-	  archive->FindFloat("ButtonDecorator::top_margin", &aFloat2) == B_OK &&
-	  archive->FindFloat("ButtonDecorator::right_margin", &aFloat2) == B_OK &&
-	  archive->FindFloat("ButtonDecorator::bottom_margin", &aFloat2) == B_OK)
+	if (archive->FindFloat("ButtonDecorator::left_margin", &aFloat) == B_OK
+		&& archive->FindFloat("ButtonDecorator::top_margin", &aFloat2) == B_OK
+		&& archive->FindFloat("ButtonDecorator::right_margin", &aFloat2) == B_OK
+		&& archive->FindFloat("ButtonDecorator::bottom_margin", &aFloat2) == B_OK)
 		SetMargins(aFloat, aFloat2, aFloat3, aFloat4);
 }
 
@@ -404,20 +406,22 @@ ButtonDecorator::~ButtonDecorator()
 // Public
 // ============================================================================
 
-BDAlignment ButtonDecorator::Alignment(void)
+BDAlignment
+ButtonDecorator::Alignment(void)
 {
 	return fAlign;
 }
 
-status_t ButtonDecorator::Archive(BMessage *archive, bool deep) const
+status_t
+ButtonDecorator::Archive(BMessage* archive, bool deep) const
 {
 	status_t status = BArchivable::Archive(archive, deep);
 
 	// Bitmap
 	if (status == B_OK && fPictureType == BD_PICTURE_BITMAP) {
-		BMessage *message;
+		BMessage* message;
 		int32 sets, i, j;
-		BBitmap *bitmap;
+		BBitmap* bitmap;
 		char name[64];
 		sets = fBitmaps.size();
 		status = archive->AddInt32("ButtonDecorator::bitmap_sets_count", sets);
@@ -428,8 +432,7 @@ status_t ButtonDecorator::Archive(BMessage *archive, bool deep) const
 					message = new BMessage();
 					status = bitmap->Archive(message, deep);
 					if (status == B_OK) {
-						sprintf(name, "ButtonDecorator::bitmap_%d_%d",
-							(int)i, (int)j);
+						sprintf(name, "ButtonDecorator::bitmap_%d_%d", (int)i, (int)j);
 						status = archive->AddMessage(name, message);
 					}
 					delete message;
@@ -449,23 +452,19 @@ status_t ButtonDecorator::Archive(BMessage *archive, bool deep) const
 
 	// Visible
 	if (status == B_OK && fVisible != BD_VISIBLE_BOTH)
-		status = archive->AddInt32("ButtonDecorator::visible",
-			static_cast<int32>(fVisible));
+		status = archive->AddInt32("ButtonDecorator::visible", static_cast<int32>(fVisible));
 
 	// Position
 	if (status == B_OK && fPosition != BD_POSITION_ABOVE)
-		status = archive->AddInt32("ButtonDecorator::position",
-			static_cast<int32>(fPosition));
+		status = archive->AddInt32("ButtonDecorator::position", static_cast<int32>(fPosition));
 
 	// Alignment
 	if (status == B_OK && fAlign != BD_ALIGN_CENTER)
-		status = archive->AddInt32("ButtonDecorator::alignment",
-			static_cast<int32>(fAlign));
+		status = archive->AddInt32("ButtonDecorator::alignment", static_cast<int32>(fAlign));
 
 	// Picture size
 	if (status == B_OK)
-		status = archive->AddFloat("ButtonDecorator::picture_size",
-			fPictureSize);
+		status = archive->AddFloat("ButtonDecorator::picture_size", fPictureSize);
 
 	// Spacing
 	if (status == B_OK)
@@ -477,36 +476,40 @@ status_t ButtonDecorator::Archive(BMessage *archive, bool deep) const
 	if (status == B_OK)
 		status = archive->AddFloat("ButtonDecorator::top_margin", fMarginTop);
 	if (status == B_OK)
-		status = archive->AddFloat("ButtonDecorator::right_margin",
-			fMarginRight);
+		status = archive->AddFloat("ButtonDecorator::right_margin", fMarginRight);
 	if (status == B_OK)
-		status = archive->AddFloat("ButtonDecorator::bottom_margin",
-			fMarginBottom);
+		status = archive->AddFloat("ButtonDecorator::bottom_margin", fMarginBottom);
 
 	return status;
 }
 
-unsigned ButtonDecorator::CountBitmapSets(void)
+unsigned
+ButtonDecorator::CountBitmapSets(void)
 {
-	if (fPictureType != BD_PICTURE_BITMAP) return 0;
+	if (fPictureType != BD_PICTURE_BITMAP)
+		return 0;
 	return fBitmaps.size();
 }
 
-bool ButtonDecorator::DeleteBitmapSet(unsigned size)
+bool
+ButtonDecorator::DeleteBitmapSet(unsigned size)
 {
-	if (fPictureType != BD_PICTURE_BITMAP) return false;
-	BDBitmapSet *set = GetBitmapSet(size);
-	if (set == NULL) return false;
+	if (fPictureType != BD_PICTURE_BITMAP)
+		return false;
+	BDBitmapSet* set = GetBitmapSet(size);
+	if (set == NULL)
+		return false;
 	int index = IndexOfBitmapSet(set);
 	_delete_bitmap_set(index);
 	if (fBitmaps.size() == 0)
 		fPictureType = BD_PICTURE_NONE;
 	return true;
-	fNeedsUpdate = true; // TODO only if currently used bitmap has been deleted
+	fNeedsUpdate = true;  // TODO only if currently used bitmap has been deleted
 	return true;
 }
 
-bool ButtonDecorator::DeleteBitmapSetAt(unsigned index)
+bool
+ButtonDecorator::DeleteBitmapSetAt(unsigned index)
 {
 	if (fPictureType != BD_PICTURE_BITMAP || index >= fBitmaps.size())
 		return false;
@@ -514,44 +517,45 @@ bool ButtonDecorator::DeleteBitmapSetAt(unsigned index)
 	if (fBitmaps.size() == 0) {
 		fCurrentSet = NULL;
 		fPictureType = BD_PICTURE_NONE;
-	}
-	else
+	} else
 		_select_current_set();
-	fNeedsUpdate = true; // TODO only if currently used bitmap has been deleted
+	fNeedsUpdate = true;  // TODO only if currently used bitmap has been deleted
 	return true;
 }
 
-void ButtonDecorator::DeletePicture(void)
+void
+ButtonDecorator::DeletePicture(void)
 {
-	if (fPictureType == BD_PICTURE_NONE) return;
+	if (fPictureType == BD_PICTURE_NONE)
+		return;
 	if (fPictureType == BD_PICTURE_BITMAP) {
 		while (fBitmaps.size() > 0)
 			_delete_bitmap_set(0);
 		fCurrentSet = NULL;
-	}
-	else if (fPictureType == BD_PICTURE_SVG) {
+	} else if (fPictureType == BD_PICTURE_SVG) {
 		// TODO
 	}
 	fPictureType = BD_PICTURE_NONE;
 	fNeedsUpdate = true;
 }
 
-void ButtonDecorator::Draw(BView *view, BRect rect, int status)
+void
+ButtonDecorator::Draw(BView* view, BRect rect, int status)
 {
 	if (view == NULL || !rect.IsValid())
 		return;
-	if (!(status == BD_STATUS_NORMAL || status == BD_STATUS_DISABLED ||
-	  status == BD_STATUS_PUSHED || status == BD_STATUS_PUSHED_DISABLED ||
-	  status == BD_STATUS_OVER || status == BD_STATUS_OVER_DISABLED ||
-	  status == BD_STATUS_OVER_PUSHED ||
-	  status == BD_STATUS_OVER_PUSHED_DISABLED))
+	if (!(status == BD_STATUS_NORMAL || status == BD_STATUS_DISABLED || status == BD_STATUS_PUSHED
+			|| status == BD_STATUS_PUSHED_DISABLED || status == BD_STATUS_OVER
+			|| status == BD_STATUS_OVER_DISABLED || status == BD_STATUS_OVER_PUSHED
+			|| status == BD_STATUS_OVER_PUSHED_DISABLED))
 		return;
 
 	BRect *picture, *label;
 	BRegion region;
 
 	_calc_rects(view, &picture, &label);
-	if (picture == NULL && label == NULL) return;
+	if (picture == NULL && label == NULL)
+		return;
 
 	if (picture != NULL) {
 		view->PushState();
@@ -576,10 +580,12 @@ void ButtonDecorator::Draw(BView *view, BRect rect, int status)
 	fNeedsUpdate = false;
 }
 
-BDBitmapSet * ButtonDecorator::GetBitmapSet(unsigned size)
+BDBitmapSet*
+ButtonDecorator::GetBitmapSet(unsigned size)
 {
-	if (fPictureType != BD_PICTURE_BITMAP || size == 0) return NULL;
-	BDBitmapSet *candidate = NULL;
+	if (fPictureType != BD_PICTURE_BITMAP || size == 0)
+		return NULL;
+	BDBitmapSet* candidate = NULL;
 	unsigned i = 0;
 	while (i < fBitmaps.size()) {
 		if (fBitmaps[i]->size == size)
@@ -597,32 +603,34 @@ BDBitmapSet * ButtonDecorator::GetBitmapSet(unsigned size)
 	return candidate;
 }
 
-BDBitmapSet * ButtonDecorator::GetBitmapSetAt(unsigned index)
+BDBitmapSet*
+ButtonDecorator::GetBitmapSetAt(unsigned index)
 {
-	return (fPictureType != BD_PICTURE_BITMAP || index >= fBitmaps.size() ?
-		NULL : fBitmaps[index]);
+	return (fPictureType != BD_PICTURE_BITMAP || index >= fBitmaps.size() ? NULL : fBitmaps[index]);
 }
 
-void ButtonDecorator::GetPicture(BBitmap *picture[8])
+void
+ButtonDecorator::GetPicture(BBitmap* picture[8])
 {
 	bool isnull = (fPictureType == BD_PICTURE_BITMAP || fCurrentSet == NULL);
 	if (!isnull) {
-		for (int  i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 			picture[i] = fCurrentSet->bitmap[i];
-	}
-	else {
+	} else {
 		for (int i = 0; i < 8; i++)
 			picture[i] = NULL;
 	}
 }
 
-void ButtonDecorator::GetPreferredSize(BView *view, float *width, float *height)
+void
+ButtonDecorator::GetPreferredSize(BView* view, float* width, float* height)
 {
-	if (view == NULL || (width == NULL && height == NULL)) return;
+	if (view == NULL || (width == NULL && height == NULL))
+		return;
 
 	BRect *picture, *label;
 	float w = floor(fMarginLeft) + floor(fMarginRight),
-		h = floor(fMarginTop) + floor(fMarginBottom);
+		  h = floor(fMarginTop) + floor(fMarginBottom);
 
 	_calc_rects(view, &picture, &label);
 
@@ -640,10 +648,8 @@ void ButtonDecorator::GetPreferredSize(BView *view, float *width, float *height)
 
 	// Picture and label
 	if (picture != NULL && label != NULL) {
-		float ps = picture->Width() + 1.0,
-			lw = label->Width() + 1.0,
-			lh = label->Height() + 1.0,
-			sp = floor(fSpacing);
+		float ps = picture->Width() + 1.0, lw = label->Width() + 1.0, lh = label->Height() + 1.0,
+			  sp = floor(fSpacing);
 		switch (fPosition) {
 			case BD_POSITION_ABOVE:
 			case BD_POSITION_BELOW:
@@ -659,63 +665,79 @@ void ButtonDecorator::GetPreferredSize(BView *view, float *width, float *height)
 	}
 
 	// Report the results
-	if (width != NULL) *width = w;
-	if (height != NULL) *height = h;
+	if (width != NULL)
+		*width = w;
+	if (height != NULL)
+		*height = h;
 }
 
-int ButtonDecorator::IndexOfBitmapSet(BDBitmapSet *set)
+int
+ButtonDecorator::IndexOfBitmapSet(BDBitmapSet* set)
 {
-	if (fPictureType != BD_PICTURE_BITMAP || set == NULL) return -1;
+	if (fPictureType != BD_PICTURE_BITMAP || set == NULL)
+		return -1;
 	for (unsigned i = 0; i < fBitmaps.size(); i++) {
-		if (fBitmaps[i] == set) return i;
+		if (fBitmaps[i] == set)
+			return i;
 	}
 	return -1;
 }
 
-BArchivable * ButtonDecorator::Instantiate(BMessage *archive)
+BArchivable*
+ButtonDecorator::Instantiate(BMessage* archive)
 {
-	return (validate_instantiation(archive, "ButtonDecorator") ?
-		new ButtonDecorator(archive) : NULL);
+	return (
+		validate_instantiation(archive, "ButtonDecorator") ? new ButtonDecorator(archive) : NULL);
 }
 
-const char * ButtonDecorator::Label(void)
+const char*
+ButtonDecorator::Label(void)
 {
 	return fLabel;
 }
 
-void ButtonDecorator::Margins(float *left, float *top, float *right,
-	float *bottom)
+void
+ButtonDecorator::Margins(float* left, float* top, float* right, float* bottom)
 {
-	if (left != NULL) *left = fMarginLeft;
-	if (top != NULL) *top = fMarginLeft;
-	if (right != NULL) *right = fMarginLeft;
-	if (bottom != NULL) *bottom = fMarginLeft;
+	if (left != NULL)
+		*left = fMarginLeft;
+	if (top != NULL)
+		*top = fMarginLeft;
+	if (right != NULL)
+		*right = fMarginLeft;
+	if (bottom != NULL)
+		*bottom = fMarginLeft;
 }
 
-bool ButtonDecorator::NeedsUpdate(void)
+bool
+ButtonDecorator::NeedsUpdate(void)
 {
 	return fNeedsUpdate;
 }
 
-float ButtonDecorator::PictureSize(void)
+float
+ButtonDecorator::PictureSize(void)
 {
 	return fPictureSize;
 }
 
-BDPictureType ButtonDecorator::PictureType(void)
+BDPictureType
+ButtonDecorator::PictureType(void)
 {
 	return fPictureType;
 }
 
-BDPosition ButtonDecorator::Position(void)
+BDPosition
+ButtonDecorator::Position(void)
 {
 	return fPosition;
 }
 
-bool ButtonDecorator::SetAlignment(BDAlignment align)
+bool
+ButtonDecorator::SetAlignment(BDAlignment align)
 {
-	if (align != BD_ALIGN_LEFT && align != BD_ALIGN_RIGHT &&
-	  align != BD_ALIGN_TOP && align != BD_ALIGN_BOTTOM)
+	if (align != BD_ALIGN_LEFT && align != BD_ALIGN_RIGHT && align != BD_ALIGN_TOP
+		&& align != BD_ALIGN_BOTTOM)
 		return false;
 	if (align != fAlign) {
 		fAlign = align;
@@ -724,27 +746,30 @@ bool ButtonDecorator::SetAlignment(BDAlignment align)
 	return true;
 }
 
-void ButtonDecorator::SetLabel(const char *label)
+void
+ButtonDecorator::SetLabel(const char* label)
 {
 	if (fLabel != NULL) {
 		delete[] fLabel;
 		fLabel = NULL;
 	}
-	if (label == NULL) return;
+	if (label == NULL)
+		return;
 	size_t len = strlen(label);
-	if (len == 0) return;
+	if (len == 0)
+		return;
 	fLabel = new char[len + 1];
 	memcpy(fLabel, label, len + 1);
 	fNeedsUpdate = true;
 }
 
-bool ButtonDecorator::SetMargins(float left, float top, float right,
-	float bottom)
+bool
+ButtonDecorator::SetMargins(float left, float top, float right, float bottom)
 {
 	if (left < 0.0 || top < 0.0 || right < 0.0 || bottom < 0.0)
 		return false;
-	if (left != fMarginLeft || top != fMarginTop || right == fMarginRight ||
-	  bottom != fMarginBottom) {
+	if (left != fMarginLeft || top != fMarginTop || right == fMarginRight
+		|| bottom != fMarginBottom) {
 		fMarginLeft = left;
 		fMarginTop = top;
 		fMarginRight = right;
@@ -754,22 +779,25 @@ bool ButtonDecorator::SetMargins(float left, float top, float right,
 	return true;
 }
 
-bool ButtonDecorator::SetPicture(BBitmap *picture[8])
+bool
+ButtonDecorator::SetPicture(BBitmap* picture[8])
 {
 	color_space space, sp;
-	BDBitmapSet *set;
+	BDBitmapSet* set;
 	unsigned i, j;
 	float size;
 	BRect r;
 
 	// Check validity of first bitmap
-	if (picture[0] == NULL) return false;
-	if (!picture[0]->IsValid()) return false;
+	if (picture[0] == NULL)
+		return false;
+	if (!picture[0]->IsValid())
+		return false;
 	r = picture[0]->Bounds();
 	size = r.IntegerHeight();
 	space = picture[0]->ColorSpace();
 	if (r.IntegerWidth() != size || !_check_color_space(space))
-	  	return false;
+		return false;
 
 	// Check that no picture is given twice
 	for (i = 0; i < 8; i++) {
@@ -796,8 +824,7 @@ bool ButtonDecorator::SetPicture(BBitmap *picture[8])
 				return false;
 			r = picture[i]->Bounds();
 			sp = picture[i]->ColorSpace();
-			if (r.IntegerHeight() != size || r.IntegerWidth() != size ||
-			  sp != space)
+			if (r.IntegerHeight() != size || r.IntegerWidth() != size || sp != space)
 				return false;
 		}
 	}
@@ -838,9 +865,11 @@ bool ButtonDecorator::SetPicture(BBitmap *picture[8])
 	return true;
 }
 
-bool ButtonDecorator::SetPictureSize(float size)
+bool
+ButtonDecorator::SetPictureSize(float size)
 {
-	if (size < 1.0) return false;
+	if (size < 1.0)
+		return false;
 	if (size != fPictureSize) {
 		fPictureSize = size;
 		_select_current_set();
@@ -849,10 +878,11 @@ bool ButtonDecorator::SetPictureSize(float size)
 	return true;
 }
 
-bool ButtonDecorator::SetPosition(BDPosition position)
+bool
+ButtonDecorator::SetPosition(BDPosition position)
 {
-	if (position != BD_POSITION_ABOVE && position != BD_POSITION_BELOW &&
-	  position != BD_POSITION_LEFT && position != BD_POSITION_RIGHT)
+	if (position != BD_POSITION_ABOVE && position != BD_POSITION_BELOW
+		&& position != BD_POSITION_LEFT && position != BD_POSITION_RIGHT)
 		return false;
 	if (position != fPosition) {
 		fPosition = position;
@@ -861,9 +891,11 @@ bool ButtonDecorator::SetPosition(BDPosition position)
 	return true;
 }
 
-bool ButtonDecorator::SetSpacing(float spacing)
+bool
+ButtonDecorator::SetSpacing(float spacing)
 {
-	if (spacing < 0.0) return false;
+	if (spacing < 0.0)
+		return false;
 	if (spacing != fSpacing) {
 		fSpacing = spacing;
 		fNeedsUpdate = true;
@@ -871,10 +903,10 @@ bool ButtonDecorator::SetSpacing(float spacing)
 	return true;
 }
 
-bool ButtonDecorator::SetVisible(BDVisible visible)
+bool
+ButtonDecorator::SetVisible(BDVisible visible)
 {
-	if (visible != BD_VISIBLE_BOTH && visible != BD_VISIBLE_LABEL &&
-	  visible != BD_VISIBLE_PICTURE)
+	if (visible != BD_VISIBLE_BOTH && visible != BD_VISIBLE_LABEL && visible != BD_VISIBLE_PICTURE)
 		return false;
 	if (visible != fVisible) {
 		fVisible = visible;
@@ -883,12 +915,14 @@ bool ButtonDecorator::SetVisible(BDVisible visible)
 	return true;
 }
 
-float ButtonDecorator::Spacing(void)
+float
+ButtonDecorator::Spacing(void)
 {
 	return fSpacing;
 }
 
-BDVisible ButtonDecorator::Visible(void)
+BDVisible
+ButtonDecorator::Visible(void)
 {
 	return fVisible;
 }

@@ -12,30 +12,27 @@
 #include <stdio.h>
 #include "Constants.h"
 
-TexFileFilter::TexFileFilter() 
-				:	BRefFilter()
+TexFileFilter::TexFileFilter()
+	: BRefFilter()
 {
-	
 }
 
-bool TexFileFilter::Filter(const entry_ref* ref, BNode* node, struct stat_beos* st, const char* filetype)
+bool
+TexFileFilter::Filter(const entry_ref* ref, BNode* node, struct stat_beos* st, const char* filetype)
 {
 	bool isOk = false;
 	char type[256];
 	BNodeInfo nodeInfo(node);
 
-	if (node->IsDirectory()) 
-	{
+	if (node->IsDirectory()) {
 		isOk = true;
-	}
-	else 
-	{
+	} else {
 		nodeInfo.GetType(type);
-		BString refStr(ref->name);		
+		BString refStr(ref->name);
 		// allow all files with type TEX_FILETYPE
-		isOk = (refStr.FindFirst(".tex") > 0 || (strcmp(TEX_FILETYPE, type) == 0 || strcmp("text/plain", type) == 0));
+		isOk = (refStr.FindFirst(".tex") > 0
+				|| (strcmp(TEX_FILETYPE, type) == 0 || strcmp("text/plain", type) == 0));
 	}
 
 	return isOk;
 }
-

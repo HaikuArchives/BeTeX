@@ -48,8 +48,8 @@
  */
 
 // libwalter headers
-#include "Toolbar.h"
 #include "ToolbarItem.h"
+#include "Toolbar.h"
 
 // =============================================================================
 // WToolbarItem
@@ -60,16 +60,16 @@
 /* Creates a new item with the given name. Like a BView's name, it is not
  * visible to the user, unless a descendant draws it. Name can be NULL.
  * A newly created item is not flexible and, once attached to a toolbar, will be
- * visible. 
+ * visible.
  */
-WToolbarItem::WToolbarItem(const char *name)
+WToolbarItem::WToolbarItem(const char* name)
 	: BHandler(name)
 {
 	_InitObject();
 	SetName(name);
 }
 
-WToolbarItem::WToolbarItem(BMessage *archive)
+WToolbarItem::WToolbarItem(BMessage* archive)
 	: BHandler(archive)
 {
 	bool enabled, visible, flexible;
@@ -117,7 +117,7 @@ WToolbarItem::_InitObject(void)
  *  WToolbarItem::visible	bool
  */
 status_t
-WToolbarItem::Archive(BMessage *archive, bool deep) const
+WToolbarItem::Archive(BMessage* archive, bool deep) const
 {
 	status_t status;
 
@@ -138,11 +138,10 @@ WToolbarItem::Archive(BMessage *archive, bool deep) const
 	return status;
 }
 
-BArchivable *
-WToolbarItem::Instantiate(BMessage *archive)
+BArchivable*
+WToolbarItem::Instantiate(BMessage* archive)
 {
-	return (validate_instantiation(archive, "WToolbarItem") ?
-		new WToolbarItem(archive) : NULL);
+	return (validate_instantiation(archive, "WToolbarItem") ? new WToolbarItem(archive) : NULL);
 }
 
 // Public
@@ -176,7 +175,7 @@ WToolbarItem::DetachedFromToolbar(void)
  * buffer). The default implementation does nothing.
  */
 void
-WToolbarItem::Draw(BView *canvas, BRect update_rect)
+WToolbarItem::Draw(BView* canvas, BRect update_rect)
 {
 }
 
@@ -208,7 +207,7 @@ WToolbarItem::Frame(void)
  * item is flexible, it will be stretched to fit the toolbar.
  */
 void
-WToolbarItem::GetPreferredSize(float *width, float *height)
+WToolbarItem::GetPreferredSize(float* width, float* height)
 {
 	if (width != NULL)
 		*width = -1.0;
@@ -278,8 +277,7 @@ WToolbarItem::MouseDown(BPoint point)
  * message that triggered the event. The default implementation does nothing.
  */
 void
-WToolbarItem::MouseMoved(BPoint point, uint32 transit,
-	const BMessage *message)
+WToolbarItem::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
 }
 
@@ -314,7 +312,7 @@ WToolbarItem::SetFlexible(bool flexible)
 	fFlexible = flexible;
 	if (fToolbar != NULL)
 		fToolbar->Update();
-}	
+}
 
 /* Shows or hides the item.
  */
@@ -331,7 +329,7 @@ WToolbarItem::SetVisible(bool visible)
 /* Returns the toolbar the item belongs to, or NULL if the item doesn't belong
  * to any toolbar.
  */
-WToolbar *
+WToolbar*
 WToolbarItem::Toolbar(void)
 {
 	return fToolbar;

@@ -11,19 +11,19 @@
 #include "BeTeXLogo.h"
 
 /*
-Default display : BeTeX logo 
+Default display : BeTeX logo
 */
 
-DocView::DocView(BRect frame) 
-			:	BView(frame, "DocView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+DocView::DocView(BRect frame)
+	: BView(frame, "DocView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	BRect logoRect(0, 0, 246, 107);
 	m_logo = new BBitmap(logoRect, B_RGB32);
-	
-	int numBits = (logoRect.IntegerWidth()+1) * (logoRect.IntegerHeight()+1) * 3;
-	m_logo->ImportBits(K_BETEX_LOGO, numBits, 247*3, 0, B_RGB24_BIG);
+
+	int numBits = (logoRect.IntegerWidth() + 1) * (logoRect.IntegerHeight() + 1) * 3;
+	m_logo->ImportBits(K_BETEX_LOGO, numBits, 247 * 3, 0, B_RGB24_BIG);
 }
 
 DocView::~DocView()
@@ -31,8 +31,9 @@ DocView::~DocView()
 	delete m_logo;
 }
 
-void DocView::Draw(BRect r)
+void
+DocView::Draw(BRect r)
 {
-	MovePenTo(5,5);
-	DrawBitmap(m_logo);	
+	MovePenTo(5, 5);
+	DrawBitmap(m_logo);
 }

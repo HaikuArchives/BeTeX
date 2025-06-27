@@ -11,111 +11,95 @@
 #include "Constants.h"
 #include "PrefsListItem.h"
 
-PrefsListView::PrefsListView(BRect frame, BView* parent, BMessenger *messenger) 
-				:	BListView(frame,"listview",B_SINGLE_SELECTION_LIST,B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE),
-					m_msgr(messenger),
-					m_parent(parent),
-					m_lastSelectedIndex(-1)
+PrefsListView::PrefsListView(BRect frame, BView* parent, BMessenger* messenger)
+	: BListView(frame, "listview", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES,
+		  B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE),
+	  m_msgr(messenger),
+	  m_parent(parent),
+	  m_lastSelectedIndex(-1)
 {
 }
 
-PrefsListView::~PrefsListView()
+PrefsListView::~PrefsListView() {}
+void
+PrefsListView::SelectionChanged()
 {
-}
-void PrefsListView::SelectionChanged()
-{
-	
-	if(m_lastSelectedIndex >= 0)
-	{
+	if (m_lastSelectedIndex >= 0) {
 		((PrefsListItem*)ItemAt(m_lastSelectedIndex))->Hide();
 	}
 
 	int32 current = CurrentSelection();
-	if (current >= 0)
-	{	
+	if (current >= 0) {
 		((PrefsListItem*)ItemAt(current))->Show();
 		m_lastSelectedIndex = current;
+	} else {
+		m_lastSelectedIndex = -1;
 	}
-	else
-	{
-		m_lastSelectedIndex = -1;	
-	}	
 }
 
-void PrefsListView::Next(int32 increment)
+void
+PrefsListView::Next(int32 increment)
 {
 	int32 items = CountItems();
-	if (items > 1)
-	{
+	if (items > 1) {
 		int32 current = CurrentSelection();
-		if (current >= 0)
-		{
-			if(current + increment < items)
-			{			
+		if (current >= 0) {
+			if (current + increment < items) {
 				Select(current + increment);
-			}
-			else
-			{	
-				//select last item in list
+			} else {
+				// select last item in list
 				Select(items - 1);
 			}
 		}
 	}
 }
 
-void PrefsListView::Prev(int32 decrement)
+void
+PrefsListView::Prev(int32 decrement)
 {
 	int32 items = CountItems();
-	if(items > 1)
-	{
+	if (items > 1) {
 		int32 current = CurrentSelection();
-		if (current >= 0)
-		{
-			if(current - decrement >= 0)
-			{
+		if (current >= 0) {
+			if (current - decrement >= 0) {
 				Select(current - decrement);
-			}
-			else
-			{
-				//select first item in list
+			} else {
+				// select first item in list
 				Select(0);
 			}
 		}
 	}
 }
 
-void PrefsListView::MessageReceived(BMessage *message)
+void
+PrefsListView::MessageReceived(BMessage* message)
 {
-	switch(message->what)
-	{
+	switch (message->what) {
 		case B_MOUSE_WHEEL_CHANGED:
-		{	
-			//We have a mouse wheel event when the focus is on the desktop.
+		{
+			// We have a mouse wheel event when the focus is on the desktop.
 			float delta_y;
-			if(message->FindFloat("be:wheel_delta_y",&delta_y) == B_OK)
-			{				
-				//Wrap-Around is taken care of too.
-				if(delta_y > 0)       //move wheel down/back
+			if (message->FindFloat("be:wheel_delta_y", &delta_y) == B_OK) {
+				// Wrap-Around is taken care of too.
+				if (delta_y > 0)  // move wheel down/back
 				{
 					Next();
-				}
-				else if(delta_y < 0)	//move wheel up/forward
+				} else if (delta_y < 0)	 // move wheel up/forward
 				{
-					Prev();	
+					Prev();
 				}
 			}
-						
-		}
-		break;
+
+		} break;
 		default:
-		{	
-			BListView::MessageReceived(message);	
-		}
-		break;
+		{
+			BListView::MessageReceived(message);
+		} break;
 	}
 }
 
-void PrefsListView::MouseDown(BPoint point)
+void
+PrefsListView::MouseDown(BPoint point)
 {
 	BListView::MouseDown(point);
 }

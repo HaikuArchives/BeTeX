@@ -33,50 +33,47 @@ class WToolbar;
 // =============================================================================
 
 class WToolbarItem : public BHandler {
-friend class WToolbar;
+	friend class WToolbar;
+
 public:
+	WToolbarItem(const char* name = NULL);
+	WToolbarItem(BMessage* archive);
+	virtual ~WToolbarItem();
 
-						WToolbarItem(const char *name = NULL);
-						WToolbarItem(BMessage *archive);
-virtual					~WToolbarItem();
+	// BArchivable hooks
+	virtual status_t Archive(BMessage* archive, bool deep = true) const;
+	static BArchivable* Instantiate(BMessage* archive);
 
-// BArchivable hooks
-virtual	status_t		Archive(BMessage *archive,
-							bool deep = true) const;
-static	BArchivable *	Instantiate(BMessage *archive);
-
-// Other methods
-virtual	void			AttachedToToolbar(void);
-		BRect			Bounds();
-virtual	void			DetachedFromToolbar(void);
-virtual	void			Draw(BView *canvas, BRect updateRect);
-		bool			Flexible(void);
-		BRect			Frame(void);
-virtual	void			GetPreferredSize(float *width,
-							float *height);
-		int				Index(void);
-		void			Invalidate(void);
-		int				Line(void);
-virtual	void			MouseDown(BPoint point);
-virtual	void			MouseMoved(BPoint point, uint32 transit,
-							const BMessage *message);
-virtual	void			MouseUp(BPoint point);
-		int				Position(void);
-virtual	void			SetFlexible(bool flexible);
-		void			SetVisible(bool visible);
-		WToolbar *		Toolbar(void);
-virtual	void			Update(void);
-		bool			Visible(void);
+	// Other methods
+	virtual void AttachedToToolbar(void);
+	BRect Bounds();
+	virtual void DetachedFromToolbar(void);
+	virtual void Draw(BView* canvas, BRect updateRect);
+	bool Flexible(void);
+	BRect Frame(void);
+	virtual void GetPreferredSize(float* width, float* height);
+	int Index(void);
+	void Invalidate(void);
+	int Line(void);
+	virtual void MouseDown(BPoint point);
+	virtual void MouseMoved(BPoint point, uint32 transit, const BMessage* message);
+	virtual void MouseUp(BPoint point);
+	int Position(void);
+	virtual void SetFlexible(bool flexible);
+	void SetVisible(bool visible);
+	WToolbar* Toolbar(void);
+	virtual void Update(void);
+	bool Visible(void);
 
 private:
-		void			_InitObject(void);
-		bool			fFlexible;
-		BRect			fFrame;
-		float			fHeight;
-		int				fLine;
-		WToolbar *		fToolbar;
-		bool			fVisible;
-		float			fWidth;
+	void _InitObject(void);
+	bool fFlexible;
+	BRect fFrame;
+	float fHeight;
+	int fLine;
+	WToolbar* fToolbar;
+	bool fVisible;
+	float fWidth;
 };
 
-#endif // _TOOLBAR_ITEM_H_
+#endif	// _TOOLBAR_ITEM_H_

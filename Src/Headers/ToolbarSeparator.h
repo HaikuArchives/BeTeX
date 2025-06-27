@@ -26,18 +26,17 @@
 
 class WToolbarSeparator : public WToolbarItem {
 public:
-							WToolbarSeparator(const char *name = NULL);
-							WToolbarSeparator(BMessage *archive);
-	virtual					~WToolbarSeparator();
+	WToolbarSeparator(const char* name = NULL);
+	WToolbarSeparator(BMessage* archive);
+	virtual ~WToolbarSeparator();
 
 	// BArchivable hooks
-	virtual	status_t		Archive(BMessage *archive,
-								bool deep = true) const;
-	static	BArchivable *	Instantiate(BMessage *archive);
+	virtual status_t Archive(BMessage* archive, bool deep = true) const;
+	static BArchivable* Instantiate(BMessage* archive);
 
 	// WToolbarItem hooks
-	virtual	void			Draw(BView *canvas, BRect updateRect);
-	virtual	void			GetPreferredSize(float *width, float *height);
+	virtual void Draw(BView* canvas, BRect updateRect);
+	virtual void GetPreferredSize(float* width, float* height);
 };
 
-#endif // _TOOLBAR_SEPARATOR_H_
+#endif	// _TOOLBAR_SEPARATOR_H_

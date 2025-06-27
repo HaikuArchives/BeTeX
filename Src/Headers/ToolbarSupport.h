@@ -29,8 +29,7 @@ class BView;
 
 class WToolbarSupport {
 public:
-	static	void			Draw3DBorder(BView *view, BRect rect,
-								bool inset = false);
+	static void Draw3DBorder(BView* view, BRect rect, bool inset = false);
 };
 
-#endif // _SUPPORT_H_
+#endif	// _SUPPORT_H_

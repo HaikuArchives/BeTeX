@@ -52,15 +52,14 @@ typedef enum {
 } BDAlignment;
 
 // Status constants
-#define BD_STATUS_NORMAL				0
-#define BD_STATUS_DISABLED				1
-#define BD_STATUS_PUSHED				2
-#define BD_STATUS_PUSHED_DISABLED		BD_STATUS_PUSHED | BD_STATUS_DISABLED
-#define BD_STATUS_OVER					4
-#define BD_STATUS_OVER_DISABLED			BD_STATUS_OVER | BD_STATUS_DISABLED
-#define BD_STATUS_OVER_PUSHED			BD_STATUS_OVER | BD_STATUS_PUSHED
-#define BD_STATUS_OVER_PUSHED_DISABLED	BD_STATUS_OVER | BD_STATUS_PUSHED | \
-										BD_STATUS_DISABLED
+#define BD_STATUS_NORMAL 0
+#define BD_STATUS_DISABLED 1
+#define BD_STATUS_PUSHED 2
+#define BD_STATUS_PUSHED_DISABLED BD_STATUS_PUSHED | BD_STATUS_DISABLED
+#define BD_STATUS_OVER 4
+#define BD_STATUS_OVER_DISABLED BD_STATUS_OVER | BD_STATUS_DISABLED
+#define BD_STATUS_OVER_PUSHED BD_STATUS_OVER | BD_STATUS_PUSHED
+#define BD_STATUS_OVER_PUSHED_DISABLED BD_STATUS_OVER | BD_STATUS_PUSHED | BD_STATUS_DISABLED
 
 // Picture type
 typedef enum {
@@ -71,99 +70,92 @@ typedef enum {
 
 // Bitmap set; contains bitmaps for all states of the same size
 typedef struct {
-	unsigned	size;
-	BBitmap *	bitmap[8];
+	unsigned size;
+	BBitmap* bitmap[8];
 } BDBitmapSet;
 
 class ButtonDecorator : public BArchivable {
-
 private:
-
-	void	_calc_rects(BView *view, BRect **picture, BRect **label);
-	void	_delete_bitmap_set(int num);
-	int		_get_real_pic_index(int status);
-	void	_init(void);
-	void	_select_current_set(void);
+	void _calc_rects(BView* view, BRect** picture, BRect** label);
+	void _delete_bitmap_set(int num);
+	int _get_real_pic_index(int status);
+	void _init(void);
+	void _select_current_set(void);
 
 	// Content
-	vector<BDBitmapSet*>	fBitmaps;
-	BDBitmapSet *			fCurrentSet;
-	char *					fLabel;
+	vector<BDBitmapSet*> fBitmaps;
+	BDBitmapSet* fCurrentSet;
+	char* fLabel;
 
 	// Content properties
-	BDVisible		fVisible;
-	float			fPictureSize;
-	BDPictureType	fPictureType;
+	BDVisible fVisible;
+	float fPictureSize;
+	BDPictureType fPictureType;
 
 	// Position and alignment
-	BDPosition	fPosition;
-	BDAlignment	fAlign;
+	BDPosition fPosition;
+	BDAlignment fAlign;
 
 	// Spacing and margins
-	float	fSpacing;
-	float	fMarginLeft, fMarginTop, fMarginRight, fMarginBottom;
+	float fSpacing;
+	float fMarginLeft, fMarginTop, fMarginRight, fMarginBottom;
 
 	// Needs update?
-	bool	fNeedsUpdate;
+	bool fNeedsUpdate;
 
 protected:
-
-	virtual	void	DrawLabel(BView *view, BRect rect, int status);
-	virtual	void	DrawPicture(BView *view, BRect rect, int status);
+	virtual void DrawLabel(BView* view, BRect rect, int status);
+	virtual void DrawPicture(BView* view, BRect rect, int status);
 
 public:
-
-			ButtonDecorator(const char *label, BBitmap *picture,
-				BDPosition position);
-			ButtonDecorator(BMessage *archive);
-	virtual	~ButtonDecorator();
+	ButtonDecorator(const char* label, BBitmap* picture, BDPosition position);
+	ButtonDecorator(BMessage* archive);
+	virtual ~ButtonDecorator();
 
 	// BArchivable hooks
-	static	BArchivable *	Instantiate(BMessage *archive);
-	virtual	status_t		Archive(BMessage *archive, bool deep = true) const;
+	static BArchivable* Instantiate(BMessage* archive);
+	virtual status_t Archive(BMessage* archive, bool deep = true) const;
 
 	// Picture
-			void	GetPicture(BBitmap *picture[8]);
-	virtual	bool	SetPicture(BBitmap *picture[8]);
-	virtual	void	DeletePicture(void);
+	void GetPicture(BBitmap* picture[8]);
+	virtual bool SetPicture(BBitmap* picture[8]);
+	virtual void DeletePicture(void);
 
 	// Special for bitmaps
-			unsigned		CountBitmapSets(void);
-			int				IndexOfBitmapSet(BDBitmapSet *set);
-			BDBitmapSet *	GetBitmapSet(unsigned size);
-			BDBitmapSet *	GetBitmapSetAt(unsigned index);
-			bool			DeleteBitmapSet(unsigned size);
-			bool			DeleteBitmapSetAt(unsigned index);
+	unsigned CountBitmapSets(void);
+	int IndexOfBitmapSet(BDBitmapSet* set);
+	BDBitmapSet* GetBitmapSet(unsigned size);
+	BDBitmapSet* GetBitmapSetAt(unsigned index);
+	bool DeleteBitmapSet(unsigned size);
+	bool DeleteBitmapSetAt(unsigned index);
 
 	// Label
-	const char *	Label(void);
-	void			SetLabel(const char *label);
+	const char* Label(void);
+	void SetLabel(const char* label);
 
 	// Content properties
-			BDVisible		Visible(void);
-	virtual	bool			SetVisible(BDVisible visible);
-			float			PictureSize(void);
-	virtual	bool			SetPictureSize(float size);
-			BDPictureType	PictureType(void);
+	BDVisible Visible(void);
+	virtual bool SetVisible(BDVisible visible);
+	float PictureSize(void);
+	virtual bool SetPictureSize(float size);
+	BDPictureType PictureType(void);
 
 	// Position and alignment
-			BDPosition	Position(void);
-	virtual	bool		SetPosition(BDPosition position);
-			BDAlignment	Alignment(void);
-	virtual	bool		SetAlignment(BDAlignment align);
+	BDPosition Position(void);
+	virtual bool SetPosition(BDPosition position);
+	BDAlignment Alignment(void);
+	virtual bool SetAlignment(BDAlignment align);
 
 	// Spacing and margins
-			float	Spacing(void);
-	virtual	bool	SetSpacing(float);
-			void	Margins(float *left, float *top, float *right,
-						float *bottom);
-	virtual	bool	SetMargins(float left, float top, float right,
-						float bottom);
+	float Spacing(void);
+	virtual bool SetSpacing(float);
+	void Margins(float* left, float* top, float* right, float* bottom);
+	virtual bool SetMargins(float left, float top, float right, float bottom);
 
 	// Methods
-	virtual	void	GetPreferredSize(BView *view, float *width, float *height);
-	virtual	void	Draw(BView *view, BRect rect, int status);
-	virtual	bool	NeedsUpdate(void);
+	virtual void GetPreferredSize(BView* view, float* width, float* height);
+	virtual void Draw(BView* view, BRect rect, int status);
+	virtual bool NeedsUpdate(void);
 };
 
 
@@ -220,4 +212,4 @@ public:
  *
  */
 
-#endif // __BUTTONDECORATOR_H__
+#endif	// __BUTTONDECORATOR_H__

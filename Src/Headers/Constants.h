@@ -9,28 +9,28 @@
 
 #include <be/interface/View.h>
 
-static bool CompareColors(const rgb_color a, const rgb_color b)
+static bool
+CompareColors(const rgb_color a, const rgb_color b)
 {
-	return a.red == b.red
-		&& a.green == b.green
-		&& a.blue == b.blue
-		&& a.alpha == b.alpha;
+	return a.red == b.red && a.green == b.green && a.blue == b.blue && a.alpha == b.alpha;
 }
 
-inline bool operator==(const rgb_color &a, const rgb_color &b)
+inline bool
+operator==(const rgb_color& a, const rgb_color& b)
 {
 	return CompareColors(a, b);
 }
 
-inline bool operator!=(rgb_color &a, rgb_color &b)
+inline bool
+operator!=(rgb_color& a, rgb_color& b)
 {
 	return !CompareColors(a, b);
 }
 
-#define TEX_FILETYPE					"text/x-tex"
-#define APP_SIG							"application/x-vnd.mik-BeTeX"
-#define GREEK_SYMBOL_FONT_FAMILY		"rtxmi"
-#define GREEK_SYMBOL_FONT_STYLE			"Medium"
+#define TEX_FILETYPE "text/x-tex"
+#define APP_SIG "application/x-vnd.mik-BeTeX"
+#define GREEK_SYMBOL_FONT_FAMILY "rtxmi"
+#define GREEK_SYMBOL_FONT_STYLE "Medium"
 
 // clang-format off
 //lower case letters
@@ -277,5 +277,5 @@ namespace InterfaceConstants
 };
 
 // clang-format on
- 
+
 #endif

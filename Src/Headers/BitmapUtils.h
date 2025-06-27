@@ -20,11 +20,10 @@ class BBitmap;
 
 class BitmapUtils {
 public:
+	static BBitmap* Grayscale(BBitmap* bitmap);
 
-	static	BBitmap *	Grayscale(BBitmap *bitmap);
-
-	static	BBitmap *	LoadFromResource(const char *name);
-	static	BBitmap *	LoadFromResource(int32 id);
+	static BBitmap* LoadFromResource(const char* name);
+	static BBitmap* LoadFromResource(int32 id);
 };
 
-#endif // __BITMAPUTILS_H__
+#endif	// __BITMAPUTILS_H__

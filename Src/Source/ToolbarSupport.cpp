@@ -39,9 +39,11 @@
  * @param[in] inset Leave \c false if you want a raised border, \c true for an
  *                  inset border
  */
-void WToolbarSupport::Draw3DBorder(BView *view, BRect rect, bool inset)
+void
+WToolbarSupport::Draw3DBorder(BView* view, BRect rect, bool inset)
 {
-	if (view == NULL || !(rect.IsValid())) return;
+	if (view == NULL || !(rect.IsValid()))
+		return;
 
 	rgb_color lighter, light, dark, shadow;
 	float l, t, r, b;
@@ -68,8 +70,7 @@ void WToolbarSupport::Draw3DBorder(BView *view, BRect rect, bool inset)
 		view->AddLine(BPoint(l, t), BPoint(r, t), shadow);
 		view->AddLine(BPoint(l + 1, t + 1), BPoint(l + 1, b - 1), dark);
 		view->AddLine(BPoint(l + 1, t + 1), BPoint(r - 1, t + 1), dark);
-	}
-	else {
+	} else {
 		view->AddLine(BPoint(l, t), BPoint(r - 1, t), lighter);
 		view->AddLine(BPoint(l, t), BPoint(l, b - 1), lighter);
 		view->AddLine(BPoint(l + 1, t + 1), BPoint(r - 2, t + 1), light);

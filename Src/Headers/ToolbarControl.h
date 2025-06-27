@@ -34,36 +34,34 @@ class WToolbar;
 // =============================================================================
 
 class WToolbarControl : public WToolbarItem, public BInvoker {
-friend class WToolbar;
+	friend class WToolbar;
+
 private:
-			void			_init_object(void);
-			bool			fEnabled;
+	void _init_object(void);
+	bool fEnabled;
+
 public:
-							WToolbarControl(const char *name = NULL,
-								BMessage *message = NULL);
-							WToolbarControl(BMessage *archive);
-	virtual					~WToolbarControl();
+	WToolbarControl(const char* name = NULL, BMessage* message = NULL);
+	WToolbarControl(BMessage* archive);
+	virtual ~WToolbarControl();
 
 	// BArchivable hooks
-	virtual	status_t		Archive(BMessage *archive,
-								bool deep = true) const;
-	static	BArchivable *	Instantiate(BMessage *archive);
+	virtual status_t Archive(BMessage* archive, bool deep = true) const;
+	static BArchivable* Instantiate(BMessage* archive);
 
 	// WToolbarItem hooks
-	virtual	void			AttachedToToolbar(void);
-	virtual	void			DetachedFromToolbar(void);
-	virtual	void			Draw(BView *canvas, BRect updateRect);
-	virtual	void			GetPreferredSize(float *width,
-								float *height);
-	virtual	void			MouseDown(BPoint point);
-	virtual	void			MouseMoved(BPoint point, uint32 transit,
-								const BMessage *message);
-	virtual	void			MouseUp(BPoint point);
-	virtual	void			Update(void);
+	virtual void AttachedToToolbar(void);
+	virtual void DetachedFromToolbar(void);
+	virtual void Draw(BView* canvas, BRect updateRect);
+	virtual void GetPreferredSize(float* width, float* height);
+	virtual void MouseDown(BPoint point);
+	virtual void MouseMoved(BPoint point, uint32 transit, const BMessage* message);
+	virtual void MouseUp(BPoint point);
+	virtual void Update(void);
 
 	// Other methods
-			bool			Enabled(void);
-	virtual	void			SetEnabled(bool enabled);
+	bool Enabled(void);
+	virtual void SetEnabled(bool enabled);
 };
 
-#endif // _TOOLBAR_CONTROL_H_
+#endif	// _TOOLBAR_CONTROL_H_
