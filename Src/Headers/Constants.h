@@ -32,6 +32,7 @@ inline bool operator!=(rgb_color &a, rgb_color &b)
 #define GREEK_SYMBOL_FONT_FAMILY		"rtxmi"
 #define GREEK_SYMBOL_FONT_STYLE			"Medium"
 
+// clang-format off
 //lower case letters
 namespace GreekSymbolConstants
 {
@@ -47,10 +48,10 @@ namespace GreekSymbolConstants
 			K_GREEK_SYMBOL_IOTA =			19,
 			K_GREEK_SYMBOL_KAPPA =			20,
 			K_GREEK_SYMBOL_LAMBDA =			21,
-			K_GREEK_SYMBOL_MU =				22,
-			K_GREEK_SYMBOL_NU =				23,
-			K_GREEK_SYMBOL_XI =				24,
-			K_GREEK_SYMBOL_PI =				25,
+			K_GREEK_SYMBOL_MU =			22,
+			K_GREEK_SYMBOL_NU =			23,
+			K_GREEK_SYMBOL_XI =			24,
+			K_GREEK_SYMBOL_PI =			25,
 			K_GREEK_SYMBOL_RHO =			26,
 			K_GREEK_SYMBOL_SIGMA =			27,
 			K_GREEK_SYMBOL_TAU =			28,
@@ -66,20 +67,20 @@ namespace GreekSymbolConstants
 namespace ColorConstants
 {
 	const rgb_color	
-			K_BLACK =						{0,0,0,255},
-			K_WHITE = 						{255,255,255,255},
-			K_RED = 						{255,0,0,255},
-			K_BLUE = 						{0,0,255,255},
+			K_BLACK =					{0,0,0,255},
+			K_WHITE = 					{255,255,255,255},
+			K_RED = 					{255,0,0,255},
+			K_BLUE = 					{0,0,255,255},
 			K_MAGENTA = 					{255,0,255,255},
-			K_YELLOW = 						{254,202,0,255},
-			K_GREEN = 						{0,150,113,255},
-			K_PURPLE = 						{136,0,156,255},
+			K_YELLOW = 					{254,202,0,255},
+			K_GREEN = 					{0,150,113,255},
+			K_PURPLE = 					{136,0,156,255},
 			K_NAVY_BLUE = 					{50,0,150,255},
-			K_ORANGE = 						{255,174,0,255},
+			K_ORANGE = 					{255,174,0,255},
 			K_BUBBLE_DEFAULT = 				{255,255,200,255},
 			/*BeOS Colors*/
-			K_BE_BLUE_BACKGROUND =			{51,102,152,255},
-			K_BE_BLUE_STATUS_BAR =			{51,152,255,255},
+			K_BE_BLUE_BACKGROUND =				{51,102,152,255},
+			K_BE_BLUE_STATUS_BAR =				{51,152,255,255},
 			K_BE_BLUE_FOCUS =				{0,0,229,255},
 			K_BE_YELLOW_TAB =				{255,203,0,255},
 			K_BE_GREY_PANEL =				{216,216,216,255},
@@ -98,13 +99,13 @@ namespace ColorConstants
 			K_SPECTRUM_INDIGO =				{25,0,60,255},
 			K_SPECTRUM_PURPLE =				{105,0,84,255},			
 			//Metal
-			K_GOLD   =						{234,209,0,255},
-			K_SILVER =						{226,226,226,255},
-			K_COPPER =						{213,100,0,255},
+			K_GOLD   =					{234,209,0,255},
+			K_SILVER =					{226,226,226,255},
+			K_COPPER =					{213,100,0,255},
 			K_ORICHALCHUM =					{255,174,0},
 			
 			//UI color constants			
-			K_UNSAVED_TEXT_COLOR =			{0,0,255}
+			K_UNSAVED_TEXT_COLOR =				{0,0,255}
 			;
 };
 
@@ -112,28 +113,28 @@ namespace MenuConstants
 {
 	//File Menu
 	const uint32 
-			K_MENU_FILE_NEW =				'mfnw',
-			K_MENU_FILE_OPEN =				'mfop',
+			K_MENU_FILE_NEW =			'mfnw',
+			K_MENU_FILE_OPEN =			'mfop',
 			K_MENU_FILE_OPEN_RECENT =		'mfor',
 			K_MENU_FILE_OPEN_TEMPLATE =		'mfot',
 			K_MENU_FILE_OPEN_FOLDER =		'mfof',
 			K_UPDATE_RECENT_DOCS =			'udrd',
-			K_MENU_FILE_CLOSE =				'mfcl',
-			K_MENU_FILE_SAVE =				'mfsv',
+			K_MENU_FILE_CLOSE =			'mfcl',
+			K_MENU_FILE_SAVE =			'mfsv',
 			K_MENU_FILE_SAVEAS =			'mfsa',
 			K_MENU_FILE_NEXT_ITEM =			'mfni',
 			K_MENU_FILE_PREV_ITEM =			'mfpi',
 			K_MENU_FILE_PAGE_SETUP =		'mfps',
-			K_MENU_FILE_PRINT =				'mfpr',
-			K_MENU_FILE_PREFS =				'mfpf',
-			K_MENU_FILE_ABOUT =				'mfab',
-			K_MENU_FILE_QUIT =				'mfqt'
+			K_MENU_FILE_PRINT =			'mfpr',
+			K_MENU_FILE_PREFS =			'mfpf',
+			K_MENU_FILE_ABOUT =			'mfab',
+			K_MENU_FILE_QUIT =			'mfqt'
 			;
 
 	//Edit Menu
 	const uint32 
-			K_MENU_EDIT_UNDO =				'meun',
-			K_MENU_EDIT_REDO =				'mere',
+			K_MENU_EDIT_UNDO =			'meun',
+			K_MENU_EDIT_REDO =			'mere',
 			K_MENU_EDIT_SEARCH =			'mesh',
 			K_MENU_EDIT_GOTOLINE =			'megl'
 			;
@@ -146,23 +147,23 @@ namespace MenuConstants
 			K_MENU_FORMAT_SHIFT_LEFT =		'ftsl',
 			K_MENU_FORMAT_SHIFT_RIGHT =		'ftsr',
 			K_MENU_FORMAT_COMMENTLINE =		'ftcl',
-			K_MENU_FORMAT_UNCOMMENTLINE =	'ftul',
-			K_MENU_FORMAT_RESET_LAYOUT =	'rlmf'
+			K_MENU_FORMAT_UNCOMMENTLINE =		'ftul',
+			K_MENU_FORMAT_RESET_LAYOUT =		'rlmf'
 			;
 			
 	//Insert Menu
 	const uint32
 			K_MENU_INSERT_FILE =			'mife',
-			K_MENU_INSERT_FILE_RECEIVED =	'frim',
+			K_MENU_INSERT_FILE_RECEIVED =		'frim',
 			K_MENU_INSERT_DATE =			'mide',
 			K_MENU_INSERT_ARRAY =			'miay',
-			K_MENU_INSERT_ARRAY_WITHDIM =	'aywd',
+			K_MENU_INSERT_ARRAY_WITHDIM =		'aywd',
 			K_MENU_INSERT_MATRIX =			'mimx',
-			K_MENU_INSERT_MATRIX_WITHDIM =	'mxwd',
+			K_MENU_INSERT_MATRIX_WITHDIM =		'mxwd',
 			K_MENU_INSERT_TABULAR =			'mitr',
-			K_MENU_INSERT_TABULAR_WITHDIM =	'trwd',
+			K_MENU_INSERT_TABULAR_WITHDIM =		'trwd',
 			K_MENU_INSERT_EQUATION =		'mien', 
-			K_MENU_INSERT_COLORED_TEXT =	'mict',
+			K_MENU_INSERT_COLORED_TEXT =		'mict',
 			K_MENU_INSERT_ITEMIZE =			'miit',
 			K_MENU_INSERT_DESCRIPTION =		'midn',
 			K_MENU_INSERT_ENUMERATE =		'miee',
@@ -172,7 +173,7 @@ namespace MenuConstants
 			K_MENU_INSERT_FIGURE =			'mifg',
 			K_MENU_INSERT_TABLE =			'mitb',
 			K_MENU_INSERT_EQNARRAY =		'miea',
-			K_MENU_INSERT_EQNARRAY_STAR =	'mies',
+			K_MENU_INSERT_EQNARRAY_STAR =		'mies',
 			K_MENU_INSERT_VERBATIM =		'mivb',
 			K_MENU_INSERT_QUOTE =			'miqt'
 			;
@@ -196,13 +197,13 @@ namespace ToolbarConstants
 			K_CMD_LAUNCH_PSVIEWER =			'lpsv',
 			K_CMD_LAUNCH_BE_PDF =			'lbpf',
 			K_CMD_LAUNCH_HTMLVIEWER =		'lhlv',
-			K_UPDATE_TEXTVIEW_SHORTCUTS =	'udts'
+			K_UPDATE_TEXTVIEW_SHORTCUTS =		'udts'
 			;
 };
 
 namespace AboutMessages
 {
-	const uint32 K_ABOUT_WINDOW_QUIT =				'abwq',
+	const uint32 K_ABOUT_WINDOW_QUIT =					'abwq',
 			K_ABOUT_WINDOW_LAUNCH = 				'abwg',
 			K_GOTO_BETEX_HOMEPAGE = 				'gtbh',
 			K_GOTO_BETEX_DONATEPAGE = 				'gtbd',
@@ -215,8 +216,8 @@ namespace SearchWindowConstants
 	const uint32 
 			K_SEARCH_WINDOW_FIND =					'swfd',
 			K_SEARCH_WINDOW_REPLACE =				'swrp',
-			K_SEARCH_WINDOW_REPLACE_ALL =			'swra',
-			K_SEARCH_WINDOW_SETTINGS_CHANGED =		'swsc',
+			K_SEARCH_WINDOW_REPLACE_ALL =				'swra',
+			K_SEARCH_WINDOW_SETTINGS_CHANGED =			'swsc',
 			K_SEARCH_WINDOW_QUIT =					'swqt'
 			;
 };
@@ -226,7 +227,7 @@ namespace ColorPrefsConstants
 	const uint32 
 			K_COLOR_WINDOW_QUIT =					'clrq',
 			K_COLOR_PREFS_UPDATE =					'cput',
-			K_COLOR_PREFS_OK =						'cpok',
+			K_COLOR_PREFS_OK =					'cpok',
 			K_COLOR_PREFS_CANCEL =					'cpcl'
 			;
 };
@@ -234,14 +235,14 @@ namespace ColorPrefsConstants
 namespace PrefsConstants
 {
 	const uint32 
-			K_PREFS_UPDATE =						'PVud',
-			K_PREFS_VIEW_OK =						'pvok',
+			K_PREFS_UPDATE =					'PVud',
+			K_PREFS_VIEW_OK =					'pvok',
 			K_PREFS_VIEW_CANCEL =					'pvcl',
-			K_PREFS_VIEW_RESET_COLOR_DEFAULTS = 	'pcrd',
-			K_PREFS_VIEW_RESET_COMMAND_DEFAULTS =	'pcmd',
-			K_PREFS_VIEW_RESET_TOOLBAR_DEFAULTS =	'pvrt',			
-			K_PREFS_VIEW_RESET_GENERAL_DEFAULTS =	'pcgd',
-			K_PREFS_WINDOW_QUIT =				'pfwq'
+			K_PREFS_VIEW_RESET_COLOR_DEFAULTS = 			'pcrd',
+			K_PREFS_VIEW_RESET_COMMAND_DEFAULTS =			'pcmd',
+			K_PREFS_VIEW_RESET_TOOLBAR_DEFAULTS =			'pvrt',
+			K_PREFS_VIEW_RESET_GENERAL_DEFAULTS =			'pcgd',
+			K_PREFS_WINDOW_QUIT =					'pfwq'
 			;
 			
 	const uint32
@@ -257,22 +258,24 @@ namespace InterfaceConstants
 	const uint32 
 			K_CMD_TBUTTON_INSERT =					'ctbi',
 			K_HANDLE_HIERARCHY =					'hier',
-			K_ANALYSE_TEXVIEW =						'atxv',
-			K_PARSE_LINE =							'psln',
-			K_UPDATE_CLIPBOARD_MENU_STATUS =		'ucms',
+			K_ANALYSE_TEXVIEW =					'atxv',
+			K_PARSE_LINE =						'psln',
+			K_UPDATE_CLIPBOARD_MENU_STATUS =			'ucms',
 			K_UPDATE_STATUSBAR =					'udsb',
 			K_UNDO_HIGHLIGHTING =					'udhl',
 			K_FILE_CONTENTS_CHANGED =				'fcch',
-			K_GTL_WINDOW_GO =						'glwg',
-			K_GTL_WINDOW_QUIT =						'glwq',
-			K_RESET_ALL_TEX_VIEW_COLORS =			'ratc',
-			K_RESET_ALL_TEX_VIEW_FONTS =			'ratf',
+			K_GTL_WINDOW_GO =					'glwg',
+			K_GTL_WINDOW_QUIT =					'glwq',
+			K_RESET_ALL_TEX_VIEW_COLORS =				'ratc',
+			K_RESET_ALL_TEX_VIEW_FONTS =				'ratf',
 			K_SPAN_WINDOW_LAUNCH =					'spwl',
 			K_SPAN_WINDOW_QUIT =					'spwq',
-			K_DIM_WINDOW_OK =						'dwok',
+			K_DIM_WINDOW_OK =					'dwok',
 			K_DIM_WINDOW_CANCEL =					'dwcl',
-			K_DIM_WINDOW_QUIT =						'dwqt'
+			K_DIM_WINDOW_QUIT =					'dwqt'
 			;
 };
+
+// clang-format on
  
 #endif
