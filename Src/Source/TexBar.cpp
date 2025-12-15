@@ -811,7 +811,7 @@ TexBar::Tile(BView* v, bool IsOnlyResizing)
 			AddChild(IntlHeader);
 		}
 		//	if(!IsGreekAbsent || !IsBigAbsent || !IsBinaryAbsent || !IsMiscAbsent ||
-		//!IsBinRelAbsent|| !IsMMAAbsent)
+		//! IsBinRelAbsent|| !IsMMAAbsent)
 		//	{
 
 		IntlHeader->MoveTo(tiler.LeftTop());
