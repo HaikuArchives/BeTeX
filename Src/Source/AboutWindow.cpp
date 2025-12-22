@@ -129,13 +129,14 @@ AboutWindow::AboutWindow(BRect frame, BMessenger* messenger)
 
 	BMessenger mymsnger(this);
 	BMessage increment(UPDATE_COLORS);
-	BMessageRunner* run = new BMessageRunner(mymsnger, &increment, UPDATE_TIME, -1);
+	m_run = new BMessageRunner(mymsnger, &increment, UPDATE_TIME, -1);
 	m_msgr = messenger;
 }
 
 AboutWindow::~AboutWindow()
 {
 	delete m_msgr;
+	delete m_run;
 }
 
 void
@@ -198,7 +199,7 @@ AboutWindow::MessageReceived(BMessage* msg)
 		} break;
 		case AboutMessages::K_GOTO_BETEX_DONATEPAGE:
 		{
-			const char* url = "http://www.haiku-inc.org/donate";
+			const char* url = "https://www.haiku-inc.org/donate";
 			be_roster->Launch("text/html", 1, (char**)&url);
 			Quit();
 		} break;

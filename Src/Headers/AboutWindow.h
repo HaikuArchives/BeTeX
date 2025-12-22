@@ -45,7 +45,7 @@ public:
 private:
 	AboutView* m_about;
 	BMessenger* m_msgr;
-
+	BMessageRunner* m_run;
 	BButton *m_homePage, *m_donate, *m_beBits, *m_quit;
 
 	GradientView* m_gradient;
