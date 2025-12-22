@@ -7,7 +7,6 @@
 #include <be/interface/Rect.h>
 #include <be/interface/TextView.h>
 #include <be/storage/Entry.h>
-#include <be/storage/File.h>
 #include <be/support/String.h>
 
 #include <Messenger.h>

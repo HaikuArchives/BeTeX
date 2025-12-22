@@ -6,8 +6,6 @@
 #include <be/interface/MenuItem.h>
 #include <be/interface/Rect.h>
 #include <be/interface/ScrollView.h>
-#include <be/interface/View.h>
-#include <be/interface/Window.h>
 #include <be/storage/FilePanel.h>
 #include <be/storage/FindDirectory.h>
 #include <be/storage/NodeMonitor.h>
@@ -17,9 +15,9 @@
 using std::vector;
 
 #include "AboutWindow.h"
-#include "BubbleHelper.h"
 #include "ColorWindow.h"
 #include "DimensionWindow.h"
+#include "DocView.h"
 #include "GoToLineWindow.h"
 #include "MainTBar.h"
 #include "PrefsWindow.h"
@@ -29,8 +27,6 @@ using std::vector;
 #include "SplitPane.h"
 #include "StatusBar.h"
 #include "TexBar.h"
-#include "TexView.h"
-#include "iconheaders/ConverterIcons.h"
 
 class MainWindow : public BWindow {
 public:

@@ -8,6 +8,7 @@
 #define ABOUT_WINDOW_H
 
 #include <be/app/Message.h>
+#include <be/app/MessageRunner.h>
 #include <be/app/Messenger.h>
 #include <be/interface/Bitmap.h>
 #include <be/interface/Button.h>
@@ -17,7 +18,7 @@
 #include "GradientView.h"
 
 const uint32 UPDATE_COLORS = 'updt';
-const int32 UPDATE_TIME = 100;
+const int32 UPDATE_TIME = 2000;
 
 class AboutView : public BView {
 public:

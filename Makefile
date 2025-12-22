@@ -114,7 +114,7 @@ LOCAL_INCLUDE_PATHS =  Src/Source \
 
 #	Specify the level of optimization that you want. Specify either NONE (O0),
 #	SOME (O1), FULL (O2), or leave blank (for the default optimization level).
-OPTIMIZE := NONE
+OPTIMIZE := FULL
 
 # 	Specify the codes for languages you are going to support in this
 # 	application. The default "en" one must be provided too. "make catkeys"

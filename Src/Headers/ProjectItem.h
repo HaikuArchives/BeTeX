@@ -10,7 +10,6 @@
 #include <be/interface/ListItem.h>
 #include <be/interface/Rect.h>
 #include <be/interface/ScrollView.h>
-#include <be/interface/View.h>
 #include <be/storage/Path.h>
 
 

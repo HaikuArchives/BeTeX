@@ -21,6 +21,7 @@ PrefsListView::PrefsListView(BRect frame, BView* parent, BMessenger* messenger)
 }
 
 PrefsListView::~PrefsListView() {}
+
 void
 PrefsListView::SelectionChanged()
 {

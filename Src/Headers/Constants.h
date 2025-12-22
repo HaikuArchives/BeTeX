@@ -206,8 +206,7 @@ namespace AboutMessages
 	const uint32 K_ABOUT_WINDOW_QUIT =					'abwq',
 			K_ABOUT_WINDOW_LAUNCH = 				'abwg',
 			K_GOTO_BETEX_HOMEPAGE = 				'gtbh',
-			K_GOTO_BETEX_DONATEPAGE = 				'gtbd',
-			K_GOTO_BETEX_BEBITSPAGE = 				'gbbb'
+			K_GOTO_BETEX_DONATEPAGE = 				'gtbd'
 			;
 };
 
