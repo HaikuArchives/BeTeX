@@ -25,11 +25,6 @@ using std::cout;
 using std::endl;
 
 #include "Constants.h"
-#include "ConverterIcons.h"
-#include "DocView.h"
-#include "MainTBar.h"
-#include "MessageFields.h"
-#include "Preferences.h"
 #include "TexFileFilter.h"
 #include "Toolbar.h"
 #include "ToolbarButton.h"

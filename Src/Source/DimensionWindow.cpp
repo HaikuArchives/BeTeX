@@ -11,7 +11,6 @@
 #include <be/interface/Button.h>
 #include <be/interface/View.h>
 #include <ctype.h>
-#include <stdlib.h>
 #include "Constants.h"
 #include "MessageFields.h"
 

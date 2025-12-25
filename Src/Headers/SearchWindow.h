@@ -6,8 +6,6 @@
 #include <be/interface/CheckBox.h>
 #include <be/interface/Rect.h>
 #include <be/interface/ScrollView.h>
-#include <be/interface/View.h>
-#include <be/interface/Window.h>
 #include "TexView.h"
 
 class ParentView;

@@ -38,11 +38,11 @@ AboutView::Draw(BRect updateRect)
 	DrawBitmap(m_logo);
 	MovePenTo((updateRect.Width() - m_logo->Bounds().Width()) / 4, 0);
 
-	MovePenBy(0, 100);
+	MovePenBy(0, 90);
 	BPoint p = PenLocation();
 
 	BString about_line;
-	// about_line << "BeTeX " << BETEX_VERSION << " by Brent Miszalski";
+	about_line << "BeTeX " /*<< BETEX_VERSION <<*/ " by Brent Miszalski";
 	DrawString(about_line.String());  //.\nThanks to:\n\tEli Dayan\n\tMichael Pfeiffer\n");
 	MovePenTo(p);
 	MovePenBy(0, 20);
@@ -51,6 +51,9 @@ AboutView::Draw(BRect updateRect)
 	MovePenTo(p);
 	MovePenBy(font.StringWidth("Thanks To:   "), 20);
 	DrawString("Michael Pfeiffer");
+	MovePenTo(p);
+	MovePenBy(0, 40);
+	DrawString("Adapted to Haiku by Sylvain Kerjean");
 
 	updateRect = Bounds();
 	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
@@ -94,51 +97,46 @@ AboutWindow::AboutWindow(BRect frame, BMessenger* messenger)
 	AddChild(m_gradient = new GradientView(specRect, m_top, m_bottom));
 
 	BRect aboutRect = Bounds();
-	aboutRect.InsetBy(80, 60);
+	aboutRect.InsetBy(70, 60);
 	m_about = new AboutView(aboutRect);
 	m_about->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	m_gradient->AddChild(m_about);
 
 	int bwidth = 50;
 	int bheight = 30;
-	int bpad = 10;
-	BRect btnRect(frame.right - (2 * bpad) - bwidth, frame.bottom - (2 * bpad) - bheight,
-		frame.right - (2 * bpad), frame.bottom - (2 * bpad));
+	int bpad = (aboutRect.Width() - (60 + 120 + 50)) / 2;
+	BRect btnRect(
+		aboutRect.right - bwidth, frame.bottom - 15 - bheight, aboutRect.right, frame.bottom - 15);
 	m_quit
 		= new BButton(btnRect, "quitbtn", "OK", new BMessage(AboutMessages::K_ABOUT_WINDOW_QUIT));
 	m_quit->MakeDefault(true);
-	m_gradient->AddChild(m_quit);
 
-	bwidth = 100;
-	btnRect = BRect(frame.right - (2 * bpad) - bwidth, frame.bottom - (2 * bpad) - bheight,
-		frame.right - (2 * bpad), frame.bottom - (2 * bpad));
-	btnRect.OffsetBy(-(50 + (2 * bpad)), 0);
-
+	bwidth = 120;
+	btnRect = BRect(
+		aboutRect.right - bwidth, frame.bottom - 15 - bheight, aboutRect.right, frame.bottom - 15);
+	btnRect.OffsetBy(-(50 + bpad), 0);
 	m_homePage = new BButton(btnRect, "homepagebtn", "BeTeX Homepage",
 		new BMessage(AboutMessages::K_GOTO_BETEX_HOMEPAGE));
-	m_gradient->AddChild(m_homePage);
 
-	btnRect.OffsetBy(-(80 + (2 * bpad)), 0);
-	btnRect.right = btnRect.left + 80;
-	m_beBits = new BButton(
-		btnRect, "fBeBitsbtn", "BeBits Page", new BMessage(AboutMessages::K_GOTO_BETEX_BEBITSPAGE));
-	m_gradient->AddChild(m_beBits);
-
-	btnRect.OffsetBy(-(60 + (2 * bpad)), 0);
-	btnRect.right = btnRect.left + 60;
+	btnRect.OffsetBy(-(120 + bpad), 0);
+	btnRect.left = btnRect.right - 60;
 	m_donate = new BButton(
 		btnRect, "fDonatebtn", "Donate", new BMessage(AboutMessages::K_GOTO_BETEX_DONATEPAGE));
+
 	m_gradient->AddChild(m_donate);
+	m_gradient->AddChild(m_homePage);
+	m_gradient->AddChild(m_quit);
 
 	BMessenger mymsnger(this);
 	BMessage increment(UPDATE_COLORS);
-
+	m_run = new BMessageRunner(mymsnger, &increment, UPDATE_TIME, -1);
 	m_msgr = messenger;
 }
 
 AboutWindow::~AboutWindow()
 {
 	delete m_msgr;
+	delete m_run;
 }
 
 void
@@ -195,19 +193,13 @@ AboutWindow::MessageReceived(BMessage* msg)
 		} break;
 		case AboutMessages::K_GOTO_BETEX_HOMEPAGE:
 		{
-			const char* url = "http://misza.beosjournal.org";
-			be_roster->Launch("text/html", 1, (char**)&url);
-			Quit();
-		} break;
-		case AboutMessages::K_GOTO_BETEX_BEBITSPAGE:
-		{
-			const char* url = "http://www.bebits.com/app/3919";
+			const char* url = "https://github.com/HaikuArchives/BeTeX";
 			be_roster->Launch("text/html", 1, (char**)&url);
 			Quit();
 		} break;
 		case AboutMessages::K_GOTO_BETEX_DONATEPAGE:
 		{
-			const char* url = "http://misza.beosjournal.org/donate.html";
+			const char* url = "https://www.haiku-inc.org/donate";
 			be_roster->Launch("text/html", 1, (char**)&url);
 			Quit();
 		} break;

@@ -7,10 +7,6 @@
 #include <be/interface/CheckBox.h>
 #include <be/interface/Rect.h>
 #include <be/interface/Slider.h>
-#include <be/interface/StringView.h>
-#include <be/interface/TextControl.h>
-#include <be/interface/View.h>
-#include <be/interface/Window.h>
 
 #include "ColorButton.h"
 #include "Prefs.h"
